@@ -15,11 +15,11 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Strings for the quizaccess_heartbeat plugin.
- *
- * @package    quizaccess_heartbeat
- * @author     Amrata Ramchandani <ramchandani.amrata@gmail.com>
- * @copyright  2017, Indian Institute Of Technology,Bombay,India
+ * Strings for the quizaccess_heartbeatmonitor plugin.
+
+ * @package    quizaccess_heartbeatmonitor
+ * @author     P Sunthar, Amrata Ramchandani <ramchandani.amrata@gmail.com>, Kashmira Nagwekar
+ * @copyright  2017, Indian Institute Of Technology, Bombay, India
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -27,13 +27,5 @@
 defined('MOODLE_INTERNAL') || die();
 
 
-$string['attemptquiz'] = 'Attempt quiz now';
-$string['quizwillstartin'] = 'Quiz will start in';
-$string['days'] = 'days';
-$string['day'] = 'day';
-$string['hours'] = 'hours';
-$string['hour'] = 'hour';
-$string['minutes'] = 'minutes';
-$string['minute'] = 'minute';
 $string['pluginname'] = 'Hearbeat Monitor';
 

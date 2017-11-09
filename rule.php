@@ -47,7 +47,7 @@ class quizaccess_heartbeat extends quiz_access_rule_base {
         global $CFG, $PAGE, $SESSION;
 
 //         echo "<script src='http://127.0.0.1:3000/socket.io/socket.io.js'></script>";
-//         $PAGE->requires->js( new moodle_url('http://127.0.0.1:3000/socket.io/socket.io.js'), true );
+        $PAGE->requires->js( new moodle_url('http://127.0.0.1:3000/socket.io/socket.io.js'), true );
         $PAGE->requires->js( new moodle_url($CFG->wwwroot . '/mod/quiz/accessrule/heartbeat/client.js') );
 
 //----------------------echo javascript - works! --------------------------------------------------

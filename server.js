@@ -14,14 +14,23 @@ var io			 = require('socket.io').listen(http);
 console.log('In server.js');
 
 var port = 3000;
+var count = 0;
+var sockarr = [];
 
 var record = io.sockets.on('connection', function (socket) {	
 	// When the client emits the 'load' event, reply with the 
 	// number of people in this chat room
-	console.log(socket.id + ' socket connected');
+	count++;
+	sockarr[count] = socket;
+	console.log(count + ' - ' + socket.id + ' socket connected');
 	
 	socket.on('disconnect', function(){
-		console.log(socket.id + ' socket disconnected');
+		for (const [key, value] of Object.entries(sockarr)) {
+			if (value === socket) {
+				var index = key;
+			}
+		}
+		console.log(index + ' - ' + socket.id + ' socket disconnected');
 	});
 });
 
