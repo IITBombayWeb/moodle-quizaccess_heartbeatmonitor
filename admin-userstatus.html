@@ -1,0 +1,116 @@
+<html>
+<!--
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
+/**
+ * Admin module for quizaccess_heartbeatmonitor plugin.
+ *
+ * @package    quizaccess
+ * @subpackage heartbeatmonitor
+ * @author     P Sunthar, Amrata Ramchandani <ramchandani.amrata@gmail.com>, Kashmira Nagwekar
+ * @copyright  2017 IIT Bombay, India
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */ 
+ -->
+<head>
+    <title> User Status </title>
+
+    <!-- Jquery -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js"></script>
+    <style>
+        table {
+            font-family: arial, sans-serif;
+            border-collapse: collapse;
+            width: 50%;
+        }
+        td,th {
+            border: 1px solid #dddddd;
+            text-align: left;
+            padding: 8px;
+        }
+    </style>
+</head>
+
+<body>
+    <h3> Live status of users </h3><br>
+    <table id='livestatus'>
+        <tr>
+            <th> Username </th>
+            <th> Quiz ID </th>
+            <th> Room ID </th>
+            <th> Status </th>
+            <th> Amount of Online/Offline Time </th>
+        </tr>
+    </table>
+
+
+    <script>
+    function humanise(difference){
+        var days    = Math.floor(difference / (1000 * 60 * 60 * 24));
+        var hours   = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        var minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
+        var seconds = Math.floor((difference % (1000 * 60)) / 1000);
+        var time    = days + ' days, ' + hours + ' hrs, ' + minutes + ' mins, ' + seconds + ' secs' ;
+        return time;
+    }
+    
+    setInterval(function() {
+        $.get("/livestatus", function(livestatusinfo) {
+            for(i in livestatusinfo){
+                var username        = livestatusinfo[i].username;
+                var quizid          = livestatusinfo[i].quizid;
+                var roomid          = livestatusinfo[i].roomid;
+                var countConnSockID = livestatusinfo[i].count_connected_socketid;
+                var countDisconnSockID  = livestatusinfo[i].count_disconnected_socketid;
+                var maxConnTimestamp    = livestatusinfo[i].max_connected_timestamp;
+                var maxDisconnTimestamp = livestatusinfo[i].max_disconnected_timestamp;
+    
+                if(countConnSockID == countDisconnSockID) {
+                    var socketstatus        = "Disconnected";
+                    var timestampToConsider = maxDisconnTimestamp;
+                } else {
+                    if(countConnSockID > countDisconnSockID) {
+                        var socketstatus        = "Connected";
+                        var timestampToConsider = maxConnTimestamp;
+                    }
+                }
+    
+                var currentTimestamp    = new Date().getTime();
+                var diff                = currentTimestamp - timestampToConsider;
+                var onlineTime          = humanise(diff);
+        
+                if($('#'+roomid).length > 0) {
+                    $('#'+roomid).find('td:eq(3)').html(socketstatus);
+                    $('#'+roomid).find('td:eq(4)').html(onlineTime);
+                   //then update that row-> delete previous one or try to update it
+                } else {
+                   // new row addition
+                   var  row='<tr id=' + roomid
+                                + '><td>' + username
+                                + '</td><td>' + quizid
+                                + '</td><td>' + roomid
+                                + '</td><td>' + socketstatus
+                                + '</td><td>' + onlineTime
+                                + '</td></tr>';
+                    $("#livestatus").append(row);
+                }
+           }
+        });
+    }, 3000);
+    
+    </script>
+</body>
+</html>

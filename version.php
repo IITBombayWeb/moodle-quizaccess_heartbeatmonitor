@@ -17,9 +17,10 @@
 /**
  * Version information for the quizaccess_heartbeatmonitor plugin.
  *
- * @package    quizaccess_heartbeatmonitor
+ * @package    quizaccess
+ * @subpackage heartbeatmonitor
  * @author     P Sunthar, Amrata Ramchandani <ramchandani.amrata@gmail.com>, Kashmira Nagwekar
- * @copyright  2017, Indian Institute Of Technology, Bombay, India
+ * @copyright  2017 IIT Bombay, India
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
