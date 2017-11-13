@@ -49,7 +49,7 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
         $PAGE->requires->js( new moodle_url('http://127.0.0.1:3000/socket.io/socket.io.js'), true );
         $PAGE->requires->js( new moodle_url($CFG->wwwroot . '/mod/quiz/accessrule/heartbeatmonitor/client.js') );
 
-        $attemptid = optional_param('attempt', 0, PARAM_INT);
+        $attemptid = required_param('attempt', PARAM_INT);
         $sessionkey = sesskey();
         $userid = $_SESSION['USER']->id;
         $username = $_SESSION['USER']->username;

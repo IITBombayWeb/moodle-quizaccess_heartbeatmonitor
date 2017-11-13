@@ -68,7 +68,7 @@
                 var roomid      = socket[i].roomid;
                 var socketid    = socket[i].socketid;
                 var ip          = socket[i].ip;
-                if($('#'+socketid.slice(1, -1)).length > 0) {
+                if($('#'+socketid).length > 0) {
                     continue;
                 } else {
                     var row = '<tr id =' + socketid  

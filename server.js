@@ -63,7 +63,7 @@ var connsckts;
 app.get('/connectedsocketids', function(req, res) {
 //	console.log('-------------cir json obj------------------');
 //	console.log(connsckts);
-	res.send(CircularJSON.stringify(connsckts));
+	res.send(connsckts);
 })
 
 // Send deletedsockets array to the admin-socketinfo page.
@@ -85,13 +85,13 @@ var record = io.sockets.on('connection', function (socket) {
 		console.log('In attempt event');
 				
 		// Construct record for socket connected.
-	    socket.username 		= "'" + data.username + "'";
+	    socket.username 		= data.username;
 	    socket.quizid 			= data.quizid;
-	    socket.roomid 			= "'" + data.roomid + "'";
-	    socket.socketid 		= "'" + socket.id + "'";
-	    socket.statusConnected	= "'Connected'";
+	    socket.roomid 			= data.roomid;
+	    socket.socketid 		= socket.id;
+	    socket.statusConnected	= 'Connected';
 	    socket.timestampC		= socket.handshake.issued;
-	    socket.ip				= "'" + socket.request.connection.remoteAddress + "'";
+	    socket.ip				= socket.request.connection.remoteAddress;
 
 	    var socketobject = {  username : socket.username, 
 	    						quizid : socket.quizid, 
@@ -105,26 +105,13 @@ var record = io.sockets.on('connection', function (socket) {
 //	    connectedSockets.push(socketobject);
 //	    console.log(io.sockets.sockets);
 	    
-	    // Convert obj into JSON text to send it to the client.
-	    // Doesn't work..io.sockets.sockets obj has circular references in it.
-//	    connsckts = JSON.stringify(io.sockets.sockets); 
-	    
 	    // To convert obj with cir. ref. into JSON 
 	    // 1 - Using util ============================================
-//	    console.log('---------util--------'); 
-//	    console.log(typeof io.sockets.sockets);
 //	    convertedobj = util.inspect(io.sockets.sockets);
 //	    connsckts = JSON.stringify(convertedobj); 
-	    
-//		console.log('-------------connsckts obj------------------');
-//		console.log(typeof connsckts);
-		connsckts = io.sockets.connected;
-		
-//		console.log('-------------users-----------------');
-//		console.log(io.sockets.connected);
 		
 	    // 2 - Using CircularJSON ============================================
-//	    console.log(CircularJSON.stringify(io.sockets.sockets));
+	    connsckts = CircularJSON.stringify(io.sockets.connected);
 	    
 	    for(i=0; i<connectedSockets.length; i++) {
 	    	console.log('Connected sockets - ' + connectedSockets[i]);
@@ -132,12 +119,12 @@ var record = io.sockets.on('connection', function (socket) {
 	    
 	    // Insert connection record into database.
 	    var sql = "INSERT INTO socketinfo (username, quizid, roomid, socketid, socketstatus, ip, timestamp) VALUES" 
-	    				+ "(" + socket.username + "," 
-	    				+ socket.quizid + "," 
-	    				+ socket.roomid + "," 
-	    				+ socket.socketid + ","
-	    				+ socket.statusConnected + "," 
-	    				+ socket.ip + "," 
+	    				+ "('" + socket.username + "', " 
+	    				+ socket.quizid + ", '" 
+	    				+ socket.roomid + "', '" 
+	    				+ socket.socketid + "', '"
+	    				+ socket.statusConnected + "', '" 
+	    				+ socket.ip + "', " 
 	    				+ socket.timestampC + ")";
 	    con.query(sql, function (err, result) {
 	    	if (err) throw err;
@@ -157,7 +144,7 @@ var record = io.sockets.on('connection', function (socket) {
 		//=====================================================================
 		// Construct record for socket disconnected.
 		socket.timestampD = new Date().getTime();
-	    socket.statusDisconnected = "'Disconnected'";
+		socket.statusDisconnected = 'Disconnected';
 	    
 	    // Add to the deletedSockets array.
 	    deletedSockets.push(socket.id);
@@ -173,13 +160,13 @@ var record = io.sockets.on('connection', function (socket) {
 	    
 	    // Insert disconnection record into database.
 	    var sql = "INSERT INTO socketinfo (username, quizid, roomid, socketid, socketstatus, ip, timestamp) VALUES" 
-	    				+ "(" + socket.username + "," 
-	    				+ socket.quizid + "," 
-	    				+ socket.roomid + ","
-	    				+ socket.socketid + "," 
-	    				+ socket.statusDisconnected + ","
-	    				+ socket.ip + ","
-	    				+ socket.timestampD + ")";
+						+ "('" + socket.username + "', " 
+						+ socket.quizid + ", '" 
+						+ socket.roomid + "', '" 
+						+ socket.socketid + "', '"
+						+ socket.statusDisconnected + "', '" 
+						+ socket.ip + "', " 
+						+ socket.timestampD + ")";
 
 	    con.query(sql, function(err, result) {
 	    	if (err) throw err;
