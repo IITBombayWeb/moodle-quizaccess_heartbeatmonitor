@@ -48,14 +48,13 @@
     <h3> Live status of users </h3><br>
     <table id='livestatus'>
         <tr>
-            <th> Username </th>
-            <th> Quiz ID </th>
-            <th> Room ID </th>
-            <th> Status </th>
+            <th> Username   </th>
+            <th> Quiz ID    </th>
+            <th> Room ID    </th>
+            <th> Status     </th>
             <th> Amount of Online/Offline Time </th>
         </tr>
     </table>
-
 
     <script>
     function humanise(difference){
@@ -70,10 +69,10 @@
     setInterval(function() {
         $.get("/livestatus", function(livestatusinfo) {
             for(i in livestatusinfo){
-                var username        = livestatusinfo[i].username;
-                var quizid          = livestatusinfo[i].quizid;
-                var roomid          = livestatusinfo[i].roomid;
-                var countConnSockID = livestatusinfo[i].count_connected_socketid;
+                var username            = livestatusinfo[i].username;
+                var quizid              = livestatusinfo[i].quizid;
+                var roomid              = livestatusinfo[i].roomid;
+                var countConnSockID     = livestatusinfo[i].count_connected_socketid;
                 var countDisconnSockID  = livestatusinfo[i].count_disconnected_socketid;
                 var maxConnTimestamp    = livestatusinfo[i].max_connected_timestamp;
                 var maxDisconnTimestamp = livestatusinfo[i].max_disconnected_timestamp;
@@ -98,7 +97,7 @@
                    //then update that row-> delete previous one or try to update it
                 } else {
                    // new row addition
-                   var  row='<tr id=' + roomid
+                   var row = '<tr id=' + roomid
                                 + '><td>' + username
                                 + '</td><td>' + quizid
                                 + '</td><td>' + roomid

@@ -26,6 +26,8 @@
 var app 		= require('express')();
 var http 		= require('http').createServer(app);
 var io			= require('socket.io').listen(http);
+var util 		= require('util');
+var CircularJSON	= require('circular-json');
 
 var bodyParser 	= require('body-parser');
 var mysql 		= require('mysql');
@@ -56,27 +58,32 @@ app.get('/admin-userstatus', function (req, res) {
 
 // Send connectedsockets array to the admin-socketinfo page.
 var connectedSockets = [];
+var connsckts; 
+
 app.get('/connectedsocketids', function(req, res) {
-	res.send(connectedSockets);
+//	console.log('-------------json obj------------------');
+//	console.log(connsckts);
+	res.send(connsckts);
 })
 
 // Send deletedsockets array to the admin-socketinfo page.
-var deletedSockets =[];
+var deletedSockets = [];
 app.get('/deletedsocketids', function(req, res) {
 	res.send(deletedSockets);
 })
 //=================================================================================
 
 var record = io.sockets.on('connection', function (socket) {	
-	// When the client emits the 'load' event, reply with the 
-	// number of people in this chat room
+
 	count++;
 	sockarr[count] = socket;
 	console.log(count + ' - ' + socket.id + ' socket connected');
 	
+	console.log('count: ' + io.sockets.server.eio.clientsCount);
 	//============================================================
 	socket.on('attempt', function(data) {
-		console.log('In on attempt event');
+		console.log('In attempt event');
+				
 		// Construct record for socket connected.
 	    socket.username 		= "'" + data.username + "'";
 	    socket.quizid 			= data.quizid;
@@ -95,7 +102,22 @@ var record = io.sockets.on('connection', function (socket) {
 	    console.log('Socket object - ' + socketobject.username);
 	    
 	    // Add to the connectedSockets array.
-	    connectedSockets.push(socketobject);
+//	    connectedSockets.push(socketobject);
+//	    console.log(io.sockets.sockets);
+	    
+	    // Convert obj into JSON text to send it to the client.
+	    // Doesn't work..io.sockets.sockets obj has circular references in it.
+//	    connsckts = JSON.stringify(io.sockets.sockets); 
+	    
+	    // To convert obj with cir. ref. into JSON text
+	    // 1 - Using util ============================================
+//	    console.log('---------util--------'); 
+//	    console.log(util.inspect(io.sockets.sockets));
+	    convertedobj = util.inspect(io.sockets.sockets);
+	    connsckts = JSON.stringify(convertedobj); 
+	    
+	    // 2 - Using CircularJSON ============================================
+//	    console.log(CircularJSON.stringify(io.sockets.sockets));
 	    
 	    for(i=0; i<connectedSockets.length; i++) {
 	    	console.log('Connected sockets - ' + connectedSockets[i]);
@@ -112,7 +134,7 @@ var record = io.sockets.on('connection', function (socket) {
 	    				+ socket.timestampC + ")";
 	    con.query(sql, function (err, result) {
 	    	if (err) throw err;
-	    	console.log('Record for connected socket : '+socket.socketid+' is inserted into the db');
+	    	console.log('Record for connected socket : ' + socket.socketid + ' is inserted into the db');
 	    });
 	});
 	//============================================================
