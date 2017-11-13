@@ -61,9 +61,9 @@ var connectedSockets = [];
 var connsckts; 
 
 app.get('/connectedsocketids', function(req, res) {
-//	console.log('-------------json obj------------------');
+//	console.log('-------------cir json obj------------------');
 //	console.log(connsckts);
-	res.send(connsckts);
+	res.send(CircularJSON.stringify(connsckts));
 })
 
 // Send deletedsockets array to the admin-socketinfo page.
@@ -109,13 +109,20 @@ var record = io.sockets.on('connection', function (socket) {
 	    // Doesn't work..io.sockets.sockets obj has circular references in it.
 //	    connsckts = JSON.stringify(io.sockets.sockets); 
 	    
-	    // To convert obj with cir. ref. into JSON text
+	    // To convert obj with cir. ref. into JSON 
 	    // 1 - Using util ============================================
 //	    console.log('---------util--------'); 
-//	    console.log(util.inspect(io.sockets.sockets));
-	    convertedobj = util.inspect(io.sockets.sockets);
-	    connsckts = JSON.stringify(convertedobj); 
+//	    console.log(typeof io.sockets.sockets);
+//	    convertedobj = util.inspect(io.sockets.sockets);
+//	    connsckts = JSON.stringify(convertedobj); 
 	    
+//		console.log('-------------connsckts obj------------------');
+//		console.log(typeof connsckts);
+		connsckts = io.sockets.connected;
+		
+//		console.log('-------------users-----------------');
+//		console.log(io.sockets.connected);
+		
 	    // 2 - Using CircularJSON ============================================
 //	    console.log(CircularJSON.stringify(io.sockets.sockets));
 	    
