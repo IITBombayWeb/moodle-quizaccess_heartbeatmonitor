@@ -41,11 +41,11 @@ function client(Y, quizid, userid, username, attemptid, sessionkey)
 {
 	var socket = io('http://127.0.0.1:3000');
 //	alert('Hello World!' + sessionkey);	
-	var roomid = username + quizid;
+	var roomid = username + quizid + attemptid;
 	
 	socket.on('connect', function() {
 //		console.log("Connect function - client side");
-		socket.emit('attempt', { username:username, quizid:quizid, roomid:roomid });
+		socket.emit('attempt', { username:username, quizid:quizid, roomid:roomid, attemptid:attemptid });
 	});
 	
 }

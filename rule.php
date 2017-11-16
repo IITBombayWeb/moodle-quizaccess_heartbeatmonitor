@@ -46,9 +46,11 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
     public function setup_attempt_page($page) {
         global $CFG, $PAGE, $_SESSION;
 //         echo '<br><br><br>';
+
         $PAGE->requires->js( new moodle_url('http://127.0.0.1:3000/socket.io/socket.io.js'), true );
         $PAGE->requires->js( new moodle_url($CFG->wwwroot . '/mod/quiz/accessrule/heartbeatmonitor/client.js') );
 
+//         echo "<script>alert('hi');</script>";
         $attemptid = required_param('attempt', PARAM_INT);
         $sessionkey = sesskey();
         $userid = $_SESSION['USER']->id;
@@ -59,6 +61,5 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
 //         print_object($username);
 
         $PAGE->requires->js_init_call('client', array($quizid, $userid, $username, $attemptid, $sessionkey));
-
     }
 }
