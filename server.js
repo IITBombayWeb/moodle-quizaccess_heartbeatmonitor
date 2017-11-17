@@ -33,349 +33,184 @@ var bodyParser 	= require('body-parser');
 var mysql 		= require('mysql');
 
 var con = mysql.createConnection({
-	host 	 : "localhost",
-	user 	 : "root",
-	password : "root123",
-	database : "trialdb"
+	host : "localhost",
+	user : "root",
+	password : "root@mysql",
+	database : "trial"
 });
 
 app.use(bodyParser.urlencoded({ extended: true }));
 
-console.log('In server.js file');
+app.get('/admin-userstatus', function(req, res) {
+    res.sendFile(__dirname + '/admin-userstatus.html');
+});
 
 var port = 3000;
-var count = 0;
-var sockarr = [];
-
-//=================================================================================
-app.get('/admin-socketinfo', function (req, res) {
-	res.sendFile(__dirname + '/admin-socketinfo.html');
-});
-
-app.get('/admin-userstatus', function (req, res) {
-	res.sendFile(__dirname + '/admin-userstatus.html');
-});
-
-// Send connectedsockets array to the admin-socketinfo page.
-var connectedSockets = [];
-var connsckts; 
-
-app.get('/connectedsocketids', function(req, res) {
-//	console.log('-------------cir json obj------------------');
-//	console.log(connsckts);
-	res.send(connsckts);
-})
-
-// Send deletedsockets array to the admin-socketinfo page.
-var deletedSockets = [];
-app.get('/deletedsocketids', function(req, res) {
-	res.send(deletedSockets);
-})
-//=================================================================================
-
-var connow, prevdiscon, starttime, endtime, whattime;
-var slot = 0;
 
 var record = io.sockets.on('connection', function (socket) {	
+	console.log( socket.id + ' connected');
 	
-	count++;
-	sockarr[count] = socket;
-	console.log(count + ' - ' + socket.id + ' socket connected');
+  
 	
-//	console.log('total count: ' + io.sockets.server.eio.clientsCount);
-	
-	//============================================================
 	socket.on('attempt', function(data) {
-//		console.log('In attempt event');
-				
-		// Construct record for socket connected.
-	    socket.username 		= data.username;
-	    socket.quizid 			= data.quizid;
-	    socket.roomid 			= data.roomid;
-	    socket.socketid 		= socket.id;
-	    socket.statusConnected	= 'Connected';
-	    socket.timestampC		= socket.handshake.issued;
-	    socket.ip				= socket.request.connection.remoteAddress;
-	    
-	    connow = socket.timestampC;
-	    if(starttime !== undefined) {
-	    	if((connow - prevdiscon) > 2000) {
-		    	starttime = socket.timestampC;
-		    	console.log('starttime: ' + starttime);
-		    }
-	    } else {
-	    	var maxts, username, quizid, roomid, ip;
-	    	starttime = socket.timestampC;
-	    	console.log('starttime: ' + starttime);
-	    	console.log('prevdiscon: ' + prevdiscon);
-	    	
-	    	var sql1 = "select username, quizid, roomid, " + 
-							"max(case when socketstatus   = 'Disconnected' 	then timestamp end) as max_disconnected_timestamp " + 
-							"from socketinfo " + 
-							"where username = '" + socket.username + "' AND " + 
-							"quizid = " + socket.quizid + " AND " + 
-							"roomid = '" + socket.roomid + "' " + 
-							"group by username, quizid, roomid";
-							
-	    	
-	    	con.query(sql1, function (err, result) {
-		    	if (err) throw err;
-		    	console.log(result);
-		    	for (var i in result) {
-		    		username = result[i].username;
-		    		quizid = result[i].quizid;
-		    		roomid = result[i].roomid;
-//		    		ip = result[i].ip;
-					maxts = result[i].max_disconnected_timestamp;
-			    	console.log('maxts: ' + maxts);
-		    	}
-		    });
-	    	
-//	    	Query socketinfo2 for getting slot and ip
-//	    	var sql1 = "select username, quizid, roomid, " + 
-//			"max(case when socketstatus   = 'Disconnected' 	then timestamp end) as max_disconnected_timestamp " + 
-//			"from socketinfo " + 
-//			"where username = '" + socket.username + "' AND " + 
-//			"quizid = " + socket.quizid + " AND " + 
-//			"roomid = '" + socket.roomid + "' " + 
-//			"group by username, quizid, roomid";
-//			
-//
-//			con.query(sql1, function (err, result) {
-//				if (err) throw err;
-//				console.log(result);
-//				for (var i in result) {
-//					username = result[i].username;
-//					quizid = result[i].quizid;
-//					roomid = result[i].roomid;
-//				//	ip = result[i].ip;
-//					maxts = result[i].max_disconnected_timestamp;
-//					console.log('maxts: ' + maxts);
-//				}
-//			});
-	    	
-	    	var sql2 = "INSERT INTO socketinfo2 (username, quizid, roomid, slot, whattime, ip, timestamp) VALUES" 
-							+ "('" + username + "', " 
-							+ quizid + ", '" 
-							+ roomid + "', '" 
-							+ "1" + "', '"
-							+ "endtime" + "', '" 
-							+ "null" + "', " 
-							+ maxts + ")";
-			con.query(sql2, function (err, result) {
-				if (err) throw err;
-			//	console.log('Record for connected socket : ' + socket.socketid + ' is inserted into the db');
-			});
-	    	
-	    	// Insert connection record into database.
-	    	slot++;
-	    	whattime = 'starttime';
-		    var sql = "INSERT INTO socketinfo2 (username, quizid, roomid, slot, whattime, ip, timestamp) VALUES" 
-		    				+ "('" + socket.username + "', " 
-		    				+ socket.quizid + ", '" 
-		    				+ socket.roomid + "', '" 
-		    				+ slot + "', '"
-		    				+ whattime + "', '" 
-		    				+ socket.ip + "', " 
-		    				+ socket.timestampC + ")";
-		    con.query(sql, function (err, result) {
-		    	if (err) throw err;
-//		    	console.log('Record for connected socket : ' + socket.socketid + ' is inserted into the db');
-		    });
-	    	
-	    }
-	    	    
-	    
-	    // Rooms code start============================================================
-	    socket.join(data.roomid);
-//	    console.log("======/ Rooms Connect=========");
-	    var clients = io.sockets.adapter.rooms[data.roomid].sockets;   
-
-	    //to get the number of clients
-	    var numClients = (typeof clients !== 'undefined') ? Object.keys(clients).length : 0;
-	    console.log(data.roomid + ' room count: ' + numClients);
-//	    if(numClients == 1) {
-//	    	// Insert into db
-//	    }
-	    var s = 0;
-	    for (var clientId in clients) {
-	    	//this is the socket of each client in the room.
-	    	s++;
-	    	var clientSocket = io.sockets.connected[clientId];
-//	    	console.log('S' + s + ': ' + clientSocket.id + ' TS: ' + socket.timestampC);
-	    }
-//	    console.log("======Rooms Connect /=========");
-	    // Rooms code end============================================================
-
-	    var socketobject = {  username : socket.username, 
+	
+		    socket.username = "'" + data.username + "'";
+	        socket.quizid = data.quizid;
+	        socket.roomid = "'" + data.roomid + "'";
+	        socket.socketid = "'" + socket.id + "'";
+	        socket.statusConnected = "'Connected'";
+	        socket.timestampC = socket.handshake.issued;
+	        socket.ip = "'" + socket.request.connection.remoteAddress + "'";
+	        
+	     var socketobject = {  username : socket.username, 
 	    						quizid : socket.quizid, 
 	    						roomid : socket.roomid, 
 	    					  socketid : socket.id, 
 	    						    ip : socket.ip
 	    					};
-//	    console.log('Socket object - ' + socketobject.username);
-	    
-	    // Add to the connectedSockets array.
-//	    connectedSockets.push(socketobject);
-//	    console.log(io.sockets.sockets);
-	    
-	    // To convert obj with cir. ref. into JSON 
-	    // 1 - Using util ============================================
-//	    convertedobj = util.inspect(io.sockets.sockets);
-//	    connsckts = JSON.stringify(convertedobj); 
-		
-	    // 2 - Using CircularJSON ============================================
-	    connsckts = CircularJSON.stringify(io.sockets.connected);
-	    
-	    for(i=0; i<connectedSockets.length; i++) {
-//	    	console.log('Connected sockets - ' + connectedSockets[i]);
-	    }
-	    
+
 	    // Insert connection record into database.
-	    var sql = "INSERT INTO socketinfo (username, quizid, roomid, socketid, socketstatus, ip, timestamp) VALUES" 
-	    				+ "('" + socket.username + "', " 
-	    				+ socket.quizid + ", '" 
-	    				+ socket.roomid + "', '" 
-	    				+ socket.socketid + "', '"
-	    				+ socket.statusConnected + "', '" 
-	    				+ socket.ip + "', " 
-	    				+ socket.timestampC + ")";
-	    con.query(sql, function (err, result) {
-	    	if (err) throw err;
-//	    	console.log('Record for connected socket : ' + socket.socketid + ' is inserted into the db');
-	    });
+	     var sql = "INSERT INTO socketinfo (username,quizid,roomid,socketid,socketstatus,ip,timestamp) VALUES" +
+         			"(" + socket.username + "," + socket.quizid + "," + socket.roomid + "," + socket.socketid + 
+         			"," + socket.statusConnected + "," + socket.ip + "," + socket.timestampC + ")";
+	     con.query(sql, function(err, result) {
+			   if (err) throw err;
+			});
+
+	    //Joining the connected SID to the ROOM
+	    socket.join(socket.roomid);	   
+	    //Finding the total connected SIDs to the ROOM
+	    var totalconnectedsockets= io.sockets.adapter.rooms[socket.roomid].length;   
+
+	    if (totalconnectedsockets > 0) {
+	    	socket.livestatus = "'Live'";
+           
+	    	var liverecordexistsql = "Select * from livetable1 where roomid="+socket.roomid;
+     
+	    	con.query(liverecordexistsql, function(err, result) {
+                if (err) throw err;
+                if (result.length > 0) {
+
+                    for (i in result) {
+                        status = result[i].status;
+                        timetoconsider = result[i].timetoconsider;
+                        var deadtime = result[i].deadtime;
+                        console.log(socket.roomid + ': Previous deadtime: ' + humanise(deadtime));
+                    }
+
+                    if (status == 'Dead') {
+                        console.log(socket.roomid + ': Current Deadtime is :' + humanise(socket.timestampC - timetoconsider));
+                        deadtime = parseInt(deadtime) + parseInt(socket.timestampC - timetoconsider);
+                        console.log(socket.roomid + ': After cumulation,deadtime is : ' + humanise(deadtime));
+
+                        var updatelivetablesql = "Update livetable1 set status=" + socket.livestatus + ",deadtime=" + deadtime +
+                                                 ",timetoconsider=" + socket.timestampC + " where roomid=" + socket.roomid;
+                        con.query(updatelivetablesql, function(err, result) {
+                            if (err) throw err;
+                        });
+                    }
+
+                } else {
+                    var livetablesql = "INSERT INTO livetable1 (roomid,status,timetoconsider,livetime,deadtime) VALUES" +
+                                      "(" + socket.roomid + "," + socket.livestatus + "," + socket.timestampC + ",0,0 )";
+                    con.query(livetablesql, function(err, result) {
+                        if (err) throw err;
+                    });
+                }
+            });
+          }
+	    
+
 	});
-	//============================================================
+	
 	
 	socket.on('disconnect', function() {
-		
-		for (const [key, value] of Object.entries(sockarr)) {
-			if (value === socket) {
-				var index = key;
-			}
-		}
-		console.log(index + ' - ' + socket.id + ' socket disconnected');
-//		console.log('count: ' + io.sockets.server.eio.clientsCount);
-		
-		//=====================================================================
+		console.log( socket.id + ' disconnected');
+				
 		// Construct record for socket disconnected.
 		socket.timestampD = new Date().getTime();
-		socket.statusDisconnected = 'Disconnected';
-		prevdiscon = socket.timestampD;
-//		console.log(socket);
-		//=========================My logic============================================
-//	    console.log("=========/ Rooms Disconnect========");
-//	    console.log('S: ' + socket.id + ' TS: ' + socket.timestampD);
-	    var rooms = io.sockets.adapter.rooms[socket.roomid]; 
-//	    console.log(rooms);
-
-	    //to get the number of clients
-//	    var numClients = (typeof clients !== 'undefined') ? Object.keys(clients).length : 0;
-	    if(typeof rooms !== 'undefined') {
-	    	var clients = io.sockets.adapter.rooms[socket.roomid].sockets;
-	    	var numClients = Object.keys(clients).length;
-	    	var s = 0;
-		    for (var clientId in clients) {
-		    	//this is the socket of each client in the room.
-		    	s++;
-		    	var clientSocket = io.sockets.connected[clientId];
-//		    	console.log('S' + s + ': ' + clientSocket.id + ' TS: ' + socket.timestampD);
-		    }
-	    } else {
-	    	var numClients = 0;
-	    }
-//	    console.log(socket.roomid + ' room count: ' + numClients);
-	    if(numClients == 0) {
-	    	// Insert into db
-	    }
-	    
-//	    console.log("=========Rooms Disconnect /========");
-	    //=============================================================================
-	    
-	    // Add to the deletedSockets array.
-	    deletedSockets.push(socket.id);
-
-	    // Find the index of the object having socket id which got disconnected.
-	    var index = connectedSockets.findIndex( function(o) {
-	        return o.id === socket.id;
-	    });
-	    
-	    // Remove the disconnected socket object from the connectedSockets array.
-	    if (index !== -1) connectedSockets.splice(index, 1);
-//	    console.log('Disconnected sockets - ' + deletedSockets);
-	    
+		socket.statusDisconnected = "'Disconnected'";
+	  	    
 	    // Insert disconnection record into database.
-	    var sql = "INSERT INTO socketinfo (username, quizid, roomid, socketid, socketstatus, ip, timestamp) VALUES" 
-						+ "('" + socket.username + "', " 
-						+ socket.quizid + ", '" 
-						+ socket.roomid + "', '" 
-						+ socket.socketid + "', '"
-						+ socket.statusDisconnected + "', '" 
-						+ socket.ip + "', " 
-						+ socket.timestampD + ")";
+		var sql = "INSERT INTO socketinfo (username,quizid,roomid,socketid,socketstatus,ip,timestamp) VALUES" +
+				  "(" + socket.username + "," + socket.quizid + "," + socket.roomid + "," + socket.socketid + 
+				  "," + socket.statusDisconnected + "," + socket.ip + "," + socket.timestampD + ")";
 
 	    con.query(sql, function(err, result) {
-	    	if (err) throw err;
-//	    	console.log('Record for disconnected socket : ' + socket.socketid + ' is inserted into db');
+	    	if (err) throw err;	  
 	    });
 	    
+	
 	    
-	    //=====================================================================
+//	    //This is not providing the live connected sockets,as room is getting empty on disconnection,I guess.
+//	    So currently using db,to get the live status.
+//	    var clients = io.sockets.adapter.rooms[socket.roomid].sockets;   
+//	    
+//	    var numClients = (typeof clients !== 'undefined') ? Object.keys(clients).length : 0;
+//	    console.log('still there are '+ numClients+ ' connected sockets');
+	    
+	      var liveordead = "select username,quizid,roomid," +
+          "count(case when socketstatus = 'Connected' then socketid end) as count_connected_socketid, " +
+          "count(case when socketstatus = 'Disconnected' then socketid end) as count_disconnected_socketid " +
+          "from socketinfo where roomid=" + socket.roomid +
+          "group by username,quizid,roomid";
+      
+	      con.query(liveordead, function(err, result) {
+          if (err) throw err;
+          for (i in result) {
+              countC = result[i].count_connected_socketid;
+              countD = result[i].count_disconnected_socketid;
+          }
+
+          if (countC == countD) {
+              socket.livestatus = "'Dead'";
+
+              var fetchtimesql = "select timetoconsider,livetime from livetable1 where roomid=" + socket.roomid;
+
+              con.query(fetchtimesql, function(err, result) {
+                  if (err) throw err;
+
+                  for (i in result) {
+                      var timetoconsider = result[i].timetoconsider;
+                      var livetime = result[i].livetime;
+                      console.log(socket.roomid + ':Previous livetime: ' + humanise(livetime));
+                  }
+
+                  //  here socket.timestampD is the maxdisconnecttime;
+                  console.log(socket.roomid + ':Current livetime is :' + humanise(socket.timestampD - timetoconsider));
+                  livetime = parseInt(livetime) + parseInt(socket.timestampD - timetoconsider);
+                  console.log(socket.roomid + ':After cumulation,livetime  is :' + humanise(livetime));
+
+                  var updatelivetablesql = "Update livetable1 set status=" + socket.livestatus + ", timetoconsider=" +
+                      socket.timestampD + ",livetime=" + livetime + "  where roomid=" + socket.roomid;
+
+                  con.query(updatelivetablesql, function(err, result) {
+                      if (err) throw err;
+                  });
+              });
+          }
+      });
+  
 	});
+   
 });
 
+function humanise(difference) {
+    var days = Math.floor(difference / (1000 * 60 * 60 * 24));
+    var hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    var minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
+    var seconds = Math.floor((difference % (1000 * 60)) / 1000);
+    var time = days + ' days, ' + hours + ' hrs, ' + minutes + ' mins, ' + seconds + ' secs';
+    return time;
+}
+
+
 app.get('/livestatus', function(req, res) {
-	var sql = "select username, quizid, roomid, " + 
-					"count(case when socketstatus = 'Connected' 	then socketid end) 	as count_connected_socketid, " + 
-					"count(case when socketstatus = 'Disconnected' 	then socketid end) 	as count_disconnected_socketid, " + 
-					"max(case when socketstatus   = 'Connected' 	then timestamp end) as max_connected_timestamp, " + 
-					"max(case when socketstatus   = 'Disconnected' 	then timestamp end) as max_disconnected_timestamp " + 
-	          "from socketinfo " + 
-	          "group by username, quizid, roomid";// + 
-//	          "where ";
-	
-//	var sql1 = "select username, quizid, roomid, timestamp from ( select * from socketinfo order by timestamp desc) " + 
-//					"where rownum<=" + io.sockets.server.eio.clientsCount  + "";
-	
-	var roomids = "Select DISTINCT roomid from socketinfo";
-	
-	con.query(sql, function(err, result, fields) {
-		if (err) throw err;
-//		console.log(result);
-		res.send(result);
-	});
-	
-//	con.query(roomids, function(err, result, fields) {
-//		if (err) throw err;
-////		console.log(result[0].roomid);
-////		res.send(result);
-//		
-//		for (var i in result) {
-//			console.log("=========livestatus========");
-//			console.log(result[i].roomid);
-//			roomid = result[i].roomid;
-//						
-////			if() {				  
-//				//to get the number of clients
-//			
-//				var rooms = io.sockets.adapter.rooms[roomid];
-////			    var numClients = (typeof clients !== 'undefined') ? Object.keys(clients).length : 0;
-//			    if(typeof rooms !== 'undefined') {
-//			    	var clients = io.sockets.adapter.rooms[socket.roomid].sockets;
-//			    	var numClients = Object.keys(clients).length;
-//			    	for (var clientId in clients) {
-//					       //this is the socket of each client in the room.
-//					       var clientSocket = io.sockets.connected[clientId];
-//					       console.log(clientSocket.id);
-//					}
-//			    } else {
-//			    	var numClients = 0;
-//			    }
-//			    console.log(numClients);			    
-//			    
-////			}
-//		}
-//	});
+    var sql = "select * from livetable1 ";
+    con.query(sql, function(err, result, fields) {
+        if (err) throw err;
+        res.send(result);
+    });
 });
 
 http.listen(port, function() {
