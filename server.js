@@ -31,19 +31,25 @@ var bodyParser 	= require('body-parser');
 var mysql 		= require('mysql');
 
 var con = mysql.createConnection({
-	host : "localhost",
-	user : "root",
+	host 	 : "localhost",
+	user 	 : "root",
 	password : "root123",
 	database : "trialdb"
 });
 
 app.use(bodyParser.urlencoded({ extended: true }));
 
+app.get('/', function(req, res){
+	// Render views/home.html
+	res.sendFile(__dirname + '/testserver.html');
+});
+
 app.get('/admin-userstatus', function(req, res) {
     res.sendFile(__dirname + '/admin-userstatus.html');
 });
 
 var port = 3000;
+var totalconnectedsockets;
 
 var record = io.sockets.on('connection', function (socket) {	
 	console.log( socket.id + ' connected');
@@ -57,7 +63,7 @@ var record = io.sockets.on('connection', function (socket) {
         socket.statusConnected = "'Connected'";
         socket.timestampC 	= socket.handshake.issued;
         socket.ip 			= "'" + socket.request.connection.remoteAddress + "'";
-
+        console.log('in attempt event');
 	    // Insert connection record into the database.
         // 'socketinfo' table has records of all the socket connections and disconnections.
 	    var sql = "INSERT INTO socketinfo (username, quizid, roomid, socketid, socketstatus, ip, timestamp) VALUES" +
@@ -77,7 +83,9 @@ var record = io.sockets.on('connection', function (socket) {
 	    socket.join(socket.roomid);	   
 	    
 	    // Find the total connected sockets in the room.
-	    var totalconnectedsockets = io.sockets.adapter.rooms[socket.roomid].length;   
+	    var rooms1 = io.sockets.adapter.rooms; 
+        console.log('rooms1: ' + socket.roomid);
+	    totalconnectedsockets = io.sockets.adapter.rooms[socket.roomid].length;   
 
 	    if (totalconnectedsockets > 0) {
 	    	socket.currentstatus = "'Live'";
@@ -101,7 +109,7 @@ var record = io.sockets.on('connection', function (socket) {
                         
                         // Check whether it is a ques switch or not. Ques switch time is approx. betwn. 0-2 secs.
                         // This is required when there is only one connected socket for that user.
-                        if((socket.timestampC - timetoconsider) > 2000) {
+//                        if((socket.timestampC - timetoconsider) > 2000) {
 	                        // Compute cumulative deadtime.
 	                        deadtime = parseInt(deadtime) + parseInt(socket.timestampC - timetoconsider);
 	                        console.log(socket.roomid + ': After cumulation, deadtime is: ' + humanise(deadtime));
@@ -114,21 +122,21 @@ var record = io.sockets.on('connection', function (socket) {
 	                        con.query(updatelivetablesql, function(err, result) {
 	                            if (err) throw err;
 	                        });
-                        } else {	
-                        	// Add ques switch time to the live time.
-                        	// Compute cumulative livetime.
-            		    	livetime = parseInt(livetime) + parseInt(socket.timestampC - timetoconsider);
-            		    	console.log(socket.roomid + ': After cumulation, livetime  is: ' + humanise(livetime));
-            			
-            		    	// Update 'status' entry for this user in 'livetable1'.
-            		    	var updatelivetablesql = "UPDATE livetable1 SET status = " + socket.currentstatus 
-            		    									+ ", timetoconsider = " + socket.timestampC 
-            		    									+ ", livetime = " + livetime 
-            		    									+ " where roomid = " + socket.roomid;
-            			    con.query(updatelivetablesql, function(err, result) {
-            			    	if (err) throw err;
-            			    });
-                        }
+//                        } else {	
+//                        	// Add ques switch time to the live time.
+//                        	// Compute cumulative livetime.
+//            		    	livetime = parseInt(livetime) + parseInt(socket.timestampC - timetoconsider);
+//            		    	console.log(socket.roomid + ': After cumulation, livetime  is: ' + humanise(livetime));
+//            			
+//            		    	// Update 'status' entry for this user in 'livetable1'.
+//            		    	var updatelivetablesql = "UPDATE livetable1 SET status = " + socket.currentstatus 
+//            		    									+ ", timetoconsider = " + socket.timestampC 
+//            		    									+ ", livetime = " + livetime 
+//            		    									+ " where roomid = " + socket.roomid;
+//            			    con.query(updatelivetablesql, function(err, result) {
+//            			    	if (err) throw err;
+//            			    });
+//                        }
                     }
                 } else {
                 	// Insert current status entry for this user in 'livetable1'.                	
@@ -167,7 +175,7 @@ var record = io.sockets.on('connection', function (socket) {
 	    
 	    // Find the total connected sockets in the room.
         var rooms = io.sockets.adapter.rooms[socket.roomid]; 
-        var totalconnectedsockets;
+      
         if(typeof rooms != 'undefined') {
   	    	totalconnectedsockets = io.sockets.adapter.rooms[socket.roomid].length;     	    	
   	    } else {
@@ -220,9 +228,29 @@ function humanise(difference) {
 }
 
 app.get('/livestatus', function(req, res) {
+	
     var sql = "SELECT * FROM livetable1";
     con.query(sql, function(err, result, fields) {
         if (err) throw err;
+        for(i in result){
+        	
+        	// Find the total connected sockets in the room.
+//        	totalconnectedsockets = Object.keys(io.sockets.sockets);
+//        	console.log(io.sockets.sockets);
+//        	console.log(result[i]);
+        	var roomid = "'" + result[i].roomid + "'";
+        	console.log('rid ' + roomid);
+        	var rooms = io.sockets.adapter.rooms[roomid];
+//        	console.log('rooms: ' + rooms);
+            if(typeof rooms != 'undefined') {
+      	    	totalconnectedsockets = io.sockets.adapter.rooms[roomid].length;     	    	
+      	    } else {
+      	    	totalconnectedsockets = 0;
+      	    }
+            
+        	result[i].totalconnectedsockets = totalconnectedsockets;
+//        	console.log(result[i].totalconnectedsockets);
+        }
         res.send(result);
     });
 });

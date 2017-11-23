@@ -45,21 +45,27 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
 
     public function setup_attempt_page($page) {
         global $CFG, $PAGE, $_SESSION;
-//         echo '<br><br><br>';
+        $PAGE->requires->jquery();
 
         $PAGE->requires->js( new moodle_url('http://127.0.0.1:3000/socket.io/socket.io.js'), true );
         $PAGE->requires->js( new moodle_url($CFG->wwwroot . '/mod/quiz/accessrule/heartbeatmonitor/client.js') );
 
-//         echo "<script>alert('hi');</script>";
-        $attemptid = required_param('attempt', PARAM_INT);
+        $attemptid  = required_param('attempt', PARAM_INT);
         $sessionkey = sesskey();
-        $userid = $_SESSION['USER']->id;
-        $username = $_SESSION['USER']->username;
-        $quizid = $this->quizobj->get_quizid();
+        $userid     = $_SESSION['USER']->id;
+        $username   = $_SESSION['USER']->username;
+        $quizid     = $this->quizobj->get_quizid();
 
-//         echo $sessionkey.' '.$userid.' '.$quizid.' '.$attemptid;
-//         print_object($username);
-
-        $PAGE->requires->js_init_call('client', array($quizid, $userid, $username, $attemptid, $sessionkey));
+//     	$url = 'http://127.0.0.1:3000/';
+//     	$ch = curl_init($url);
+//     	curl_setopt($ch, CURLOPT_NOBODY, true);
+//     	curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+//     	curl_exec($ch);
+//     	$retcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+//     	curl_close($ch);
+//     	if (200 == $retcode) {
+    	    $PAGE->requires->js_init_call('client', array($quizid, $userid, $username, $attemptid, $sessionkey));
+//     	}
     }
 }
+
