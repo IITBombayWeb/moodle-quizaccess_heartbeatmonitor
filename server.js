@@ -50,6 +50,8 @@ app.get('/admin-userstatus', function(req, res) {
 
 var port = 3000;
 var totalconnectedsockets;
+var clients;
+var roomwisesockets = [];
 
 var record = io.sockets.on('connection', function (socket) {	
 	console.log( socket.id + ' connected');
@@ -83,8 +85,14 @@ var record = io.sockets.on('connection', function (socket) {
 	    socket.join(socket.roomid);	   
 	    
 	    // Find the total connected sockets in the room.
-	    var rooms1 = io.sockets.adapter.rooms; 
-        console.log('rooms1: ' + socket.roomid);
+	    clients = io.sockets.adapter.rooms[socket.roomid].sockets; 
+	    roomwisesockets[socket.roomid] = [];
+	    for (var clientid in clients) {
+			//this is the socket of each client in the room.
+			var clientSocket = io.sockets.connected[clientid];
+			roomwisesockets[socket.roomid].push(clientSocket.id);
+		}
+	   
 	    totalconnectedsockets = io.sockets.adapter.rooms[socket.roomid].length;   
 
 	    if (totalconnectedsockets > 0) {
@@ -228,32 +236,31 @@ function humanise(difference) {
 }
 
 app.get('/livestatus', function(req, res) {
-	
     var sql = "SELECT * FROM livetable1";
     con.query(sql, function(err, result, fields) {
         if (err) throw err;
         for(i in result){
-        	
-        	// Find the total connected sockets in the room.
-//        	totalconnectedsockets = Object.keys(io.sockets.sockets);
-//        	console.log(io.sockets.sockets);
-//        	console.log(result[i]);
-        	var roomid = "'" + result[i].roomid + "'";
-        	console.log('rid ' + roomid);
-        	var rooms = io.sockets.adapter.rooms[roomid];
-//        	console.log('rooms: ' + rooms);
-            if(typeof rooms != 'undefined') {
-      	    	totalconnectedsockets = io.sockets.adapter.rooms[roomid].length;     	    	
-      	    } else {
-      	    	totalconnectedsockets = 0;
-      	    }
-            
         	result[i].totalconnectedsockets = totalconnectedsockets;
-//        	console.log(result[i].totalconnectedsockets);
+        	
+//        	console.log('rmid: ' + result[i].roomid);        	
+        	var roomid = "'" + result[i].roomid + "'";
+//        	console.log('rwsc: ' + roomwisesockets[roomid]);      	
+        	result[i].roomwisesockets = roomwisesockets[roomid];
+//        	console.log('resrwsc: ' + result[i].roomwisesockets);
         }
         res.send(result);
     });
 });
+
+function findsocketsinaroom(io, roomid) {
+	var clients = io.sockets.adapter.rooms[roomid].sockets;   
+	var numClients = (typeof clients !== 'undefined') ? Object.keys(clients).length : 0;
+	
+	for (var clientId in clients) {
+		//this is the socket of each client in the room.
+		var clientSocket = io.sockets.connected[clientId];
+	}   
+}
 
 http.listen(port, function() {
 	console.log('Listening on port ' + port);

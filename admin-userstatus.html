@@ -32,21 +32,29 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js"></script>
     <style>
         table {
-            font-family: arial, sans-serif;
-            border-collapse: collapse;
-            width: 50%;
+            font-family     : arial, sans-serif;
+            border-collapse : collapse;
+            table-layout    : fixed; 
+            width           : 75%;  
         }
         td,th {
-            border: 1px solid #dddddd;
-            text-align: left;
-            padding: 8px;
+            border      : 1px solid #dddddd;
+            text-align  : left;
+            width       : 100px;
+            padding     : 8px;
         }
+        td.livesockets, th.livesockets { 
+             border     : 1px solid #dddddd; 
+             text-align : left; 
+             width      : 200px; 
+             padding    : 8px; 
+         } 
     </style>
 </head>
 <body>
     <center>
     <h1>Live status of users</h1>
-    <div id='a'></div>
+    
     <table id='livestatus'>
         <tr>
             <th> Room ID    </th>
@@ -54,8 +62,11 @@
             <th> Time to consider for calculations  </th>
             <th> Total live-time    </th>
             <th> Total dead-time    </th>
+            <th class="livesockets"> Live sockets    </th>
         </tr>
     </table>
+    
+    <div id='a'></div>
     </center>
 
     <script>
@@ -72,47 +83,65 @@
         $.get("/livestatus", function(livestatusinfo) {
 //             console.log(livestatusinfo);
             
-            for(i in livestatusinfo){
-                $("#livestatus").append(livestatusinfo[i].totalconnectedsockets);
+            for(i in livestatusinfo){               
+                var roomid          = livestatusinfo[i].roomid;
+                var status          = livestatusinfo[i].status;
+                var timetoconsider  = livestatusinfo[i].timetoconsider;
+                var livetime        = livestatusinfo[i].livetime;
+                var deadtime        = livestatusinfo[i].deadtime;
+
+                var currentTimestamp    = new Date().getTime();
+//                 alert(humanise(currentTimestamp - timetoconsider) + ' ' + humanise(livetime) + ' ' + humanise((currentTimestamp - timetoconsider) + livetime));
+                if (status == 'Live') {
+                    livetime = (currentTimestamp - timetoconsider) + livetime;
+                } else {
+                    deadtime = (currentTimestamp - timetoconsider) + deadtime;
                 }
-//                 var roomid          = livestatusinfo[i].roomid;
-//                 var status          = livestatusinfo[i].status;
-//                 var timetoconsider  = livestatusinfo[i].timetoconsider;
-//                 var livetime        = livestatusinfo[i].livetime;
-//                 var deadtime        = livestatusinfo[i].deadtime;
 
-//                 var currentTimestamp    = new Date().getTime();
-// //                 alert(humanise(currentTimestamp - timetoconsider) + ' ' + humanise(livetime) + ' ' + humanise((currentTimestamp - timetoconsider) + livetime));
-//                 if (status == 'Live') {
-//                     livetime = (currentTimestamp - timetoconsider) + livetime;
-//                 } else {
-//                     deadtime = (currentTimestamp - timetoconsider) + deadtime;
-//                 }
-
-//                 var humanisedlivetime = humanise(livetime);
-//                 var humaniseddeadtime = humanise(deadtime);
+                var humanisedlivetime = humanise(livetime);
+                var humaniseddeadtime = humanise(deadtime);        
    
-//                 if($('#'+roomid).length > 0) {
-//                     //remove prev. row and add updated row
-//                     $('#'+roomid).remove();
-//                     var  row = '<tr id = ' + roomid + '><td>' 
-//                                     + roomid + '</td><td>'
-//                                     + status + '</td><td>' 
-//                                     + timetoconsider + '</td><td>' 
-//                                     + humanisedlivetime + '</td><td>' 
-//                                     + humaniseddeadtime + '</td></tr>';
-//                     $("#livestatus").append(row);
-//                 } else {
-//                     //new row addition
-//                     var  row = '<tr id = ' + roomid + '><td>' 
-//                                     + roomid + '</td><td>' 
-//                                     + status + '</td><td>' 
-//                                     + timetoconsider + '</td><td>' 
-//                                     + humanisedlivetime + '</td><td>' 
-//                                     + humaniseddeadtime + '</td></tr>';
-//                     $("#livestatus").append(row);
+                if($('#'+roomid).length > 0) {
+                    //remove prev. row and add updated row
+                    $('#'+roomid).remove();
+                    
+                    var  row = '<tr id = ' + roomid + '><td>' 
+                                    + roomid + '</td><td>'
+                                    + status + '</td><td>' 
+                                    + timetoconsider + '</td><td>' 
+                                    + humanisedlivetime + '</td><td>' 
+                                    + humaniseddeadtime + '</td>'+
+                                    '<td class="livesockets"></td></tr>';
+                    
+                    $("#livestatus").append(row);
+                    for(j in livestatusinfo[i].roomwisesockets){
+                        $('td.livesockets').append(livestatusinfo[i].roomwisesockets[j]);
+                        $('td.livesockets').append('<br>');
+                    }        
+//                     $("td.livesockets").append('a');
+                } else {
+                    //new row addition
+                    var  row = '<tr id = ' + roomid + '><td>' 
+                                    + roomid + '</td><td>' 
+                                    + status + '</td><td>' 
+                                    + timetoconsider + '</td><td>' 
+                                    + humanisedlivetime + '</td><td>' 
+                                    + humaniseddeadtime + '</td>'+
+                                    '<td class="livesockets"></td></tr>';
+                    
+                    $("#livestatus").append(row);
+                    for(j in livestatusinfo[i].roomwisesockets){
+                        $('td.livesockets').append(livestatusinfo[i].roomwisesockets[j]);
+                        $('td.livesockets').append('<br>');
+                    }                  
+//                     $("td.livesockets").append('a');
+                }
+                
+//                 for(j in livestatusinfo[i].roomwisesockets){
+//                     $("#a").append(livestatusinfo[i].roomwisesockets[j]);
 //                 }
-//             }
+                
+            }
         });
     }, 3000);
     </script>
