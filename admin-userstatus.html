@@ -36,24 +36,27 @@
             border-collapse : collapse;
             table-layout    : fixed; 
             width           : 75%;  
+            align           : center;
         }
         td,th {
             border      : 1px solid #dddddd;
             text-align  : left;
             width       : 100px;
-            padding     : 8px;
+            padding     : 15px;
         }
         td.livesockets, th.livesockets { 
              border     : 1px solid #dddddd; 
              text-align : left; 
              width      : 200px; 
-             padding    : 8px; 
+             padding    : 15px; 
          } 
+         tr:hover { background-color : #f5f5f5; }
+         body { font-family : Arial }
     </style>
 </head>
 <body>
-    <center>
-    <h1>Live status of users</h1>
+    <br>
+    <h2>Live status of users</h2>
     
     <table id='livestatus'>
         <tr>
@@ -62,12 +65,20 @@
             <th> Time to consider for calculations  </th>
             <th> Total live-time    </th>
             <th> Total dead-time    </th>
-            <th class="livesockets"> Live sockets    </th>
+            <th class="livesockets"> Live sockets   </th>
         </tr>
     </table>
+    <br><br>
     
-    <div id='a'></div>
-    </center>
+    <h3>Total sockets connected </h3>
+    <span id='allsoccount'></span>
+    <br><br>
+    
+    <h3>Listing connected sockets </h3>
+    <table id='connectedsockets'>     
+    </table>
+   
+<!--     <pre id='allsockets'></pre> -->
 
     <script>
     function humanise(difference) {
@@ -91,11 +102,13 @@
                 var deadtime        = livestatusinfo[i].deadtime;
 
                 var currentTimestamp    = new Date().getTime();
-//                 alert(humanise(currentTimestamp - timetoconsider) + ' ' + humanise(livetime) + ' ' + humanise((currentTimestamp - timetoconsider) + livetime));
+//                 var a = parseInt(currentTimestamp - timetoconsider) + parseInt(livetime);
+//                 alert(humanise(currentTimestamp - timetoconsider) + '  ' + humanise(livetime) + '  ' + humanise(a));
+                
                 if (status == 'Live') {
-                    livetime = (currentTimestamp - timetoconsider) + livetime;
+                    livetime = parseInt(currentTimestamp - timetoconsider) + parseInt(livetime);
                 } else {
-                    deadtime = (currentTimestamp - timetoconsider) + deadtime;
+                    deadtime = parseInt(currentTimestamp - timetoconsider) + parseInt(deadtime);
                 }
 
                 var humanisedlivetime = humanise(livetime);
@@ -115,10 +128,9 @@
                     
                     $("#livestatus").append(row);
                     for(j in livestatusinfo[i].roomwisesockets){
-                        $('td.livesockets').append(livestatusinfo[i].roomwisesockets[j]);
-                        $('td.livesockets').append('<br>');
-                    }        
-//                     $("td.livesockets").append('a');
+                        $('td.livesockets').append(livestatusinfo[i].roomwisesockets[j] + '<br>');
+                    } 
+                           
                 } else {
                     //new row addition
                     var  row = '<tr id = ' + roomid + '><td>' 
@@ -131,19 +143,30 @@
                     
                     $("#livestatus").append(row);
                     for(j in livestatusinfo[i].roomwisesockets){
-                        $('td.livesockets').append(livestatusinfo[i].roomwisesockets[j]);
-                        $('td.livesockets').append('<br>');
+                        $('td.livesockets').append(livestatusinfo[i].roomwisesockets[j] + '<br>');
                     }                  
-//                     $("td.livesockets").append('a');
                 }
-                
-//                 for(j in livestatusinfo[i].roomwisesockets){
-//                     $("#a").append(livestatusinfo[i].roomwisesockets[j]);
-//                 }
+
+                $("#allsoccount").text(livestatusinfo[i].allsocketscount);
+                if($('#allsockets').length > 0) {
+                    //remove prev. row and add updated row
+                    $('#allsockets').remove();
+
+                    $("#connectedsockets").append('<tr id="allsockets"><td id="here"></td></tr>');
+                    for(j in livestatusinfo[i].allsockets){
+                    	$("#here").append(livestatusinfo[i].allsockets[j] + '<br>');
+                    }
+                    
+                } else {
+                	$("#connectedsockets").append('<tr id="allsockets"><td id="here"></td></tr>');
+                	for(j in livestatusinfo[i].allsockets){
+                    	$("#here").append(livestatusinfo[i].allsockets[j] + '<br>');
+                    }
+                }
                 
             }
         });
-    }, 3000);
+    }, 1000);
     </script>
 </body>
 </html>

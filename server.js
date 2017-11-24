@@ -52,9 +52,21 @@ var port = 3000;
 var totalconnectedsockets;
 var clients;
 var roomwisesockets = [];
+var allsocketscount;
+var allsockets;
 
 var record = io.sockets.on('connection', function (socket) {	
 	console.log( socket.id + ' connected');
+	console.log('con skts: ' + io.sockets.server.eio.clientsCount);
+	allsocketscount = io.sockets.server.eio.clientsCount;
+	
+	var clientsall = io.sockets.server.eio.clients;
+	allsockets = [];
+	for (var clientId in clientsall) {
+		//this is the socket of each client in the room.
+		allsockets.push(io.sockets.server.eio.clients[clientId].id);
+	}  
+//	console.log('allsockets : ' + allsockets);
 		
 	socket.on('attempt', function(data) {
 		// Append some extra data to the socket object.
@@ -94,6 +106,7 @@ var record = io.sockets.on('connection', function (socket) {
 		}
 	   
 	    totalconnectedsockets = io.sockets.adapter.rooms[socket.roomid].length;   
+	    console.log('totalconnectedsockets in atmpt: ' + totalconnectedsockets);
 
 	    if (totalconnectedsockets > 0) {
 	    	socket.currentstatus = "'Live'";
@@ -189,7 +202,7 @@ var record = io.sockets.on('connection', function (socket) {
   	    } else {
   	    	totalconnectedsockets = 0;
   	    }
-//        console.log('totalconnectedsockets: ' + totalconnectedsockets);
+//        console.log('totalconnectedsockets1111: ' + totalconnectedsockets);
   	    
   	    if(totalconnectedsockets == 0) {          
 		    socket.currentstatus = "'Dead'";
@@ -241,11 +254,13 @@ app.get('/livestatus', function(req, res) {
         if (err) throw err;
         for(i in result){
         	result[i].totalconnectedsockets = totalconnectedsockets;
-        	
+//        	console.log('totalconnectedsockets: ' + totalconnectedsockets); 
 //        	console.log('rmid: ' + result[i].roomid);        	
         	var roomid = "'" + result[i].roomid + "'";
 //        	console.log('rwsc: ' + roomwisesockets[roomid]);      	
         	result[i].roomwisesockets = roomwisesockets[roomid];
+        	result[i].allsockets = allsockets;
+        	result[i].allsocketscount = allsocketscount;
 //        	console.log('resrwsc: ' + result[i].roomwisesockets);
         }
         res.send(result);
