@@ -39,11 +39,48 @@
 //------------------------------ using YUI --------------------------------------------
 function client(Y, quizid, userid, username, attemptid, sessionkey)
 {
-	var socket = io('http://127.0.0.1:3000');	
+	var socket = io('http://127.0.0.1:3000', {
+						'secure':                    false,
+					    'connect timeout':           5000,
+					    'try multiple transports':   true,
+					    'reconnect':                 true,
+					    'reconnection delay':        500,
+					    'reopen delay':              3000,
+					    'max reconnection attempts': 10,
+					    'sync disconnect on unload': true,
+					    'auto connect':              false,
+					    'remember transport':        false,
+					    transports: [
+					        'websocket'
+					      , 'flashsocket'
+					      , 'htmlfile'
+					      , 'xhr-multipart'
+					      , 'xhr-polling'
+					      , 'jsonp-polling']
+					});	
+	
 	var roomid = username + quizid;	
+//	console.log('before socket connected');// + socket);
+//	for (var i in socket){
+//		console.log(socket[i].id);
+//	}
+//	console.log('before socket connected' + socket.id + ' ts ' + (socket.handshake.issued) + 
+//	console.log(' cur ' + (new Date().getTime()));
+	
 	socket.on('connect', function() {
+		console.log('after  socket connected ' + socket.id  + ' cur ' + (new Date().getTime()));
+//		for (var i in socket){
+//			console.log(socket[i].id);
+//		}
+//		console.log(' ts ' + (socket.handshake.issued) + ' cur ' + (new Date().getTime()));
+
+//		console.log('connect emit recieved' + socketi );
 //		console.log("Connect function - client side");
 		socket.emit('attempt', { username:username, quizid:quizid, roomid:roomid, attemptid:attemptid });
 	});	
+	
+	socket.on('disconnect', function() {
+		console.log('after  socket disconnected ' + socket.id  + ' cur ' + (new Date().getTime()));
+	});
 }
 

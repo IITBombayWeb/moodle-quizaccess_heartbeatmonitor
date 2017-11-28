@@ -50,23 +50,25 @@ app.get('/admin-userstatus', function(req, res) {
 
 var port = 3000;
 var totalconnectedsockets;
-var clients;
-var roomwisesockets = [];
+var roomwisesockets;
+var roomwisesocketids = [];
 var allsocketscount;
-var allsockets;
+var allsocketids;
 
 var record = io.sockets.on('connection', function (socket) {	
-	console.log( socket.id + ' connected');
-	console.log('con skts: ' + io.sockets.server.eio.clientsCount);
+//	console.log( socket.id + ' connected. ts: ' + socket.handshake.issued);
+	console.log('connect - con skts: ' + io.sockets.server.eio.clientsCount);
 	allsocketscount = io.sockets.server.eio.clientsCount;
+	console.log('socket connected ' + socket.id + ' ts ' + (socket.handshake.issued) + ' cur ' + (new Date().getTime()));
+
 	
-	var clientsall = io.sockets.server.eio.clients;
-	allsockets = [];
-	for (var clientId in clientsall) {
+	var allclients = io.sockets.server.eio.clients;
+	allsocketids = [];
+	for (var clientid in allclients) {
 		//this is the socket of each client in the room.
-		allsockets.push(io.sockets.server.eio.clients[clientId].id);
+		allsocketids.push(io.sockets.server.eio.clients[clientid].id);
 	}  
-//	console.log('allsockets : ' + allsockets);
+//	console.log('allsocketids: ' + allsocketids);
 		
 	socket.on('attempt', function(data) {
 		// Append some extra data to the socket object.
@@ -77,7 +79,7 @@ var record = io.sockets.on('connection', function (socket) {
         socket.statusConnected = "'Connected'";
         socket.timestampC 	= socket.handshake.issued;
         socket.ip 			= "'" + socket.request.connection.remoteAddress + "'";
-        console.log('in attempt event');
+//        console.log('in attempt event');
 	    // Insert connection record into the database.
         // 'socketinfo' table has records of all the socket connections and disconnections.
 	    var sql = "INSERT INTO socketinfo (username, quizid, roomid, socketid, socketstatus, ip, timestamp) VALUES" +
@@ -97,16 +99,16 @@ var record = io.sockets.on('connection', function (socket) {
 	    socket.join(socket.roomid);	   
 	    
 	    // Find the total connected sockets in the room.
-	    clients = io.sockets.adapter.rooms[socket.roomid].sockets; 
-	    roomwisesockets[socket.roomid] = [];
-	    for (var clientid in clients) {
+	    roomwisesockets = io.sockets.adapter.rooms[socket.roomid].sockets;
+	    roomwisesocketids[socket.roomid] = [];
+	    for (var clientid in roomwisesockets) {
 			//this is the socket of each client in the room.
-			var clientSocket = io.sockets.connected[clientid];
-			roomwisesockets[socket.roomid].push(clientSocket.id);
+			var clientsocket = io.sockets.connected[clientid];
+			roomwisesocketids[socket.roomid].push(clientsocket.id);
 		}
 	   
 	    totalconnectedsockets = io.sockets.adapter.rooms[socket.roomid].length;   
-	    console.log('totalconnectedsockets in atmpt: ' + totalconnectedsockets);
+//	    console.log('totalconnectedsockets in atmpt: ' + totalconnectedsockets);
 
 	    if (totalconnectedsockets > 0) {
 	    	socket.currentstatus = "'Live'";
@@ -123,17 +125,17 @@ var record = io.sockets.on('connection', function (socket) {
                         var timetoconsider 	= result[i].timetoconsider;
                         var deadtime 		= result[i].deadtime;
                         var livetime 		= result[i].livetime;
-                        console.log(socket.roomid + ': Previous deadtime: ' + humanise(deadtime) + ' Status: ' + status);
+//                        console.log(socket.roomid + ': Previous deadtime: ' + humanise(deadtime) + ' Status: ' + status);
                     }
                     if (status == 'Dead') {
-                        console.log(socket.roomid + ': Current deadtime is: ' + humanise(socket.timestampC - timetoconsider));
+//                        console.log(socket.roomid + ': Current deadtime is: ' + humanise(socket.timestampC - timetoconsider));
                         
                         // Check whether it is a ques switch or not. Ques switch time is approx. betwn. 0-2 secs.
                         // This is required when there is only one connected socket for that user.
 //                        if((socket.timestampC - timetoconsider) > 2000) {
 	                        // Compute cumulative deadtime.
 	                        deadtime = parseInt(deadtime) + parseInt(socket.timestampC - timetoconsider);
-	                        console.log(socket.roomid + ': After cumulation, deadtime is: ' + humanise(deadtime));
+//	                        console.log(socket.roomid + ': After cumulation, deadtime is: ' + humanise(deadtime));
 	
 	                        // Update 'status' entry for this user in 'livetable1'.
 	                        var updatelivetablesql = "UPDATE livetable1 SET status = " 	+ socket.currentstatus 
@@ -175,12 +177,25 @@ var record = io.sockets.on('connection', function (socket) {
 	
 	
 	socket.on('disconnect', function() {
-		console.log(socket.id + ' disconnected');
-				
+	
+	console.log(socket.id + ' disconnected. curr ts: ' + (new Date().getTime()));
+	console.log('disconnect - con skts: ' + io.sockets.server.eio.clientsCount);
+	
+	allsocketscount = io.sockets.server.eio.clientsCount;
+	var allclients = io.sockets.server.eio.clients;
+	allsocketids = [];
+	if (allclients != undefined) {
+		for (var clientid in allclients) {
+			//this is the socket of each client in the room.
+			allsocketids.push(io.sockets.server.eio.clients[clientid].id);
+		} 
+	}
+
+	if(socket.roomid != undefined) {			
 		// Construct record for the disconnected socket.
 		socket.timestampD = new Date().getTime();
 		socket.statusDisconnected = "'Disconnected'";
-	  	    
+		
 	    // Insert disconnection record into database.
 		var sql = "INSERT INTO socketinfo (username, quizid, roomid, socketid, socketstatus, ip, timestamp) VALUES" +
 				  	"(" + socket.username + "," 
@@ -198,12 +213,21 @@ var record = io.sockets.on('connection', function (socket) {
         var rooms = io.sockets.adapter.rooms[socket.roomid]; 
       
         if(typeof rooms != 'undefined') {
-  	    	totalconnectedsockets = io.sockets.adapter.rooms[socket.roomid].length;     	    	
+  	    	totalconnectedsockets = io.sockets.adapter.rooms[socket.roomid].length;  
+  	    	
+  	    	// Find the total connected sockets in the room.
+  		    roomwisesockets = io.sockets.adapter.rooms[socket.roomid].sockets; 
+  	    	roomwisesocketids[socket.roomid] = [];
+  		    for (var clientid in roomwisesockets) {
+  				//this is the socket of each client in the room.
+  				var clientsocket = io.sockets.connected[clientid];
+  				roomwisesocketids[socket.roomid].push(clientsocket.id);
+  			}
   	    } else {
   	    	totalconnectedsockets = 0;
   	    }
 //        console.log('totalconnectedsockets1111: ' + totalconnectedsockets);
-  	    
+        	    
   	    if(totalconnectedsockets == 0) {          
 		    socket.currentstatus = "'Dead'";
 		    
@@ -215,15 +239,15 @@ var record = io.sockets.on('connection', function (socket) {
 		    	for (i in result) {
 		    		var timetoconsider = result[i].timetoconsider;
 		    		var livetime = result[i].livetime;
-		    		console.log(socket.roomid + ': Previous livetime: ' + humanise(livetime));
+//		    		console.log(socket.roomid + ': Previous livetime: ' + humanise(livetime));
 		    	}
 		
 		    	// Here, socket.timestampD is the maxdisconnecttime.
-		    	console.log(socket.roomid + ': Current livetime is: ' + humanise(socket.timestampD - timetoconsider));
+//		    	console.log(socket.roomid + ': Current livetime is: ' + humanise(socket.timestampD - timetoconsider));
 		    	
 		    	// Compute cumulative livetime.
 		    	livetime = parseInt(livetime) + parseInt(socket.timestampD - timetoconsider);
-		    	console.log(socket.roomid + ': After cumulation, livetime  is: ' + humanise(livetime));
+//		    	console.log(socket.roomid + ': After cumulation, livetime  is: ' + humanise(livetime));
 			
 		    	// Update 'status' entry for this user in 'livetable1'.
 		    	var updatelivetablesql = "UPDATE livetable1 SET status = " + socket.currentstatus 
@@ -235,6 +259,7 @@ var record = io.sockets.on('connection', function (socket) {
 			    });
 			});
 		}
+	}
 	}); 
 });
 
@@ -257,9 +282,9 @@ app.get('/livestatus', function(req, res) {
 //        	console.log('totalconnectedsockets: ' + totalconnectedsockets); 
 //        	console.log('rmid: ' + result[i].roomid);        	
         	var roomid = "'" + result[i].roomid + "'";
-//        	console.log('rwsc: ' + roomwisesockets[roomid]);      	
-        	result[i].roomwisesockets = roomwisesockets[roomid];
-        	result[i].allsockets = allsockets;
+//        	console.log('rwsc: ' + roomwisesocketids[roomid]);      	
+        	result[i].roomwisesockets = roomwisesocketids[roomid];
+        	result[i].allsockets = allsocketids;
         	result[i].allsocketscount = allsocketscount;
 //        	console.log('resrwsc: ' + result[i].roomwisesockets);
         }
@@ -271,9 +296,9 @@ function findsocketsinaroom(io, roomid) {
 	var clients = io.sockets.adapter.rooms[roomid].sockets;   
 	var numClients = (typeof clients !== 'undefined') ? Object.keys(clients).length : 0;
 	
-	for (var clientId in clients) {
+	for (var clientid in clients) {
 		//this is the socket of each client in the room.
-		var clientSocket = io.sockets.connected[clientId];
+		var clientSocket = io.sockets.connected[clientid];
 	}   
 }
 
