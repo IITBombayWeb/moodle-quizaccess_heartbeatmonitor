@@ -33,7 +33,7 @@ defined('MOODLE_INTERNAL') || die();
  * It is being called from quiz_extend_settings_navigation function.
  */
 function heartbeatmonitor_accessrule_extend_navigation($accessrulenode, $cm) {
-    $url        = new moodle_url('/mod/quiz/accessrule/heartbeatmonitor/calculatetime.php'
+    $url        = new moodle_url('/mod/quiz/accessrule/heartbeatmonitor/index.php'
             , array(
             'quizid' => $cm->instance,
             'courseid' => $cm->course,

@@ -30,4 +30,5 @@ defined('MOODLE_INTERNAL') || die();
 
 $string['pluginname'] = 'Hearbeat monitor quiz access rule';
 $string['calculatetime'] = 'Calculate time';
+$string['liveusers'] = 'Live users';
 
