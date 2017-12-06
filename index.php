@@ -88,9 +88,7 @@ $result = $conn->query($sql);
 
 $table = new html_table();
 $table->head = array('Roomid', 'Status', 'Time to consider', 'Live time', 'Dead time');
-updatetime($result, $table);
 
-function updatetime($result, $table) {
 if ($result->num_rows > 0) {
     // Output data of each row.
     while($data = $result->fetch_assoc()) {
@@ -102,8 +100,8 @@ if ($result->num_rows > 0) {
         $livetime        = $data["livetime"];
         $deadtime        = $data["deadtime"];
 
-        //                 $now = new DateTime();
-        //                 $currentTimestamp = $now->getTimestamp();
+//         $now = new DateTime();
+//         $currentTimestamp = $now->getTimestamp();
         $currentTimestamp = intval(microtime(true)*1000);
 
         if ($status == 'Live') {
@@ -146,13 +144,24 @@ if ($result->num_rows > 0) {
             $table->rowclasses['roomid'] = $roomid;
             $row = new html_table_row();
             $row->id = $roomid;
-//             $row->attributes['class'] = $roomid;
+            //             $row->attributes['class'] = $roomid;
 
             $cell1 = new html_table_cell($roomid);
+            $cell1->id = 'roomid';
+
             $cell2 = new html_table_cell($status);
+            $cell2->id = 'status';
+
             $cell3 = new html_table_cell($timetoconsider);
+            $cell3->id = 'timetoconsider';
+
             $cell4 = new html_table_cell($humanisedlivetime);
+            $cell4->id = 'livetime';
+            $cell4->attributes['value'] = $livetime;
+
             $cell5 = new html_table_cell($humaniseddeadtime);
+            $cell5->id = 'deadtime';
+            $cell4->attributes['value'] = $deadtime;
 
             $row->cells[] = $cell1;
             $row->cells[] = $cell2;
@@ -166,45 +175,79 @@ if ($result->num_rows > 0) {
 }
 echo html_writer::table($table);
 
-}
-
 function secondsToTime($seconds) {
     $dtF = new DateTime('@0');
     $dtT = new DateTime("@$seconds");
     return $dtF->diff($dtT)->format('%a d, %h h : %i m : %s s');
 }
 
-function humanise($difference) {
-    $days    = floor($difference / (1000 * 60 * 60 * 24));
-    $hours   = floor(($difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-    $minutes = floor(($difference % (1000 * 60 * 60)) / (1000 * 60));
-    $seconds = floor(($difference % (1000 * 60)) / 1000);
-    $time    = $days+' days, '+$hours+' hrs, '+$minutes+' mins, '+$seconds+' secs' ;
-    return $time;
-}
 ?>
 
 <script>
-
-// setInterval(function() {
-//     $.get("/calculatetime", function(data) {
-//         alert('hhi ');
-
-//     });
-// }, 1000);
 
 function humanise(difference) {
     var days    = Math.floor(difference / (1000 * 60 * 60 * 24));
     var hours   = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
     var minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
     var seconds = Math.floor((difference % (1000 * 60)) / 1000);
-    var time    = days+' days, '+hours+' hrs, '+minutes+' mins, '+seconds+' secs' ;
+    var time    = days + ' d, ' + hours + ' h : ' + minutes + ' m : ' + seconds + ' s' ;
     return time;
 }
 
+function countDownTimer(livetime, deadtime) {
+
+    $(document).ready(function() {
+        var interval = setInterval(function() {
+            // Database should also be queried every sec.
+
+            // Update livetime and deadtime every sec.
+    	    var status = $('#status').html();
+    	    var timetoconsider = $('#timetoconsider').html();
+//     	    var livetime = $('#livetime').html();
+//     	    var deadtime = $('#deadtime').html();
+    	    var currentTimestamp = new Date().getTime();
+
+//     	    alert(currentTimestamp + '  ' + timetoconsider + '  ' + livetime);
+//             alert(humanise((currentTimestamp - timetoconsider) + livetime));
+//             alert(humanise(livetime1));
+//             alert(humanise(currentTimestamp) + '  ' + humanise(timetoconsider) + '  ' + humanise(livetime));
+
+            if (status == 'Live') {
+//                 livetime = parseInt(currentTimestamp - timetoconsider);
+                livetime = livetime + 1000;
+            } else {
+//                 deadtime = parseInt(currentTimestamp - timetoconsider);
+                deadtime = deadtime + 1000;
+            }
+
+            var humanisedlivetime = humanise(livetime);
+            var humaniseddeadtime = humanise(deadtime);
+
+            $('#livetime').html(humanisedlivetime);
+    	    $('#deadtime').html(humaniseddeadtime);
+
+		}, 1000);
+    });
+}
 </script>
 
+
+<!-- setInterval(function() { -->
+<!--     $.get("/calculatetime", function(data) { -->
+<!--         alert('hhi '); -->
+
+<!--     }); -->
+
+<!--     $(document).ready(function(){ -->
+<!--         window.setInterval(getScreenGen, 5000); // call our function every 5 sec -->
+<!--     }); -->
+
+<!-- }, 1000); -->
+
+<!-- </script> -->
+
 <?php
+echo "<script type='text/javascript'>countDownTimer($livetime, $deadtime);</script>";
 // echo 'hi';
 $conn->close();
 
