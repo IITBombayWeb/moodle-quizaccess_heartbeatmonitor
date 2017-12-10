@@ -59,7 +59,7 @@ function client(Y, quizid, userid, username, attemptid, sessionkey)
 					      , 'jsonp-polling']
 					});	
 	
-	var roomid = username + quizid;	
+	var roomid = username + '_' + quizid + '_' + attemptid;	
 //	console.log('before socket connected');// + socket);
 //	for (var i in socket){
 //		console.log(socket[i].id);

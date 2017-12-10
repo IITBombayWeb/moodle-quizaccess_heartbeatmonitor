@@ -15,10 +15,12 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * This page handles listing of quiz overrides
+ * Admin module for quizaccess_heartbeatmonitor plugin.
  *
- * @package    mod_quiz
- * @copyright  2010 Matt Petro
+ * @package    quizaccess
+ * @subpackage heartbeatmonitor
+ * @author     P Sunthar, Amrata Ramchandani <ramchandani.amrata@gmail.com>, Kashmira Nagwekar
+ * @copyright  2017 IIT Bombay, India
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -27,6 +29,7 @@ require_once('../../../../config.php');
 // require_once($CFG->dirroot.'/mod/quiz/lib.php');
 // require_once($CFG->dirroot.'/mod/quiz/locallib.php');
 // require_once($CFG->dirroot.'/mod/quiz/override_form.php');
+require_once($CFG->dirroot . '/mod/quiz/accessrule/heartbeatmonitor/setoverride_form.php');
 
 
 $quizid     = required_param('quizid', PARAM_INT);
@@ -42,9 +45,15 @@ $mode = "user";
 
 // Strings.
 $pluginname = get_string('pluginname', 'quizaccess_heartbeatmonitor');
+$heading    = get_string('heading', 'quizaccess_heartbeatmonitor', $quiz->name);
+
+$overrideediturl = new moodle_url('/mod/quiz/overrideedit.php');//, array(
+//         'quizid' => $quizid,
+//         'courseid' => $courseid,
+//         'cmid' => $cmid
+// ));
 
 $url = new moodle_url('/mod/quiz/accessrule/heartbeatmonitor/index.php', array('quizid'=>$quizid, 'courseid'=>$courseid, 'cmid'=>$cmid));
-
 $PAGE->set_url($url);
 
 require_login($course, false, $cm);
@@ -59,16 +68,10 @@ $PAGE->set_pagelayout('admin');
 $PAGE->set_title($pluginname);
 $PAGE->set_heading($course->fullname);
 echo $OUTPUT->header();
-// echo $OUTPUT->heading(format_string($quiz->name, true, array('context' => $context)));
-echo $OUTPUT->heading(format_string($pluginname, true, array('context' => $context)));
-
-echo '<br>';
+echo $OUTPUT->heading($heading) . '<br>';
 
 // Display live users.
 // Fetch records from database.
-// mysql_connect('localhost','root','root123');
-// mysql_select_db("trialdb");
-
 $servername = "localhost";
 $username   = "root";
 $password   = "root123";
@@ -83,68 +86,48 @@ if ($conn->connect_error) {
 }
 // echo "Connected successfully";
 
-$sql = 'SELECT * FROM livetable1';
+$sql = 'SELECT * FROM livetable1';  // Select data for a particular quiz and not entire table..insert quizid col in livetable1 for this.
 $result = $conn->query($sql);
 
 $table = new html_table();
-$table->head = array('Roomid', 'Status', 'Time to consider', 'Live time', 'Dead time');
+$table->caption = get_string('liveusers', 'quizaccess_heartbeatmonitor');
+$table->head = array('', 'Roomid', 'Status', 'Time to consider', 'Live time', 'Dead time');
 
 if ($result->num_rows > 0) {
     // Output data of each row.
     while($data = $result->fetch_assoc()) {
-        //                 $table->data[] = array($data["roomid"], $data["status"], $data["timetoconsider"], $data["livetime"], $data["deadtime"]);
-
         $roomid          = $data["roomid"];
-        $status          = $data["status"];
-        $timetoconsider  = $data["timetoconsider"];
-        $livetime        = $data["livetime"];
-        $deadtime        = $data["deadtime"];
+        $arr             = explode("_", $roomid);
+        $attemptid       = $arr[count($arr) - 1];
+        $quizid1         = $arr[count($arr) - 2];
 
-//         $now = new DateTime();
-//         $currentTimestamp = $now->getTimestamp();
-        $currentTimestamp = intval(microtime(true)*1000);
+        if($quizid1 == $quizid) {
+            $status          = $data["status"];
+            $timetoconsider  = $data["timetoconsider"];
+            $livetime        = $data["livetime"];
+            $deadtime        = $data["deadtime"];
 
-        if ($status == 'Live') {
-            $livetime = ($currentTimestamp - $timetoconsider) + $livetime;
-        } else {
-            $deadtime = ($currentTimestamp - $timetoconsider) + $deadtime;
-        }
+            $currentTimestamp = intval(microtime(true)*1000);
 
-//         $humanisedlivetime = humanise($livetime);
-//         $humaniseddeadtime = humanise($deadtime);
+            if ($status == 'Live') {
+                $livetime = ($currentTimestamp - $timetoconsider) + $livetime;
+            } else {
+                $deadtime = ($currentTimestamp - $timetoconsider) + $deadtime;
+            }
 
-        $humanisedlivetime = secondsToTime(intval($livetime / 1000));
-        $humaniseddeadtime = secondsToTime(intval($deadtime / 1000));
-
-//         if(isset($table->rowclasses['roomid'])) {
-//             // remove prev. row and add updated row
-// //             delete_field::$roomid;
-
-//             $table->rowclasses['roomid'] = $roomid;
-//             $row = new html_table_row();
-//             $row->id = $roomid;
-// //             $row->attributes['class'] = $roomid;
-
-//             $cell1 = new html_table_cell($roomid);
-//             $cell2 = new html_table_cell($status);
-//             $cell3 = new html_table_cell($timetoconsider);
-//             $cell4 = new html_table_cell($humanisedlivetime);
-//             $cell5 = new html_table_cell($humaniseddeadtime);
-
-//             $row->cells[] = $cell1;
-//             $row->cells[] = $cell2;
-//             $row->cells[] = $cell3;
-//             $row->cells[] = $cell4;
-//             $row->cells[] = $cell5;
-
-//             $table->data[] = $row;
-//         } else {
-//             echo 'else';
+            $humanisedlivetime = secondsToTime(intval($livetime / 1000));
+            $humaniseddeadtime = secondsToTime(intval($deadtime / 1000));
 
             $table->rowclasses['roomid'] = $roomid;
-            $row = new html_table_row();
-            $row->id = $roomid;
-            //             $row->attributes['class'] = $roomid;
+            $row        = new html_table_row();
+            $row->id    = $roomid;
+            $row->attributes['class'] = $roomid;
+
+            $cell0 = new html_table_cell(
+                        html_writer::empty_tag('input', array('type'  => 'checkbox',
+                                                              'name'  => $roomid,
+                                                              'class' => 'setoverride')));
+            $cell0->id = 'select';
 
             $cell1 = new html_table_cell($roomid);
             $cell1->id = 'roomid';
@@ -161,8 +144,9 @@ if ($result->num_rows > 0) {
 
             $cell5 = new html_table_cell($humaniseddeadtime);
             $cell5->id = 'deadtime';
-            $cell4->attributes['value'] = $deadtime;
+            $cell5->attributes['value'] = $deadtime;
 
+            $row->cells[] = $cell0;
             $row->cells[] = $cell1;
             $row->cells[] = $cell2;
             $row->cells[] = $cell3;
@@ -170,21 +154,42 @@ if ($result->num_rows > 0) {
             $row->cells[] = $cell5;
 
             $table->data[] = $row;
-//         }
+        }
     }
 }
-echo html_writer::table($table);
+
+if(!empty($table->data)) {
+    echo html_writer::table($table);
+    $options = null;
+    echo $OUTPUT->single_button($overrideediturl->out(true,
+            array('action' => 'adduser', 'cmid' => $cm->id)),
+            get_string('addnewuseroverride', 'quiz'), 'get', $options);
+
+    $mform = new setoverride_form(null);
+    $formdata = array ('quizid' => $quizid, 'courseid' => $courseid, 'cmid' => $cmid);
+    $mform->set_data($formdata);
+    $mform->display();
+
+    // Implement overrides.
+    if ($fromformdata = $mform->get_data()) {
+        if (!empty($fromformdata->save)) {
+            $overrideediturl->param('action', 'adduser');
+            $overrideediturl->param('cmid', $cmid);
+            redirect($overrideediturl);
+        }
+    }
+} else {
+    echo $OUTPUT->notification(get_string('nodatafound', 'quizaccess_heartbeatmonitor'), 'info');
+}
 
 function secondsToTime($seconds) {
     $dtF = new DateTime('@0');
     $dtT = new DateTime("@$seconds");
     return $dtF->diff($dtT)->format('%a d, %h h : %i m : %s s');
 }
-
 ?>
 
 <script>
-
 function humanise(difference) {
     var days    = Math.floor(difference / (1000 * 60 * 60 * 24));
     var hours   = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
@@ -195,23 +200,19 @@ function humanise(difference) {
 }
 
 function countDownTimer(livetime, deadtime) {
-
     $(document).ready(function() {
         var interval = setInterval(function() {
             // Database should also be queried every sec.
-
             // Update livetime and deadtime every sec.
     	    var status = $('#status').html();
     	    var timetoconsider = $('#timetoconsider').html();
 //     	    var livetime = $('#livetime').html();
 //     	    var deadtime = $('#deadtime').html();
     	    var currentTimestamp = new Date().getTime();
-
 //     	    alert(currentTimestamp + '  ' + timetoconsider + '  ' + livetime);
 //             alert(humanise((currentTimestamp - timetoconsider) + livetime));
 //             alert(humanise(livetime1));
 //             alert(humanise(currentTimestamp) + '  ' + humanise(timetoconsider) + '  ' + humanise(livetime));
-
             if (status == 'Live') {
 //                 livetime = parseInt(currentTimestamp - timetoconsider);
                 livetime = livetime + 1000;
@@ -219,36 +220,19 @@ function countDownTimer(livetime, deadtime) {
 //                 deadtime = parseInt(currentTimestamp - timetoconsider);
                 deadtime = deadtime + 1000;
             }
-
             var humanisedlivetime = humanise(livetime);
             var humaniseddeadtime = humanise(deadtime);
-
             $('#livetime').html(humanisedlivetime);
     	    $('#deadtime').html(humaniseddeadtime);
-
 		}, 1000);
     });
 }
 </script>
 
-
-<!-- setInterval(function() { -->
-<!--     $.get("/calculatetime", function(data) { -->
-<!--         alert('hhi '); -->
-
-<!--     }); -->
-
-<!--     $(document).ready(function(){ -->
-<!--         window.setInterval(getScreenGen, 5000); // call our function every 5 sec -->
-<!--     }); -->
-
-<!-- }, 1000); -->
-
-<!-- </script> -->
-
 <?php
-echo "<script type='text/javascript'>countDownTimer($livetime, $deadtime);</script>";
-// echo 'hi';
+if(isset($livetime, $deadtime)) {
+    echo "<script type='text/javascript'>countDownTimer($livetime, $deadtime);</script>";
+}
 $conn->close();
 
 // Finish the page.

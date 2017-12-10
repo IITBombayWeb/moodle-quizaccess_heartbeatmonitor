@@ -8,29 +8,43 @@
 //
 // Moodle is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle. If not, see <http://www.gnu.org/licenses/>.
+defined('MOODLE_INTERNAL') || die();
+
+require_once ($CFG->libdir . '/formslib.php');
 
 /**
- * Strings for the quizaccess_heartbeatmonitor plugin.
-
+ * Set overrides form.
+ *
  * @package    quizaccess
  * @subpackage heartbeatmonitor
  * @author     P Sunthar, Amrata Ramchandani <ramchandani.amrata@gmail.com>, Kashmira Nagwekar
  * @copyright  2017 IIT Bombay, India
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+class setoverride_form extends moodleform {
 
+    /**
+     * Form definition method.
+     */
+    function definition() {
+        global $CFG;
+        $mform = $this->_form;
 
-defined('MOODLE_INTERNAL') || die();
+        $mform->addElement('hidden', 'quizid');
+        $mform->setType('quizid', PARAM_INT);
 
+        $mform->addElement('hidden', 'courseid');
+        $mform->setType('courseid', PARAM_INT);
 
-$string['pluginname'] = 'Hearbeat monitor quiz access rule';
-$string['calculatetime'] = 'Calculate time';
-$string['liveusers'] = 'Live users';
-$string['nodatafound'] = 'No data found.';
-$string['heading'] = '{$a} | Heartbeat monitor ';
+        $mform->addElement('hidden', 'cmid');
+        $mform->setType('cmid', PARAM_INT);
 
+        $submitstring = "Set overrides";
+        $mform->addElement('submit', 'save', $submitstring);
+    }
+}
