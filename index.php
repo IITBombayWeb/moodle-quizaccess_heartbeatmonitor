@@ -63,22 +63,15 @@ $context = context_module::instance($cm->id);
 // Check the user has the required capabilities to access this plugin.
 require_capability('mod/quiz:manage', $context);
 
-// Page setup.
-$PAGE->set_pagelayout('admin');
-$PAGE->set_title($pluginname);
-$PAGE->set_heading($course->fullname);
-echo $OUTPUT->header();
-echo $OUTPUT->heading($heading) . '<br>';
-
 // Display live users.
 // Fetch records from database.
 $servername = "localhost";
-$username   = "root";
-$password   = "root123";
+$dbusername   = "root";
+$dbpassword   = "root123";
 $dbname     = "trialdb";
 
 // Create connection
-$conn = new mysqli($servername, $username, $password, $dbname);
+$conn = new mysqli($servername, $dbusername, $dbpassword, $dbname);
 
 // Check connection
 if ($conn->connect_error) {
@@ -88,6 +81,8 @@ if ($conn->connect_error) {
 
 $sql = 'SELECT * FROM livetable1';  // Select data for a particular quiz and not entire table..insert quizid col in livetable1 for this.
 $result = $conn->query($sql);
+$arr = array();
+$roomid = null;
 
 $table = new html_table();
 $table->caption = get_string('liveusers', 'quizaccess_heartbeatmonitor');
@@ -96,10 +91,17 @@ $table->head = array('', 'Roomid', 'Status', 'Time to consider', 'Live time', 'D
 if ($result->num_rows > 0) {
     // Output data of each row.
     while($data = $result->fetch_assoc()) {
-        $roomid          = $data["roomid"];
-        $arr             = explode("_", $roomid);
-        $attemptid       = $arr[count($arr) - 1];
-        $quizid1         = $arr[count($arr) - 2];
+        $roomid         = $data["roomid"];
+        $arr            = explode("_", $roomid);
+//         $attemptid      = $arr[count($arr) - 1];
+//         $quizid1        = $arr[count($arr) - 2];
+
+//         $quizid1        = array_slice($arr, -2, 1)[0];
+//         $attemptid      = array_slice($arr, -1)[0];
+
+        $attemptid      = array_splice($arr, -1)[0];
+        $quizid1        = array_splice($arr, -1)[0];
+        $username       = implode("_", $arr);
 
         if($quizid1 == $quizid) {
             $status          = $data["status"];
@@ -119,13 +121,14 @@ if ($result->num_rows > 0) {
             $humaniseddeadtime = secondsToTime(intval($deadtime / 1000));
 
             $table->rowclasses['roomid'] = $roomid;
-            $row        = new html_table_row();
-            $row->id    = $roomid;
+            $row = new html_table_row();
+            $row->id = $roomid;
             $row->attributes['class'] = $roomid;
 
             $cell0 = new html_table_cell(
                         html_writer::empty_tag('input', array('type'  => 'checkbox',
-                                                              'name'  => $roomid,
+                                                              'name'  => 'setoverride',
+                                                              'value' => $roomid,
                                                               'class' => 'setoverride')));
             $cell0->id = 'select';
 
@@ -158,28 +161,38 @@ if ($result->num_rows > 0) {
     }
 }
 
-if(!empty($table->data)) {
+$mform = new setoverride_form(null);
+$formdata = array ('quizid' => $quizid, 'courseid' => $courseid, 'cmid' => $cmid);
+$mform->set_data($formdata);
+
+if ($fromformdata = $mform->get_data()) {
+    if (!empty($fromformdata->save)) {
+        // Implement overrides.
+        $overrideediturl->param('action', 'adduser');
+        $overrideediturl->param('cmid', $cmid);
+        redirect($overrideediturl);
+    }
+} else if(empty($table->data)) {
+    echo $OUTPUT->notification(get_string('nodatafound', 'quizaccess_heartbeatmonitor'), 'info');
+} else {
+    // Page setup.
+    $PAGE->set_pagelayout('admin');
+    $PAGE->set_title($pluginname);
+    $PAGE->set_heading($course->fullname);
+    echo $OUTPUT->header();
+    echo $OUTPUT->heading($heading);
+
+//     echo 'hi';
+//     $username = preg_replace("\\w+>$", "", $roomid);
+
     echo html_writer::table($table);
-    $options = null;
+    $options = array();
     echo $OUTPUT->single_button($overrideediturl->out(true,
             array('action' => 'adduser', 'cmid' => $cm->id)),
             get_string('addnewuseroverride', 'quiz'), 'get', $options);
-
-    $mform = new setoverride_form(null);
-    $formdata = array ('quizid' => $quizid, 'courseid' => $courseid, 'cmid' => $cmid);
-    $mform->set_data($formdata);
     $mform->display();
 
-    // Implement overrides.
-    if ($fromformdata = $mform->get_data()) {
-        if (!empty($fromformdata->save)) {
-            $overrideediturl->param('action', 'adduser');
-            $overrideediturl->param('cmid', $cmid);
-            redirect($overrideediturl);
-        }
-    }
-} else {
-    echo $OUTPUT->notification(get_string('nodatafound', 'quizaccess_heartbeatmonitor'), 'info');
+    echo html_writer::div('', 'checkedusers');
 }
 
 function secondsToTime($seconds) {
@@ -199,7 +212,7 @@ function humanise(difference) {
     return time;
 }
 
-function countDownTimer(livetime, deadtime) {
+function run_script(livetime, deadtime) {
     $(document).ready(function() {
         var interval = setInterval(function() {
             // Database should also be queried every sec.
@@ -208,30 +221,47 @@ function countDownTimer(livetime, deadtime) {
     	    var timetoconsider = $('#timetoconsider').html();
 //     	    var livetime = $('#livetime').html();
 //     	    var deadtime = $('#deadtime').html();
-    	    var currentTimestamp = new Date().getTime();
-//     	    alert(currentTimestamp + '  ' + timetoconsider + '  ' + livetime);
-//             alert(humanise((currentTimestamp - timetoconsider) + livetime));
+    	    var timenow = new Date().getTime();
+//     	    alert(timenow + '  ' + timetoconsider + '  ' + livetime);
+//             alert(humanise((timenow - timetoconsider) + livetime));
 //             alert(humanise(livetime1));
-//             alert(humanise(currentTimestamp) + '  ' + humanise(timetoconsider) + '  ' + humanise(livetime));
+//             alert(humanise(timenow) + '  ' + humanise(timetoconsider) + '  ' + humanise(livetime));
             if (status == 'Live') {
-//                 livetime = parseInt(currentTimestamp - timetoconsider);
+//                 livetime = parseInt(timenow - timetoconsider);
                 livetime = livetime + 1000;
             } else {
-//                 deadtime = parseInt(currentTimestamp - timetoconsider);
+//                 deadtime = parseInt(timenow - timetoconsider);
                 deadtime = deadtime + 1000;
             }
             var humanisedlivetime = humanise(livetime);
             var humaniseddeadtime = humanise(deadtime);
             $('#livetime').html(humanisedlivetime);
     	    $('#deadtime').html(humaniseddeadtime);
+
+    	    var users = [];
+    	    $('.setoverride:checked').each(function() {
+    	        users.push($(this).val());
+    	    });
+    	    $('.checkedusers').html('Selected users: <br>');
+    	    $('.checkedusers').append(users.join(" "));
 		}, 1000);
     });
 }
+
+// function getusers() {
+//     var users = [];
+//     $('.setoverride:checked').each(function() {
+//         users.push($(this).val());
+//     });
+//     $('.checkedusers').html('Selected users: <br>');
+//     $('.checkedusers').append(users.join(" "));
+// }
 </script>
 
 <?php
 if(isset($livetime, $deadtime)) {
-    echo "<script type='text/javascript'>countDownTimer($livetime, $deadtime);</script>";
+    echo "<script type='text/javascript'>run_script($livetime, $deadtime);</script>";
+//     echo "<script type='text/javascript'>getusers();</script>";
 }
 $conn->close();
 
