@@ -29,7 +29,8 @@ require_once('../../../../config.php');
 // require_once($CFG->dirroot.'/mod/quiz/lib.php');
 // require_once($CFG->dirroot.'/mod/quiz/locallib.php');
 // require_once($CFG->dirroot.'/mod/quiz/override_form.php');
-require_once($CFG->dirroot . '/mod/quiz/accessrule/heartbeatmonitor/setoverride_form.php');
+require_once($CFG->dirroot . '/mod/quiz/accessrule/heartbeatmonitor/timelimit_override_form.php');
+require_once($CFG->dirroot . '/mod/quiz/override_form.php');
 
 
 $quizid     = required_param('quizid', PARAM_INT);
@@ -37,6 +38,7 @@ $courseid   = required_param('courseid', PARAM_INT);
 $cmid       = required_param('cmid', PARAM_INT);
 // $mode = optional_param('mode', '', PARAM_ALPHA); // One of 'user' or 'group', default is 'group'.
 
+echo '<br><br><br>';
 list($course, $cm) = get_course_and_cm_from_cmid($cmid, 'quiz');
 $quiz = $DB->get_record('quiz', array('id' => $cm->instance), '*', MUST_EXIST);
 
@@ -46,12 +48,6 @@ $mode = "user";
 // Strings.
 $pluginname = get_string('pluginname', 'quizaccess_heartbeatmonitor');
 $heading    = get_string('heading', 'quizaccess_heartbeatmonitor', $quiz->name);
-
-$overrideediturl = new moodle_url('/mod/quiz/overrideedit.php');//, array(
-//         'quizid' => $quizid,
-//         'courseid' => $courseid,
-//         'cmid' => $cmid
-// ));
 
 $url = new moodle_url('/mod/quiz/accessrule/heartbeatmonitor/index.php', array('quizid'=>$quizid, 'courseid'=>$courseid, 'cmid'=>$cmid));
 $PAGE->set_url($url);
@@ -66,8 +62,8 @@ require_capability('mod/quiz:manage', $context);
 // Display live users.
 // Fetch records from database.
 $servername = "localhost";
-$dbusername   = "root";
-$dbpassword   = "root123";
+$dbusername = "root";
+$dbpassword = "root123";
 $dbname     = "trialdb";
 
 // Create connection
@@ -86,7 +82,7 @@ $roomid = null;
 
 $table = new html_table();
 $table->caption = get_string('liveusers', 'quizaccess_heartbeatmonitor');
-$table->head = array('', 'Roomid', 'Status', 'Time to consider', 'Live time', 'Dead time');
+$table->head = array('', 'Socket room id', 'Current status', 'Status change occurred at', 'Live time', 'Dead time');
 
 if ($result->num_rows > 0) {
     // Output data of each row.
@@ -138,7 +134,7 @@ if ($result->num_rows > 0) {
             $cell2 = new html_table_cell($status);
             $cell2->id = 'status';
 
-            $cell3 = new html_table_cell($timetoconsider);
+            $cell3 = new html_table_cell(userdate(intval($timetoconsider / 1000)));
             $cell3->id = 'timetoconsider';
 
             $cell4 = new html_table_cell($humanisedlivetime);
@@ -161,35 +157,42 @@ if ($result->num_rows > 0) {
     }
 }
 
-$mform = new setoverride_form(null);
-$formdata = array ('quizid' => $quizid, 'courseid' => $courseid, 'cmid' => $cmid);
-$mform->set_data($formdata);
+// Setup the form.
+// $user = $DB->get_record('user', array('username'=>$username));
+$userid = 5;
+$timelimit = 5000;
+
+$overrideediturl = new moodle_url('/mod/quiz/overrideedit.php');
+$mform = new timelimit_override_form($overrideediturl, $cm, $quiz, $context, $userid, $timelimit);
+// $mform->set_data();
+
+// $mform = new timelimit_override_form(new moodle_url('/mod/quiz/overrideedit.php'));
+// $formdata = array ('userid' => 5);
+// $mform->set_data($formdata);
 
 if ($fromformdata = $mform->get_data()) {
     if (!empty($fromformdata->save)) {
-        // Implement overrides.
-        $overrideediturl->param('action', 'adduser');
-        $overrideediturl->param('cmid', $cmid);
-        redirect($overrideediturl);
+
     }
+
 } else if(empty($table->data)) {
     echo $OUTPUT->notification(get_string('nodatafound', 'quizaccess_heartbeatmonitor'), 'info');
+
 } else {
     // Page setup.
     $PAGE->set_pagelayout('admin');
     $PAGE->set_title($pluginname);
     $PAGE->set_heading($course->fullname);
     echo $OUTPUT->header();
-    echo $OUTPUT->heading($heading);
-
-//     echo 'hi';
-//     $username = preg_replace("\\w+>$", "", $roomid);
+//     echo $OUTPUT->heading($heading);
+    echo $OUTPUT->heading(format_string($quiz->name, true, array('context' => $context)));
 
     echo html_writer::table($table);
     $options = array();
-    echo $OUTPUT->single_button($overrideediturl->out(true,
-            array('action' => 'adduser', 'cmid' => $cm->id)),
-            get_string('addnewuseroverride', 'quiz'), 'get', $options);
+//     echo $OUTPUT->single_button($overrideediturl->out(true,
+//             array('action' => 'adduser', 'cmid' => $cm->id)),
+//             get_string('addnewuseroverride', 'quiz'), 'get', $options);
+
     $mform->display();
 
     echo html_writer::div('', 'checkedusers');
@@ -235,6 +238,7 @@ function run_script(livetime, deadtime) {
             }
             var humanisedlivetime = humanise(livetime);
             var humaniseddeadtime = humanise(deadtime);
+
             $('#livetime').html(humanisedlivetime);
     	    $('#deadtime').html(humaniseddeadtime);
 
@@ -242,8 +246,10 @@ function run_script(livetime, deadtime) {
     	    $('.setoverride:checked').each(function() {
     	        users.push($(this).val());
     	    });
-    	    $('.checkedusers').html('Selected users: <br>');
-    	    $('.checkedusers').append(users.join(" "));
+//             if(users.length > 0) {
+//         	    $('.checkedusers').html('Selected users: <br>');
+//         	    $('.checkedusers').append(users.join(" "));
+//             }
 		}, 1000);
     });
 }
