@@ -81,23 +81,24 @@ $arr = array();
 $roomid = null;
 
 $table = new html_table();
+$table->id = 'liveusers';
 $table->caption = get_string('liveusers', 'quizaccess_heartbeatmonitor');
-$table->head = array('', 'Socket room id', 'Current status', 'Status change occurred at', 'Live time', 'Dead time');
+$table->head = array('', 'Socket room id', 'Current status', 'Status update on', 'Live time', 'Dead time');
 
 if ($result->num_rows > 0) {
     // Output data of each row.
     while($data = $result->fetch_assoc()) {
         $roomid         = $data["roomid"];
         $arr            = explode("_", $roomid);
-//         $attemptid      = $arr[count($arr) - 1];
-//         $quizid1        = $arr[count($arr) - 2];
-
-//         $quizid1        = array_slice($arr, -2, 1)[0];
-//         $attemptid      = array_slice($arr, -1)[0];
-
         $attemptid      = array_splice($arr, -1)[0];
         $quizid1        = array_splice($arr, -1)[0];
         $username       = implode("_", $arr);
+//         echo 'un ' . $username;
+        $user           = $DB->get_record('user', array('username'=>$username));
+//         print_object($user);
+        if($user) {
+            $userid         = $user->id;
+        }
 
         if($quizid1 == $quizid) {
             $status          = $data["status"];
@@ -121,10 +122,11 @@ if ($result->num_rows > 0) {
             $row->id = $roomid;
             $row->attributes['class'] = $roomid;
 
+            $value = $roomid . '_' . $deadtime;
             $cell0 = new html_table_cell(
                         html_writer::empty_tag('input', array('type'  => 'checkbox',
                                                               'name'  => 'setoverride',
-                                                              'value' => $roomid,
+                                                              'value' => $value,
                                                               'class' => 'setoverride')));
             $cell0->id = 'select';
 
@@ -157,25 +159,43 @@ if ($result->num_rows > 0) {
     }
 }
 
+$sql1 = 'SELECT * FROM livetable1 WHERE status = "Live" AND deadtime <> 0';  // Select data for a particular quiz and not entire table..insert quizid col in livetable1 for this.
+$result = $conn->query($sql1);
+$deadtime1 = null;
+$userid1 = null;
+if ($result->num_rows > 0) {
+    // Output data of each row.
+    while($data = $result->fetch_assoc()) {
+        $roomid1         = $data["roomid"];
+
+        $arr            = explode("_", $roomid1);
+        $attemptid      = array_splice($arr, -1)[0];
+        $quizid1        = array_splice($arr, -1)[0];
+        $username       = implode("_", $arr);
+
+        $user           = $DB->get_record('user', array('username'=>$username));
+        $userid1         = $user->id;
+
+        if($quizid1 == $quizid) {
+            $status1          = $data["status"];
+            $timetoconsider1  = $data["timetoconsider"];
+            $livetime1        = $data["livetime"];
+            $deadtime1        = $data["deadtime"];
+            echo $roomid1 . ' ' . $livetime1;
+        }
+    }
+}
+
 // Setup the form.
 // $user = $DB->get_record('user', array('username'=>$username));
-$userid = 5;
-$timelimit = 5000;
+// $userid = 5;
+$timelimit = $quiz->timelimit + $deadtime1;
+$a = null;
 
 $overrideediturl = new moodle_url('/mod/quiz/overrideedit.php');
-$mform = new timelimit_override_form($overrideediturl, $cm, $quiz, $context, $userid, $timelimit);
-// $mform->set_data();
+$mform = new timelimit_override_form($overrideediturl, $cm, $quiz, $context, $userid1, $timelimit);
 
-// $mform = new timelimit_override_form(new moodle_url('/mod/quiz/overrideedit.php'));
-// $formdata = array ('userid' => 5);
-// $mform->set_data($formdata);
-
-if ($fromformdata = $mform->get_data()) {
-    if (!empty($fromformdata->save)) {
-
-    }
-
-} else if(empty($table->data)) {
+if(empty($table->data)) {
     echo $OUTPUT->notification(get_string('nodatafound', 'quizaccess_heartbeatmonitor'), 'info');
 
 } else {
@@ -184,14 +204,9 @@ if ($fromformdata = $mform->get_data()) {
     $PAGE->set_title($pluginname);
     $PAGE->set_heading($course->fullname);
     echo $OUTPUT->header();
-//     echo $OUTPUT->heading($heading);
     echo $OUTPUT->heading(format_string($quiz->name, true, array('context' => $context)));
 
     echo html_writer::table($table);
-    $options = array();
-//     echo $OUTPUT->single_button($overrideediturl->out(true,
-//             array('action' => 'adduser', 'cmid' => $cm->id)),
-//             get_string('addnewuseroverride', 'quiz'), 'get', $options);
 
     $mform->display();
 
@@ -215,60 +230,108 @@ function humanise(difference) {
     return time;
 }
 
-function run_script(livetime, deadtime) {
+function run_script() {
     $(document).ready(function() {
         var interval = setInterval(function() {
-            // Database should also be queried every sec.
-            // Update livetime and deadtime every sec.
-    	    var status = $('#status').html();
-    	    var timetoconsider = $('#timetoconsider').html();
-//     	    var livetime = $('#livetime').html();
-//     	    var deadtime = $('#deadtime').html();
-    	    var timenow = new Date().getTime();
-//     	    alert(timenow + '  ' + timetoconsider + '  ' + livetime);
-//             alert(humanise((timenow - timetoconsider) + livetime));
-//             alert(humanise(livetime1));
-//             alert(humanise(timenow) + '  ' + humanise(timetoconsider) + '  ' + humanise(livetime));
-            if (status == 'Live') {
-//                 livetime = parseInt(timenow - timetoconsider);
-                livetime = livetime + 1000;
-            } else {
-//                 deadtime = parseInt(timenow - timetoconsider);
-                deadtime = deadtime + 1000;
-            }
-            var humanisedlivetime = humanise(livetime);
-            var humaniseddeadtime = humanise(deadtime);
+//             alert('hi');
+            // Database should also be queried every sec.====================================
 
-            $('#livetime').html(humanisedlivetime);
-    	    $('#deadtime').html(humaniseddeadtime);
+            // Update livetime and deadtime every sec.====================================
+            $('tbody tr').each(function() {
+        	    var status = $(this).find('#status').html();
+        	    var timetoconsider = $(this).find('#timetoconsider').html();
+        	    var livetime = $('#livetime').attr('value');
+        	    var deadtime = $('#deadtime').attr('value');
+        	    var timenow = new Date().getTime();
+    //     	    alert(timenow + '  ' + timetoconsider + '  ' + livetime);
+    //             alert(humanise((timenow - timetoconsider) + livetime));
+    //             alert(humanise(livetime1));
+    //             alert(humanise(timenow) + '  ' + humanise(timetoconsider) + '  ' + humanise(livetime));
+                if (status == 'Live') {
+    //                 livetime = parseInt(timenow - timetoconsider);
+                    livetime = livetime + 1000;
+                } else {
+    //                 deadtime = parseInt(timenow - timetoconsider);
+                    deadtime = deadtime + 1000;
+                }
+                var humanisedlivetime = humanise(livetime);
+                var humaniseddeadtime = humanise(deadtime);
 
-    	    var users = [];
-    	    $('.setoverride:checked').each(function() {
-    	        users.push($(this).val());
-    	    });
-//             if(users.length > 0) {
-//         	    $('.checkedusers').html('Selected users: <br>');
+                $(this).find('#livetime').html(humanisedlivetime);
+                $(this).find('#deadtime').html(humaniseddeadtime);
+
+                // Remove checkbox, if status = 'Dead'.====================================
+        	    if (status == 'Dead') {
+        	    	$(this).find('#select').html('');
+                }
+            });
+
+    	   // Get selected users.====================================
+//     	    var users = new Array();
+//     	    $('.setoverride:checked').each(function() {
+//     	        users.push($(this).val());
+//     	    });
+// //             if(users.length > 0) {
+//         	    $('.checkedusers').html('Selected Users<br>');
 //         	    $('.checkedusers').append(users.join(" "));
-//             }
+// //             }
 		}, 1000);
     });
+
 }
 
-// function getusers() {
-//     var users = [];
-//     $('.setoverride:checked').each(function() {
-//         users.push($(this).val());
-//     });
-//     $('.checkedusers').html('Selected users: <br>');
-//     $('.checkedusers').append(users.join(" "));
-// }
+function getusers() {
+	$(document).ready(function() {
+        var interval = setInterval(function() {
+//             alert('hi');
+            var users = [];
+            var user;
+            $('.setoverride:checked').each(function() {
+            	 var $row = $(this).closest("tr");    // Find the row
+            	 var roomid = $row.find("#roomid").text();
+//             	 var user = {roomid:roomid};
+                 var status = $row.find("#status").text(); // Find the name
+                 var timetoconsider = $row.find("#timetoconsider").text(); // Find the surname
+                 var livetime = $row.find("#livetime").text();
+                 var deadtime = $row.find("#deadtime").text();
+
+//                 users.push($(this).val());
+//                  users.push(user);
+                 users.push(roomid + '/' + status + '/' + deadtime);
+            });
+            $('.checkedusers').html('Selected users: <br>');
+            $('.checkedusers').append(users.join(" "));
+//             alert(users[0]);
+
+//             return users[0];
+//             $.post(window.location, {name: 'John'}, success: function(data) {
+//                   alert('POST was successful. Server says: ' + data);
+//                 });
+        }, 1000);
+	});
+}
+
+function divscript() {
+	return $('.checkedusers').text();
+}
+
 </script>
 
 <?php
-if(isset($livetime, $deadtime)) {
-    echo "<script type='text/javascript'>run_script($livetime, $deadtime);</script>";
+
+// if(isset($livetime, $deadtime)) {
+//     $result = null;
+//     echo "<script type='text/javascript'>run_script();</script>";
 //     echo "<script type='text/javascript'>getusers();</script>";
-}
+
+    echo 'why';
+    function a() {
+        echo "<script type='text/javascript'>divscript();</script>";
+    }
+    echo 'here';
+    a();
+    echo 'now';
+// }
 $conn->close();
 
 // Finish the page.

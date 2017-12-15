@@ -37,14 +37,11 @@ class timelimit_override_form extends moodleform {
     /** @var context the quiz context. */
     protected $context;
 
-//     /** @var bool editing group override (true) or user override (false). */
-//     protected $groupmode;
-
-//     /** @var int groupid, if provided. */
-//     protected $groupid;
-
     /** @var int userid, if provided. */
     protected $userid;
+
+    /** @var int timelimit, if provided. */
+    protected $timelimit;
 
     /**
      * Constructor.
@@ -52,18 +49,15 @@ class timelimit_override_form extends moodleform {
      * @param object course module object.
      * @param object the quiz settings object.
      * @param context the quiz context.
-     * @param bool editing group override (true) or user override (false).
-     * @param object $override the override being edited, if it already exists.
      */
     public function __construct($submiturl, $cm, $quiz, $context, $userid, $timelimit) {
 
         $this->cm = $cm;
         $this->quiz = $quiz;
         $this->context = $context;
-//         $this->groupmode = $groupmode;
-//         $this->groupid = empty($override->groupid) ? 0 : $override->groupid;
         $this->userid = empty($userid) ? 0 : $userid;
         $this->timelimit = $timelimit;
+//         $this->a = $a;
 
         parent::__construct($submiturl, null, 'post');
 
@@ -89,6 +83,7 @@ class timelimit_override_form extends moodleform {
         $mform->setType('cmid', PARAM_INT);
         $mform->setDefault('cmid', $cm->id);
 
+//         // Quiz.
 //         $mform->addElement('hidden', 'quiz');
 //         $mform->setType('quiz', PARAM_INT);
 //         $mform->setDefault('quiz', $this->quiz->id);
@@ -101,7 +96,7 @@ class timelimit_override_form extends moodleform {
         $mform->setType('mform_isexpanded_id_override', PARAM_INT);
         $mform->setDefault('mform_isexpanded_id_override', 1);
 
-        // User id.
+        // User ID.
         $mform->addElement('hidden', 'userid');
         $mform->setType('userid', PARAM_INT);
         $mform->setDefault('userid', $this->userid);
