@@ -233,6 +233,7 @@ var record = io.sockets.on('connection', function (socket) {
 		    
 		    // Fetch previous entry for this user from 'livetable1'.
 		    var fetchtimesql = "SELECT timetoconsider, livetime FROM livetable1 WHERE roomid = " + socket.roomid;
+		    
 		    con.query(fetchtimesql, function(err, result) {
 		    	if (err) throw err;
 		
@@ -290,26 +291,6 @@ app.get('/livestatus', function(req, res) {
         }
         res.send(result);
     });
-});
-
-app.get('/calculatetime', function(req, res) {
-	res.send('from server');
-//    var sql = "SELECT * FROM livetable1";
-//    con.query(sql, function(err, result, fields) {
-//        if (err) throw err;
-//        for(i in result){
-//        	result[i].totalconnectedsockets = totalconnectedsockets;
-////        	console.log('totalconnectedsockets: ' + totalconnectedsockets); 
-////        	console.log('rmid: ' + result[i].roomid);        	
-//        	var roomid = "'" + result[i].roomid + "'";
-////        	console.log('rwsc: ' + roomwisesocketids[roomid]);      	
-//        	result[i].roomwisesockets = roomwisesocketids[roomid];
-//        	result[i].allsockets = allsocketids;
-//        	result[i].allsocketscount = allsocketscount;
-////        	console.log('resrwsc: ' + result[i].roomwisesockets);
-//        }
-//        res.send(result);
-//    });
 });
 
 function findsocketsinaroom(io, roomid) {

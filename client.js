@@ -23,20 +23,6 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-//$(function(){		//-------------------using jquery------------------------------------
-	// connect to the socket
-//	var socket = io('http://127.0.0.1:3000');
-	
-//	socket.on('connect', function(){
-//		socket.emit('load', id);		
-//		console.log("connected - client side");
-//	});
-//});
-//-------------------------------------------------------------------------------------
-
-//var socket = io('http://127.0.0.1:3000');
-
-//------------------------------ using YUI --------------------------------------------
 function client(Y, quizid, userid, username, attemptid, sessionkey)
 {
 	var socket = io('http://127.0.0.1:3000', {
@@ -60,22 +46,9 @@ function client(Y, quizid, userid, username, attemptid, sessionkey)
 					});	
 	
 	var roomid = username + '_' + quizid + '_' + attemptid;	
-//	console.log('before socket connected');// + socket);
-//	for (var i in socket){
-//		console.log(socket[i].id);
-//	}
-//	console.log('before socket connected' + socket.id + ' ts ' + (socket.handshake.issued) + 
-//	console.log(' cur ' + (new Date().getTime()));
 	
 	socket.on('connect', function() {
 		console.log('after  socket connected ' + socket.id  + ' cur ' + (new Date().getTime()));
-//		for (var i in socket){
-//			console.log(socket[i].id);
-//		}
-//		console.log(' ts ' + (socket.handshake.issued) + ' cur ' + (new Date().getTime()));
-
-//		console.log('connect emit recieved' + socketi );
-//		console.log("Connect function - client side");
 		socket.emit('attempt', { username:username, quizid:quizid, roomid:roomid, attemptid:attemptid });
 	});	
 	
