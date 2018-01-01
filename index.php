@@ -19,7 +19,7 @@
  *
  * @package    quizaccess
  * @subpackage heartbeatmonitor
- * @author     P Sunthar, Amrata Ramchandani <ramchandani.amrata@gmail.com>, Kashmira Nagwekar
+ * @author     Prof. P Sunthar, Amrata Ramchandani <ramchandani.amrata@gmail.com>, Kashmira Nagwekar
  * @copyright  2017 IIT Bombay, India
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -188,26 +188,39 @@ if ($result1->num_rows > 0) {
     }
 }
 
-// Page setup.
-$PAGE->set_pagelayout('admin');
-$PAGE->set_title($pluginname);
-$PAGE->set_heading($course->fullname);
-echo $OUTPUT->header();
-echo $OUTPUT->heading(format_string($quiz->name, true, array('context' => $context)));
+// Setup the form.
+$timelimit = $quiz->timelimit + intval($deadtime1 / 1000);
+//     $overrideediturl = new moodle_url('/mod/quiz/overrideedit.php');
+$overrideediturl = new moodle_url('/mod/quiz/accessrule/heartbeatmonitor/processoverride.php');
+
+// $mform = new timelimit_override_form($overrideediturl, $cm, $quiz, $context, $userid1, $timelimit);
+// come back to this page..fetch checked records and then redirect to processoverride as in ovrrdedit.php.
+$mform = new timelimit_override_form($url, $cm, $quiz, $context, $userid1, $timelimit);
 
 if(empty($table->data)) {
     echo $OUTPUT->notification(get_string('nodatafound', 'quizaccess_heartbeatmonitor'), 'info');
 
+} else if($fromform = $mform->get_data()) {
+
+
 } else {
+    // Page setup.
+    $PAGE->set_pagelayout('admin');
+    $PAGE->set_title($pluginname);
+    $PAGE->set_heading($course->fullname);
+    echo $OUTPUT->header();
+    echo $OUTPUT->heading(format_string($quiz->name, true, array('context' => $context)));
+
     // Display table.
     echo html_writer::table($table);
 
-    // Setup the form.
-    $timelimit = $quiz->timelimit + intval($deadtime1 / 1000);
-    $overrideediturl = new moodle_url('/mod/quiz/overrideedit.php');
-    $mform = new timelimit_override_form($overrideediturl, $cm, $quiz, $context, $userid1, $timelimit);
 
     $mform->display();
+
+    $conn->close();
+
+    // Finish the page.
+    echo $OUTPUT->footer();
 }
 
 function secondsToTime($seconds) {
@@ -216,7 +229,4 @@ function secondsToTime($seconds) {
     return $dtF->diff($dtT)->format('%a d, %h h : %i m : %s s');
 }
 
-$conn->close();
 
-// Finish the page.
-echo $OUTPUT->footer();

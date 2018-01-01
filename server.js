@@ -18,7 +18,7 @@
  *
  * @package    quizaccess
  * @subpackage heartbeatmonitor
- * @author     P Sunthar, Amrata Ramchandani <ramchandani.amrata@gmail.com>, Kashmira Nagwekar
+ * @author     Prof. P Sunthar, Amrata Ramchandani <ramchandani.amrata@gmail.com>, Kashmira Nagwekar
  * @copyright  2017 IIT Bombay, India
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -121,6 +121,7 @@ var record = io.sockets.on('connection', function (socket) {
                 
                 if (result.length > 0) {
                     for (i in result) {
+                    	// Previous state details.
                         var status 			= result[i].status;
                         var timetoconsider 	= result[i].timetoconsider;
                         var deadtime 		= result[i].deadtime;
