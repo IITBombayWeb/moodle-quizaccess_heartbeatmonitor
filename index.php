@@ -30,6 +30,7 @@ require_once('../../../../config.php');
 // require_once($CFG->dirroot.'/mod/quiz/locallib.php');
 // require_once($CFG->dirroot.'/mod/quiz/override_form.php');
 require_once($CFG->dirroot . '/mod/quiz/accessrule/heartbeatmonitor/timelimit_override_form.php');
+require_once($CFG->dirroot . '/mod/quiz/accessrule/heartbeatmonitor/timelimit_override_form1.php');
 require_once($CFG->dirroot . '/mod/quiz/override_form.php');
 
 
@@ -93,9 +94,9 @@ if ($result->num_rows > 0) {
         $attemptid      = array_splice($arr, -1)[0];
         $quizid1        = array_splice($arr, -1)[0];
         $username       = implode("_", $arr);
-//         echo 'un ' . $username;
+        //         echo 'un ' . $username;
         $user           = $DB->get_record('user', array('username'=>$username));
-//         print_object($user);
+        //         print_object($user);
         if($user) {
             $userid         = $user->id;
         }
@@ -123,12 +124,12 @@ if ($result->num_rows > 0) {
             $row->attributes['class'] = $roomid;
 
             $value = $roomid . '_' . $deadtime;
-            $cell0 = new html_table_cell();
-//             $cell0 = new html_table_cell(
-//                         html_writer::empty_tag('input', array('type'  => 'checkbox',
-//                                                               'name'  => 'setoverride',
-//                                                               'value' => $value,
-//                                                               'class' => 'setoverride')));
+            //             $cell0 = new html_table_cell();
+            $cell0 = new html_table_cell(
+                    html_writer::empty_tag('input', array('type'  => 'checkbox',
+                                                        'name'  => 'setoverride',
+                                                        'value' => $value,
+                                                        'class' => 'setoverride')));
             $cell0->id = 'select';
 
             $cell1 = new html_table_cell($roomid);
@@ -182,7 +183,7 @@ if ($result1->num_rows > 0) {
             $timetoconsider1  = $data["timetoconsider"];
             $livetime1        = $data["livetime"];
             $deadtime1        = $data["deadtime"];
-//             echo $roomid1 . ' ' . $livetime1;
+            //             echo $roomid1 . ' ' . $livetime1;
         }
         break;
     }
@@ -191,36 +192,79 @@ if ($result1->num_rows > 0) {
 // Setup the form.
 $timelimit = $quiz->timelimit + intval($deadtime1 / 1000);
 //     $overrideediturl = new moodle_url('/mod/quiz/overrideedit.php');
-$overrideediturl = new moodle_url('/mod/quiz/accessrule/heartbeatmonitor/processoverride.php');
+$processoverrideurl = new moodle_url('/mod/quiz/accessrule/heartbeatmonitor/processoverride.php');
 
 // $mform = new timelimit_override_form($overrideediturl, $cm, $quiz, $context, $userid1, $timelimit);
 // come back to this page..fetch checked records and then redirect to processoverride as in ovrrdedit.php.
-$mform = new timelimit_override_form($url, $cm, $quiz, $context, $userid1, $timelimit);
 
+// if(isset($_POST["result"])) {
+$mform = new timelimit_override_form($processoverrideurl, $cm, $quiz, $context, $userid1, $timelimit);
+// }
+// Page setup.
+$PAGE->set_pagelayout('admin');
+$PAGE->set_title($pluginname);
+$PAGE->set_heading($course->fullname);
+$PAGE->requires->jquery();
+echo $OUTPUT->header();
+echo $OUTPUT->heading(format_string($quiz->name, true, array('context' => $context)));
+
+// if($fromform = $mform->get_data()) {
+// //     echo '<br><br><br>hi';
+//     if (!empty($fromform->submitbutton)) {
+//         redirect($processoverrideurl);
+//     }
+
+// }  else
 if(empty($table->data)) {
     echo $OUTPUT->notification(get_string('nodatafound', 'quizaccess_heartbeatmonitor'), 'info');
 
-} else if($fromform = $mform->get_data()) {
-
-
 } else {
-    // Page setup.
-    $PAGE->set_pagelayout('admin');
-    $PAGE->set_title($pluginname);
-    $PAGE->set_heading($course->fullname);
-    echo $OUTPUT->header();
-    echo $OUTPUT->heading(format_string($quiz->name, true, array('context' => $context)));
-
     // Display table.
     echo html_writer::table($table);
 
-
     $mform->display();
 
-    $conn->close();
+    echo html_writer::div('', 'checkedusers');
+    ?>
 
-    // Finish the page.
-    echo $OUTPUT->footer();
+    <script type="text/javascript">
+    function run_script() {
+        $(document).ready(function() {
+            var interval = setInterval(function() {
+//                 alert('hi');
+
+                var users = [];
+                $('.setoverride:checked').each(function() {
+                    users.push($(this).val());
+                });
+                if(users.length > 0) {
+                    $('.checkedusers').html('');
+                    $('.checkedusers').append(users.join(" "));
+                }
+
+                $.ajax({
+            	  type: "POST",
+            	  data    : {result:JSON.stringify(users)}
+
+            	})
+//             	  .done(function( msg ) {
+//             	    alert( "Data Saved: " + msg );
+//             	  });
+
+
+
+            }, 1000);
+        });
+    }
+    </script>
+    <?php
+
+    echo "<script type='text/javascript'>run_script();</script>";
+//     echo 'div ' . getdiv();
+//     $random = $_POST["result"];
+//     echo ' div ' . $random;
+//     $getthevalueofid = var id;
+
 }
 
 function secondsToTime($seconds) {
@@ -229,4 +273,15 @@ function secondsToTime($seconds) {
     return $dtF->diff($dtT)->format('%a d, %h h : %i m : %s s');
 }
 
+function getdiv(){
+    $dom = new DOMDocument('1.0');
+    @$dom->loadHTMLFile($url);
+//     $html = file_get_html($url);
+    $div = $dom->getElementById ("checkedusers");
+//     $displaybody = $html->find('div[id=checkedusers]', 0)->plaintext;
+    return $div;
+}
 
+$conn->close();
+// Finish the page.
+echo $OUTPUT->footer();

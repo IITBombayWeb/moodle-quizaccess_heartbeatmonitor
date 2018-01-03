@@ -26,7 +26,7 @@ require_once ($CFG->libdir . '/formslib.php');
  * @copyright  2017 IIT Bombay, India
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class timelimit_override_form1 extends moodleform {
+class intermediate_form extends moodleform {
 
     /** @var object course module object. */
     protected $cm;
@@ -50,14 +50,12 @@ class timelimit_override_form1 extends moodleform {
      * @param object the quiz settings object.
      * @param context the quiz context.
      */
-    public function __construct($submiturl, $cm, $quiz, $context, $text, $timelimit) {
+    public function __construct($submiturl, $cm, $quiz, $context, $userid, $timelimit) {
 
         $this->cm = $cm;
         $this->quiz = $quiz;
         $this->context = $context;
-//         $this->userid = empty($userid) ? 0 : $userid;
-        $this->userid = empty($text) ? 0 : $text;
-
+        $this->userid = empty($userid) ? 0 : $userid;
         $this->timelimit = $timelimit;
 //         $this->a = $a;
 
@@ -98,14 +96,9 @@ class timelimit_override_form1 extends moodleform {
         $mform->setType('mform_isexpanded_id_override', PARAM_INT);
         $mform->setDefault('mform_isexpanded_id_override', 1);
 
-//         // User ID.
-//         $mform->addElement('hidden', 'userid');
-//         $mform->setType('userid', PARAM_INT);
-//         $mform->setDefault('userid', $this->userid);
-
-        // User IDs.
+        // User ID.
         $mform->addElement('hidden', 'userid');
-        $mform->setType('userid', PARAM_TEXT);
+        $mform->setType('userid', PARAM_INT);
         $mform->setDefault('userid', $this->userid);
 
         // Password.

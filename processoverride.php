@@ -35,7 +35,7 @@ $overrideid = optional_param('id', 0, PARAM_INT);
 $action = optional_param('action', null, PARAM_ALPHA);
 $reset = optional_param('reset', false, PARAM_BOOL);
 echo '<br><br><br>';
-// $override = null;
+$override = null;
 // if ($overrideid) {
 
 //     if (! $override = $DB->get_record('quiz_overrides', array('id' => $overrideid))) {
@@ -100,7 +100,7 @@ foreach ($keys as $key) {
 // }
 
 // True if group-based override.
-// $groupmode = !empty($data->groupid) || ($action === 'addgroup' && empty($overrideid));
+$groupmode = !empty($data->groupid) || ($action === 'addgroup' && empty($overrideid));
 
 $overridelisturl = new moodle_url('/mod/quiz/accessrule/heartbeatmonitor/showoverrides.php', array('cmid'=>$cm->id));
 // if (!$groupmode) {
