@@ -31,6 +31,7 @@ require_once('../../../../config.php');
 // require_once($CFG->dirroot.'/mod/quiz/override_form.php');
 require_once($CFG->dirroot . '/mod/quiz/accessrule/heartbeatmonitor/timelimit_override_form.php');
 require_once($CFG->dirroot . '/mod/quiz/accessrule/heartbeatmonitor/timelimit_override_form1.php');
+require_once($CFG->dirroot . '/mod/quiz/accessrule/heartbeatmonitor/intermediate_form.php');
 require_once($CFG->dirroot . '/mod/quiz/override_form.php');
 
 
@@ -193,29 +194,56 @@ if ($result1->num_rows > 0) {
 $timelimit = $quiz->timelimit + intval($deadtime1 / 1000);
 //     $overrideediturl = new moodle_url('/mod/quiz/overrideedit.php');
 $processoverrideurl = new moodle_url('/mod/quiz/accessrule/heartbeatmonitor/processoverride.php');
+$indexurl = new moodle_url('/mod/quiz/accessrule/heartbeatmonitor/index.php');
+$intermediaryurl = new moodle_url('/mod/quiz/accessrule/heartbeatmonitor/intermediary.php', array('quizid'=>$quizid, 'courseid'=>$courseid, 'cmid'=>$cmid));
+
 
 // $mform = new timelimit_override_form($overrideediturl, $cm, $quiz, $context, $userid1, $timelimit);
 // come back to this page..fetch checked records and then redirect to processoverride as in ovrrdedit.php.
 
 // if(isset($_POST["result"])) {
-$mform = new timelimit_override_form($processoverrideurl, $cm, $quiz, $context, $userid1, $timelimit);
+$mform = new intermediate_form(null);
+$formdata = array ('quizid'=>$quizid, 'courseid'=>$courseid, 'cmid'=>$cmid);
+$mform->set_data($formdata);
+
+// $mform = new timelimit_override_form($processoverrideurl, $cm, $quiz, $context, $userid1, $timelimit);
 // }
 // Page setup.
 $PAGE->set_pagelayout('admin');
 $PAGE->set_title($pluginname);
 $PAGE->set_heading($course->fullname);
-$PAGE->requires->jquery();
+// $PAGE->requires->jquery();
 echo $OUTPUT->header();
 echo $OUTPUT->heading(format_string($quiz->name, true, array('context' => $context)));
 
-// if($fromform = $mform->get_data()) {
-// //     echo '<br><br><br>hi';
+
+if($fromform = $mform->get_data()) {
+    echo '<br><br><br>hi';
+
+//     if(isset($_POST["result"])) {
+//         echo $_POST["result"];
 //     if (!empty($fromform->submitbutton)) {
 //         redirect($processoverrideurl);
 //     }
+?>
+<script>
+     function run_script2() {
+         $(document).ready(function() {
+//          	$("#id_submitbutton").click(function() {
+             $.ajax({
+                 type: "POST",
+                 url: "http://localhost/moodle/mod/quiz/accessrule/heartbeatmonitor/intermediary.php?quizid=1&courseid=2&cmid=7",
+               data    : {result:JSON.stringify(users)}
 
-// }  else
-if(empty($table->data)) {
+//             })
+         	});
+         });
+     }
+</script>
+    <?php
+    echo "<script type='text/javascript'>run_script2();</script>";
+//     }
+}  else if(empty($table->data)) {
     echo $OUTPUT->notification(get_string('nodatafound', 'quizaccess_heartbeatmonitor'), 'info');
 
 } else {
@@ -242,11 +270,20 @@ if(empty($table->data)) {
                     $('.checkedusers').append(users.join(" "));
                 }
 
-                $.ajax({
-            	  type: "POST",
-            	  data    : {result:JSON.stringify(users)}
+//                 $("#id_submitbutton").click(function() {
+                	$.ajax({
+                  	  type: "POST",
+//                       url: $intermediaryurl,
+                  	  data    : {result:JSON.stringify(users)}
 
-            	})
+                  	})
+//             	});
+
+//                 $.ajax({
+//             	  type: "POST",
+//             	  data    : {result:JSON.stringify(users)}
+
+//             	})
 //             	  .done(function( msg ) {
 //             	    alert( "Data Saved: " + msg );
 //             	  });
