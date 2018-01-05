@@ -40,6 +40,9 @@ class timelimit_override_form1 extends moodleform {
     /** @var int userid, if provided. */
     protected $userid;
 
+    /** @var int users array, if provided. */
+    protected $users = array();
+
     /** @var int timelimit, if provided. */
     protected $timelimit;
 
@@ -104,9 +107,14 @@ class timelimit_override_form1 extends moodleform {
 //         $mform->setDefault('userid', $this->userid);
 
         // User IDs.
-        $mform->addElement('hidden', 'userid');
-        $mform->setType('userid', PARAM_TEXT);
-        $mform->setDefault('userid', $this->userid);
+//         $mform->addElement('hidden', 'userid');
+//         $mform->setType('userid', PARAM_TEXT);
+//         $mform->setDefault('userid', $this->userid);
+
+        // Users.
+        $mform->addElement('hidden', 'users');
+        $mform->setType('users', PARAM_TEXT);
+        $mform->setDefault('users', $this->users);
 
         // Password.
         $mform->addElement('hidden', 'password');

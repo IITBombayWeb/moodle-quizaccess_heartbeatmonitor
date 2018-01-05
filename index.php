@@ -224,22 +224,26 @@ $mform = new new_form($url, $cm, $quiz, $context);
 if($fromform = $mform->get_data()) {
 
 
-    //     print_object($fromform->users);
+//         print_object($fromform->users);
     if($fromform->users) {
+//         $users = $fromform->users;
+        $users = '';
         $i = 1;
         echo '<br>You have selected : <br><br>';
+
         foreach ($fromform->users as $user) {
             $arr            = explode("_", $user);
             $attemptid      = array_splice($arr, -1)[0];
             $quizid1        = array_splice($arr, -1)[0];
             $username       = implode("_", $arr);
 
-            $user           = $DB->get_record('user', array('username'=>$username));
-            $userid1        = $user->id;
-            echo $i . ' | ' . $user->firstname .  ' ' . $user->lastname . '<br>';
+            $userdata       = $DB->get_record('user', array('username'=>$username));
+            $userid1        = $userdata->id;
+            echo $i . ' | ' . $userdata->firstname .  ' ' . $userdata->lastname . '<br>';
+            $users .= $user . ' ';
 
         }
-        $mform1 = new timelimit_override_form1($processoverrideurl, $cm, $quiz, $context, $fromform->users[0], 0);
+        $mform1 = new timelimit_override_form1($processoverrideurl, $cm, $quiz, $context, $users, 0);
 
         $mform1->display();
     }
