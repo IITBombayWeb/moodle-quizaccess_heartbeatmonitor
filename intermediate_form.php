@@ -46,6 +46,9 @@ class intermediate_form extends moodleform {
         $mform->addElement('hidden', 'cmid');
         $mform->setType('cmid', PARAM_INT);
 
+//         $mform->addElement('hidden', 'users');
+//         $mform->setType('users', PARAM_TEXT);
+
         // Submit button.
         $mform->addElement('submit', 'submitbutton', get_string('save', 'quiz'));
     }

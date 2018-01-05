@@ -28,6 +28,8 @@ require_once('../../../../config.php');
 require_once($CFG->dirroot.'/mod/quiz/lib.php');
 require_once($CFG->dirroot.'/mod/quiz/locallib.php');
 require_once($CFG->dirroot.'/mod/quiz/override_form.php');
+require_once($CFG->dirroot . '/mod/quiz/accessrule/heartbeatmonitor/timelimit_override_form1.php');
+
 
 
 $cmid = optional_param('cmid', 0, PARAM_INT);
@@ -108,7 +110,9 @@ $overridelisturl = new moodle_url('/mod/quiz/accessrule/heartbeatmonitor/showove
 // }
 
 // Setup the form.
-$mform = new quiz_override_form($url, $cm, $quiz, $context, $groupmode, $override);
+// $mform = new quiz_override_form($url, $cm, $quiz, $context, $groupmode, $override);
+    $mform = new timelimit_override_form1($url, $cm, $quiz, $context, $groupmode, $override);
+
 $mform->set_data($data);
 
 // if ($mform->is_cancelled()) {
@@ -119,8 +123,14 @@ $mform->set_data($data);
 //     redirect($url);
 
 // } else
+$indexurl = new moodle_url('/mod/quiz/accessrule/heartbeatmonitor/index.php', array('quizid'=>$quiz->id, 'courseid'=>$course->id, 'cmid'=>$cmid));
+
+if($mform->is_cancelled()) {
+    redirect($indexurl);
+}
 if ($fromform = $mform->get_data()) {
 
+    echo '<br><br>in p-ovrde';
     // Here loop over all the users for creating overrides.
 
     // Process the data.

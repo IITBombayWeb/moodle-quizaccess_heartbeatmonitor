@@ -63,107 +63,106 @@ $context = context_module::instance($cm->id);
 // Check the user has the required capabilities to access this plugin.
 require_capability('mod/quiz:manage', $context);
 
-// Display live users.
-// Fetch records from database.
-$servername = "localhost";
-$dbusername = "root";
-$dbpassword = "root123";
-$dbname     = "trialdb";
+// // Display live users.
+// // Fetch records from database.
+// $servername = "localhost";
+// $dbusername = "root";
+// $dbpassword = "root123";
+// $dbname     = "trialdb";
 
-// Create connection
-$conn = new mysqli($servername, $dbusername, $dbpassword, $dbname);
+// // Create connection
+// $conn = new mysqli($servername, $dbusername, $dbpassword, $dbname);
 
-// Check connection
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
-}
-// echo "Connected successfully";
+// // Check connection
+// if ($conn->connect_error) {
+//     die("Connection failed: " . $conn->connect_error);
+// }
+// // echo "Connected successfully";
 
-$sql = 'SELECT * FROM livetable1';  // Select data for a particular quiz and not entire table..insert quizid col in livetable1 for this.
-$result = $conn->query($sql);
-$arr = array();
-$roomid = null;
+// $sql = 'SELECT * FROM livetable1';  // Select data for a particular quiz and not entire table..insert quizid col in livetable1 for this.
+// $result = $conn->query($sql);
+// $arr = array();
+// $roomid = null;
 
-$table = new html_table();
-$table->id = 'liveusers';
-$table->caption = get_string('liveusers', 'quizaccess_heartbeatmonitor');
-$table->head = array('', 'Socket room id', 'Current status', 'Status update on', 'Live time', 'Dead time');
+// $table = new html_table();
+// $table->id = 'liveusers';
+// $table->caption = get_string('liveusers', 'quizaccess_heartbeatmonitor');
+// $table->head = array('', 'Socket room id', 'Current status', 'Status update on', 'Live time', 'Dead time');
 
-if ($result->num_rows > 0) {
-    // Output data of each row.
-    while($data = $result->fetch_assoc()) {
-        $roomid         = $data["roomid"];
-        $arr            = explode("_", $roomid);
-        $attemptid      = array_splice($arr, -1)[0];
-        $quizid1        = array_splice($arr, -1)[0];
-        $username       = implode("_", $arr);
-        //         echo 'un ' . $username;
-        $user           = $DB->get_record('user', array('username'=>$username));
-        //         print_object($user);
-        if($user) {
-            $userid         = $user->id;
-        }
+// if ($result->num_rows > 0) {
+//     // Output data of each row.
+//     while($data = $result->fetch_assoc()) {
+//         $roomid         = $data["roomid"];
+//         $arr            = explode("_", $roomid);
+//         $attemptid      = array_splice($arr, -1)[0];
+//         $quizid1        = array_splice($arr, -1)[0];
+//         $username       = implode("_", $arr);
+//         //         echo 'un ' . $username;
+//         $user           = $DB->get_record('user', array('username'=>$username));
+//         //         print_object($user);
+//         if($user) {
+//             $userid         = $user->id;
+//         }
 
-        if($quizid1 == $quizid) {
-            $status          = $data["status"];
-            $timetoconsider  = $data["timetoconsider"];
-            $livetime        = $data["livetime"];
-            $deadtime        = $data["deadtime"];
+//         if($quizid1 == $quizid) {
+//             $status          = $data["status"];
+//             $timetoconsider  = $data["timetoconsider"];
+//             $livetime        = $data["livetime"];
+//             $deadtime        = $data["deadtime"];
 
-            $currentTimestamp = intval(microtime(true)*1000);
+//             $currentTimestamp = intval(microtime(true)*1000);
 
-            if ($status == 'Live') {
-                $livetime = ($currentTimestamp - $timetoconsider) + $livetime;
-            } else {
-                $deadtime = ($currentTimestamp - $timetoconsider) + $deadtime;
-            }
+//             if ($status == 'Live') {
+//                 $livetime = ($currentTimestamp - $timetoconsider) + $livetime;
+//             } else {
+//                 $deadtime = ($currentTimestamp - $timetoconsider) + $deadtime;
+//             }
 
-            $humanisedlivetime = secondsToTime(intval($livetime / 1000));
-            $humaniseddeadtime = secondsToTime(intval($deadtime / 1000));
+//             $humanisedlivetime = secondsToTime(intval($livetime / 1000));
+//             $humaniseddeadtime = secondsToTime(intval($deadtime / 1000));
 
-            $table->rowclasses['roomid'] = $roomid;
-            $row = new html_table_row();
-            $row->id = $roomid;
-            $row->attributes['class'] = $roomid;
+//             $table->rowclasses['roomid'] = $roomid;
+//             $row = new html_table_row();
+//             $row->id = $roomid;
+//             $row->attributes['class'] = $roomid;
 
-            $value = $roomid . '_' . $deadtime;
-            //             $cell0 = new html_table_cell();
+//             $value = $roomid . '_' . $deadtime;
+//             //             $cell0 = new html_table_cell();
 //             $cell0 = new html_table_cell(
 //                     html_writer::empty_tag('input', array('type'  => 'checkbox',
 //                                                         'name'  => 'setoverride',
 //                                                         'value' => $value,
 //                                                         'class' => 'setoverride')));
-            $cell0 = new html_table_cell($user->firstname .  ' ' . $user->lastname);
-            $cell0->id = 'user';
+//             $cell0->id = 'select';
 
-            $cell1 = new html_table_cell($roomid);
-            $cell1->id = 'roomid';
+//             $cell1 = new html_table_cell($roomid);
+//             $cell1->id = 'roomid';
 
-            $cell2 = new html_table_cell($status);
-            $cell2->id = 'status';
+//             $cell2 = new html_table_cell($status);
+//             $cell2->id = 'status';
 
-            $cell3 = new html_table_cell(userdate(intval($timetoconsider / 1000)));
-            $cell3->id = 'timetoconsider';
+//             $cell3 = new html_table_cell(userdate(intval($timetoconsider / 1000)));
+//             $cell3->id = 'timetoconsider';
 
-            $cell4 = new html_table_cell($humanisedlivetime);
-            $cell4->id = 'livetime';
-            $cell4->attributes['value'] = $livetime;
+//             $cell4 = new html_table_cell($humanisedlivetime);
+//             $cell4->id = 'livetime';
+//             $cell4->attributes['value'] = $livetime;
 
-            $cell5 = new html_table_cell($humaniseddeadtime);
-            $cell5->id = 'deadtime';
-            $cell5->attributes['value'] = $deadtime;
+//             $cell5 = new html_table_cell($humaniseddeadtime);
+//             $cell5->id = 'deadtime';
+//             $cell5->attributes['value'] = $deadtime;
 
-            $row->cells[] = $cell0;
-            $row->cells[] = $cell1;
-            $row->cells[] = $cell2;
-            $row->cells[] = $cell3;
-            $row->cells[] = $cell4;
-            $row->cells[] = $cell5;
+//             $row->cells[] = $cell0;
+//             $row->cells[] = $cell1;
+//             $row->cells[] = $cell2;
+//             $row->cells[] = $cell3;
+//             $row->cells[] = $cell4;
+//             $row->cells[] = $cell5;
 
-            $table->data[] = $row;
-        }
-    }
-}
+//             $table->data[] = $row;
+//         }
+//     }
+// }
 
 // $sql1 = 'SELECT * FROM livetable1 WHERE status = "Live" AND deadtime <> 0';
 // $result1 = $conn->query($sql1);
@@ -220,34 +219,9 @@ $PAGE->set_heading($course->fullname);
 echo $OUTPUT->header();
 echo $OUTPUT->heading(format_string($quiz->name, true, array('context' => $context)));
 
-$mform = new new_form($url, $cm, $quiz, $context);
-if($fromform = $mform->get_data()) {
 
-
-    //     print_object($fromform->users);
-    if($fromform->users) {
-        $i = 1;
-        echo '<br>You have selected : <br><br>';
-        foreach ($fromform->users as $user) {
-            $arr            = explode("_", $user);
-            $attemptid      = array_splice($arr, -1)[0];
-            $quizid1        = array_splice($arr, -1)[0];
-            $username       = implode("_", $arr);
-
-            $user           = $DB->get_record('user', array('username'=>$username));
-            $userid1        = $user->id;
-            echo $i . ' | ' . $user->firstname .  ' ' . $user->lastname . '<br>';
-
-        }
-        $mform1 = new timelimit_override_form1($processoverrideurl, $cm, $quiz, $context, $fromform->users[0], 0);
-
-        $mform1->display();
-    }
-
-//     $options = array();
-//     echo $OUTPUT->single_button($url->out(true,
-//             array('quizid' => $quiz->id, 'courseid' => $course->id, 'cmid' => $cm->id)),
-//             'Back to index page', 'get', $options);
+// if($fromform = $mform->get_data()) {
+//     echo 'hi';
 //     echo isset($_POST["result"]);
 //     $obj = json_decode($_POST["result"], false);
 //     print_object($obj->result);
@@ -260,10 +234,10 @@ if($fromform = $mform->get_data()) {
 //     if(empty($table->data)) {
 //     echo $OUTPUT->notification(get_string('nodatafound', 'quizaccess_heartbeatmonitor'), 'info');
 
-} else {
+// } else {
     // Display table.
-    echo html_writer::table($table);
-
+//     echo html_writer::table($table);
+    $mform = new new_form($url, $cm, $quiz, $context);
 
     $mform->display();
 //     echo html_writer::div('', 'checkedusers');
@@ -277,13 +251,13 @@ if($fromform = $mform->get_data()) {
 //                 array('quizid'=>$quizid, 'courseid'=>$courseid, 'cmid'=>$cmid)),
 //                 'New button', 'post', $options);
 //     }
-}
+// }
 
-function secondsToTime($seconds) {
-    $dtF = new DateTime('@0');
-    $dtT = new DateTime("@$seconds");
-    return $dtF->diff($dtT)->format('%a d, %h h : %i m : %s s');
-}
+// function secondsToTime($seconds) {
+//     $dtF = new DateTime('@0');
+//     $dtT = new DateTime("@$seconds");
+//     return $dtF->diff($dtT)->format('%a d, %h h : %i m : %s s');
+// }
 
 // function getdiv(){
 //     $dom = new DOMDocument('1.0');

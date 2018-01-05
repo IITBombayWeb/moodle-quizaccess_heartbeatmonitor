@@ -50,13 +50,13 @@ class timelimit_override_form1 extends moodleform {
      * @param object the quiz settings object.
      * @param context the quiz context.
      */
-    public function __construct($submiturl, $cm, $quiz, $context, $text, $timelimit) {
+    public function __construct($submiturl, $cm, $quiz, $context, $users, $timelimit) {
 
         $this->cm = $cm;
         $this->quiz = $quiz;
         $this->context = $context;
 //         $this->userid = empty($userid) ? 0 : $userid;
-        $this->userid = empty($text) ? 0 : $text;
+        $this->users = empty($users) ? null : $users;
 
         $this->timelimit = $timelimit;
 //         $this->a = $a;
@@ -136,6 +136,14 @@ class timelimit_override_form1 extends moodleform {
         $mform->setDefault('attempts', $this->quiz->attempts);
 
         // Submit button.
-        $mform->addElement('submit', 'submitbutton', get_string('save', 'quiz'));
+//         $mform->addElement('submit', 'submitbutton', get_string('save', 'quiz'));
+        $this->add_action_buttons($cancel = true, get_string('save', 'quiz'));
+
+        //normally you use add_action_buttons instead of this code
+//         $buttonarray=array();
+//         $buttonarray[] = $mform->createElement('submit', 'submitbutton', get_string('save', 'quiz'));
+//         $buttonarray[] = $mform->createElement('reset', 'resetbutton', get_string('revert'));
+//         $buttonarray[] = $mform->createElement('cancel');
+//         $mform->addGroup($buttonarray, 'buttonar', '', ' ', false);
     }
 }
