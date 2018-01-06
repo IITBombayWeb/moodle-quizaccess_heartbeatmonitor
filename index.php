@@ -86,8 +86,9 @@ $roomid = null;
 
 $table = new html_table();
 $table->id = 'liveusers';
-$table->caption = get_string('liveusers', 'quizaccess_heartbeatmonitor');
-$table->head = array('', 'Socket room id', 'Current status', 'Status update on', 'Live time', 'Dead time');
+// $table->caption = get_string('liveusers', 'quizaccess_heartbeatmonitor');
+$table->caption = 'Users attempting quiz';
+$table->head = array('User', 'Socket room id', 'Current status', 'Status update on', 'Live time', 'Dead time');
 
 if ($result->num_rows > 0) {
     // Output data of each row.
@@ -114,8 +115,10 @@ if ($result->num_rows > 0) {
 
             if ($status == 'Live') {
                 $livetime = ($currentTimestamp - $timetoconsider) + $livetime;
+                $statustodisplay = '<font color="green"><i>Online</i></font>';
             } else {
                 $deadtime = ($currentTimestamp - $timetoconsider) + $deadtime;
+                $statustodisplay = '<font color="red"><i>Offline</i></font>';
             }
 
             $humanisedlivetime = secondsToTime(intval($livetime / 1000));
@@ -139,7 +142,7 @@ if ($result->num_rows > 0) {
             $cell1 = new html_table_cell($roomid);
             $cell1->id = 'roomid';
 
-            $cell2 = new html_table_cell($status);
+            $cell2 = new html_table_cell($statustodisplay);
             $cell2->id = 'status';
 
             $cell3 = new html_table_cell(userdate(intval($timetoconsider / 1000)));
@@ -239,6 +242,7 @@ if($fromform = $mform->get_data()) {
 
             $userdata       = $DB->get_record('user', array('username'=>$username));
             $userid1        = $userdata->id;
+
             echo $i . ' | ' . $userdata->firstname .  ' ' . $userdata->lastname . '<br>';
             $users .= $user . ' ';
 
@@ -267,7 +271,7 @@ if($fromform = $mform->get_data()) {
 } else {
     // Display table.
     echo html_writer::table($table);
-
+    echo '<br>';
 
     $mform->display();
 //     echo html_writer::div('', 'checkedusers');

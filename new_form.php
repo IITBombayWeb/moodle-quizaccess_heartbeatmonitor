@@ -252,7 +252,7 @@ class new_form extends moodleform {
 //         echo '<br>';
 
         $attributes = null;
-        $select = $mform->addElement('select', 'users', 'Select users', $arr_users, $attributes);
+        $select = $mform->addElement('select', 'users', '<b>Select users for creating user oveerride </b>', $arr_users, $attributes);
         $select->setMultiple(true);
 
         // Submit button.

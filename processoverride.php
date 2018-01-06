@@ -135,6 +135,24 @@ if ($fromform = $mform->get_data()) {
     // Here loop over all the users for creating overrides.
 
     print_object($fromform);
+
+    $roomids = array();
+    $roomids = explode(" ", $fromform->users);
+    print_object($roomids);
+    foreach ($roomids as $roomid) {
+//         $roomid         = $data["roomid"];
+        if($roomid) {
+        $arr            = explode("_", $roomid);
+        $attemptid      = array_splice($arr, -1)[0];
+        $quizid1        = array_splice($arr, -1)[0];
+        $username       = implode("_", $arr);
+        //         echo 'un ' . $username;
+        $user           = $DB->get_record('user', array('username'=>$username));
+        if($user) {
+            $userid         = $user->id;
+        }
+        }
+    }
     // Process the data.
 //     $fromform->quiz = $quiz->id;
 
