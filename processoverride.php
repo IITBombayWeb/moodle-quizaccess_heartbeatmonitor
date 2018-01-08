@@ -136,23 +136,190 @@ if ($fromform = $mform->get_data()) {
 
     print_object($fromform);
 
+    // Display live users.
+    // Fetch records from database.
+    $servername = "localhost";
+    $dbusername = "root";
+    $dbpassword = "root123";
+    $dbname     = "trialdb";
+
+    // Create connection
+    $conn = new mysqli($servername, $dbusername, $dbpassword, $dbname);
+
+    // Check connection
+    if ($conn->connect_error) {
+        die("Connection failed: " . $conn->connect_error);
+    }
+    echo "Connected successfully";
+
     $roomids = array();
     $roomids = explode(" ", $fromform->users);
     print_object($roomids);
     foreach ($roomids as $roomid) {
 //         $roomid         = $data["roomid"];
+
         if($roomid) {
-        $arr            = explode("_", $roomid);
-        $attemptid      = array_splice($arr, -1)[0];
-        $quizid1        = array_splice($arr, -1)[0];
-        $username       = implode("_", $arr);
-        //         echo 'un ' . $username;
-        $user           = $DB->get_record('user', array('username'=>$username));
-        if($user) {
-            $userid         = $user->id;
+
+//             $arr            = explode("_", $roomid);
+//             $attemptid      = array_splice($arr, -1)[0];
+//             $quizid1        = array_splice($arr, -1)[0];
+//             $username       = implode("_", $arr);
+//             //         echo 'un ' . $username;
+//             $userdata           = $DB->get_record('user', array('username'=>$username));
+//             if($user) {
+//                 $userid         = $userdata->id;
+//             }
+
+            $sql = 'SELECT * FROM livetable1 WHERE roomid = "' . $roomid . '"';  // Select data for a particular quiz and not entire table..insert quizid col in livetable1 for this.
+//             echo 'sql' . $sql . 'hi';
+            $result = $conn->query($sql);
+//             print_object($result);
+            if ($result->num_rows > 0) {
+                // Output data of each row.
+                while($data = $result->fetch_assoc()) {
+                    $roomid         = $data["roomid"];
+                    $arr            = explode("_", $roomid);
+                    $attemptid      = array_splice($arr, -1)[0];
+                    $quizid1        = array_splice($arr, -1)[0];
+                    $username       = implode("_", $arr);
+                    //         echo 'un ' . $username;
+                    $user           = $DB->get_record('user', array('username'=>$username));
+                    //         print_object($user);
+                    if($user) {
+                        $userid         = $user->id;
+                    }
+                    if($quizid1 == $quiz->id) {
+                        $status          = $data["status"];
+                        $timetoconsider  = $data["timetoconsider"];
+                        $livetime        = $data["livetime"];
+                        $deadtime        = $data["deadtime"];
+
+                        $currentTimestamp = intval(microtime(true)*1000);
+
+                        if ($status == 'Live') {
+                            $livetime = ($currentTimestamp - $timetoconsider) + $livetime;
+//                             $statustodisplay = '<font color="green"><i>Online</i></font>';
+                        } else {
+                            $deadtime = ($currentTimestamp - $timetoconsider) + $deadtime;
+//                             $statustodisplay = '<font color="red"><i>Offline</i></font>';
+                        }
+
+                        $seconds = intval($livetime / 1000);
+                        $dtF = new DateTime('@0');
+                        $dtT = new DateTime("@$seconds");
+                        $lt =  $dtF->diff($dtT)->format('%a d, %h h : %i m : %s s');
+
+                        $seconds1 = intval($deadtime / 1000);
+                        $dtF1 = new DateTime('@0');
+                        $dtT1 = new DateTime("@$seconds1");
+                        $dt =  $dtF1->diff($dtT1)->format('%a d, %h h : %i m : %s s');
+
+                        $humanisedlivetime = $lt;
+                        $humaniseddeadtime = $dt;
+                        $timelimit = $quiz->timelimit + intval($deadtime / 1000);
+                        $fromform->userid = $userid;
+                        $fromform->timelimit = $timelimit;
+//                         print_object($fromform);
+
+
+                        // Process the data.
+                        $fromform->quiz = $quiz->id;
+
+                        // Replace unchanged values with null.
+                        foreach ($keys as $key) {
+                            if ($fromform->{$key} == $quiz->{$key}) {
+                                $fromform->{$key} = null;
+                            }
+                        }
+
+                        // See if we are replacing an existing override.
+                        $userorgroupchanged = false;
+                        if (empty($override->id)) {
+                            $userorgroupchanged = true;
+                        } else if (!empty($fromform->userid)) {
+                            $userorgroupchanged = $fromform->userid !== $override->userid;
+                        } else {
+                            $userorgroupchanged = $fromform->groupid !== $override->groupid;
+                        }
+
+                        if ($userorgroupchanged) {
+                            $conditions = array(
+                                    'quiz' => $quiz->id,
+                                    'userid' => empty($fromform->userid)? null : $fromform->userid,
+                                    'groupid' => empty($fromform->groupid)? null : $fromform->groupid);
+                            if ($oldoverride = $DB->get_record('quiz_overrides', $conditions)) {
+                                // There is an old override, so we merge any new settings on top of
+                                // the older override.
+                                foreach ($keys as $key) {
+                                    if (is_null($fromform->{$key})) {
+                                        $fromform->{$key} = $oldoverride->{$key};
+                                    }
+                                }
+                                // Set the course module id before calling quiz_delete_override().
+                                $quiz->cmid = $cm->id;
+                                quiz_delete_override($quiz, $oldoverride->id);
+                            }
+                        }
+
+                        // Set the common parameters for one of the events we may be triggering.
+                        $params = array(
+                            'context' => $context,
+                            'other' => array(
+                                        'quizid' => $quiz->id
+                            )
+                        );
+                        if (!empty($override->id)) {
+                            $fromform->id = $override->id;
+                            $DB->update_record('quiz_overrides', $fromform);
+
+                            // Determine which override updated event to fire.
+                            $params['objectid'] = $override->id;
+                            if (!$groupmode) {
+                                $params['relateduserid'] = $fromform->userid;
+                                $event = \mod_quiz\event\user_override_updated::create($params);
+                            } else {
+                                $params['other']['groupid'] = $fromform->groupid;
+                                $event = \mod_quiz\event\group_override_updated::create($params);
+                            }
+
+                            // Trigger the override updated event.
+                            $event->trigger();
+                        } else {
+                            unset($fromform->id);
+                            $fromform->id = $DB->insert_record('quiz_overrides', $fromform);
+
+                            // Determine which override created event to fire.
+                            $params['objectid'] = $fromform->id;
+                            if (!$groupmode) {
+                                $params['relateduserid'] = $fromform->userid;
+                                $event = \mod_quiz\event\user_override_created::create($params);
+                            } else {
+                                $params['other']['groupid'] = $fromform->groupid;
+                                $event = \mod_quiz\event\group_override_created::create($params);
+                            }
+
+                            // Trigger the override created event.
+                            $event->trigger();
+                        }
+
+                        quiz_update_open_attempts(array('quizid'=>$quiz->id));
+                        if ($groupmode) {
+                            // Priorities may have shifted, so we need to update all of the calendar events for group overrides.
+                            quiz_update_events($quiz);
+                        } else {
+                            // User override. We only need to update the calendar event for this user override.
+                            quiz_update_events($quiz, $fromform);
+                        }
+                    }
+                }
+            }
+
         }
-        }
+
+
     }
+
+
     // Process the data.
 //     $fromform->quiz = $quiz->id;
 
@@ -242,9 +409,9 @@ if ($fromform = $mform->get_data()) {
 //         quiz_update_events($quiz, $fromform);
 //     }
 
-//     if (!empty($fromform->submitbutton)) {
-//         redirect($overridelisturl);
-//     }
+    if (!empty($fromform->submitbutton)) {
+        redirect($overridelisturl);
+    }
 
 //     // The user pressed the 'again' button, so redirect back to this page.
 //     $url->remove_params('cmid');

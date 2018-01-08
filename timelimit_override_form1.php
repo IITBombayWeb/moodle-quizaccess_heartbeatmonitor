@@ -88,10 +88,10 @@ class timelimit_override_form1 extends moodleform {
         $mform->setType('cmid', PARAM_INT);
         $mform->setDefault('cmid', $cm->id);
 
-//         // Quiz.
-//         $mform->addElement('hidden', 'quiz');
-//         $mform->setType('quiz', PARAM_INT);
-//         $mform->setDefault('quiz', $this->quiz->id);
+        // Quiz.
+        $mform->addElement('hidden', 'quiz');
+        $mform->setType('quiz', PARAM_INT);
+        $mform->setDefault('quiz', $this->quiz->id);
 
         $mform->addElement('hidden', '_qf__quiz_override_form');
         $mform->setType('_qf__quiz_override_form', PARAM_INT);
