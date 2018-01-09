@@ -88,7 +88,7 @@ $table = new html_table();
 $table->id = 'liveusers';
 // $table->caption = get_string('liveusers', 'quizaccess_heartbeatmonitor');
 $table->caption = 'Users attempting quiz';
-$table->head = array('User', 'Socket room id', 'Current status', 'Status update on', 'Live time', 'Dead time');
+$table->head = array('User', 'Socket room id', 'Current status', 'Status update on', 'Quiz time used up', 'Quiz time lost');
 
 if ($result->num_rows > 0) {
     // Output data of each row.
@@ -96,6 +96,15 @@ if ($result->num_rows > 0) {
         $roomid         = $data["roomid"];
         $arr            = explode("_", $roomid);
         $attemptid      = array_splice($arr, -1)[0];
+        $qa             = $DB->get_record('quiz_attempts', array('id'=>$attemptid));
+
+        // Error..since socket gets connected while reviewing the quiz.. but qa->state is finished..so conflict
+        if($qa->state == 'finished') {
+            $sql = 'DELETE FROM livetable1 WHERE roomid = "' . $roomid . '"';
+            $conn->query($sql);
+            continue;
+        }
+
         $quizid1        = array_splice($arr, -1)[0];
         $username       = implode("_", $arr);
         //         echo 'un ' . $username;
@@ -226,7 +235,6 @@ echo $OUTPUT->heading(format_string($quiz->name, true, array('context' => $conte
 $mform = new new_form($url, $cm, $quiz, $context);
 if($fromform = $mform->get_data()) {
 
-
 //         print_object($fromform->users);
     if($fromform->users) {
 //         $users = $fromform->users;
@@ -245,6 +253,7 @@ if($fromform = $mform->get_data()) {
 
             echo $i . ' | ' . $userdata->firstname .  ' ' . $userdata->lastname . '<br>';
             $users .= $user . ' ';
+            $i++;
 
         }
         $mform1 = new timelimit_override_form1($processoverrideurl, $cm, $quiz, $context, $users, 0);
@@ -264,15 +273,14 @@ if($fromform = $mform->get_data()) {
 //     if(isset($_POST["result"])) {
 //         echo '';
 //     }
-// }  else
-//     if(empty($table->data)) {
-//     echo $OUTPUT->notification(get_string('nodatafound', 'quizaccess_heartbeatmonitor'), 'info');
+}  else if(empty($table->data)) {
+    echo $OUTPUT->notification(get_string('nodatafound', 'quizaccess_heartbeatmonitor'), 'info');
 
 } else {
     // Display table.
     echo html_writer::table($table);
     echo '<br>';
-
+//     echo '(Note: List contains users having non-zero "Quiz time lost" value only.)';
     $mform->display();
 //     echo html_writer::div('', 'checkedusers');
 

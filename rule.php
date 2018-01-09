@@ -44,7 +44,7 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
     }
 
     public function setup_attempt_page($page) {
-        global $CFG, $PAGE, $_SESSION;
+        global $CFG, $PAGE, $_SESSION, $DB;
         $PAGE->requires->jquery();
 
         $PAGE->requires->js( new moodle_url('http://127.0.0.1:3000/socket.io/socket.io.js'), true );
@@ -64,7 +64,12 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
 //     	$retcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 //     	curl_close($ch);
 //     	if (200 == $retcode) {
+        $qa             = $DB->get_record('quiz_attempts', array('id'=>$attemptid));
+
+        // Error..since socket gets connected while reviewing the quiz.. but qa->state is finished..so conflict
+                if($qa->state != 'finished') {
     	    $PAGE->requires->js_init_call('client', array($quizid, $userid, $username, $attemptid, $sessionkey));
+                }
 //     	}
     }
 }

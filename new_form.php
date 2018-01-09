@@ -208,7 +208,6 @@ class new_form extends moodleform {
         $deadtime1 = null;
         $userid1 = null;
         $arr_users = array();
-        $i = 0;
         if ($result1->num_rows > 0) {
             // Output data of each row.
             while($data = $result1->fetch_assoc()) {
@@ -222,21 +221,15 @@ class new_form extends moodleform {
                 $user           = $DB->get_record('user', array('username'=>$username));
                 $userid1        = $user->id;
 
-                if($quizid1 == $quizid) {
+                if($quizid1 == $quiz->id) {
                     $status1          = $data["status"];
                     $timetoconsider1  = $data["timetoconsider"];
                     $livetime1        = $data["livetime"];
                     $deadtime1        = $data["deadtime"];
                     //             echo $roomid1 . ' ' . $livetime1;
+                    $arr_users[$roomid1] = $user->firstname .  ' ' . $user->lastname;
                 }
-//                 break;
-//                 $arr_users[$i] = $user->firstname .  ' ' . $user->lastname;
-                $arr_users[$roomid1] = $user->firstname .  ' ' . $user->lastname;
-
-                $i++;
             }
-
-
         }
 
         // Setup the form.
@@ -251,12 +244,26 @@ class new_form extends moodleform {
 //         echo html_writer::table($table);
 //         echo '<br>';
 
-        $attributes = null;
-        $select = $mform->addElement('select', 'users', '<b>Select users for creating user oveerride </b>', $arr_users, $attributes);
-        $select->setMultiple(true);
+//         $mform->addElement('static', 'description', '', '');
 
-        // Submit button.
-        $mform->addElement('submit', 'submitbutton', get_string('save', 'quiz'));
+        $mform->addElement('header', 'createoverrides', 'Create user override');
+        $mform->setExpanded('createoverrides', false);
+
+        if($arr_users) {
+            $attributes = null;
+            $select = $mform->addElement('select', 'users', '<b>Select users for creating user overrides </b><br>', $arr_users, $attributes);
+//             $mform->setDefault('users', 'No User');
+            reset($arr_users);
+//             $mform->getElement('users')->setSelected(array(key($arr_users)));
+            $select->setMultiple(true);
+            $mform->addElement('static', 'description', '', '(Note: List contains users who are online and have a non-zero "Quiz time lost" value only.)');
+
+            // Submit button.
+            $mform->addElement('submit', 'submitbutton', get_string('save', 'quiz'));
+        } else {
+            $mform->addElement('static', 'description', '', '(Note: No user meets minimum conditions required for creating a user override.)');
+        }
+
     }
 
     function secondsToTime($seconds) {
