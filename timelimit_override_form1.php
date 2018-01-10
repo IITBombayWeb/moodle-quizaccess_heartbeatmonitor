@@ -144,8 +144,10 @@ class timelimit_override_form1 extends moodleform {
         $mform->setDefault('attempts', $this->quiz->attempts);
 
         // Submit button.
-//         $mform->addElement('submit', 'submitbutton', get_string('save', 'quiz'));
-        $this->add_action_buttons($cancel = true, get_string('save', 'quiz'));
+        $mform->addElement('hidden', 'submitbutton', get_string('save', 'quiz'));
+        $mform->setType('submitbutton', PARAM_TEXT);
+
+        $this->add_action_buttons($cancel = true, 'Confirm');
 
         //normally you use add_action_buttons instead of this code
 //         $buttonarray=array();

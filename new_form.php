@@ -259,7 +259,13 @@ class new_form extends moodleform {
             $mform->addElement('static', 'description', '', '(Note: List contains users who are online and have a non-zero "Quiz time lost" value only.)');
 
             // Submit button.
-            $mform->addElement('submit', 'submitbutton', get_string('save', 'quiz'));
+//             $mform->addElement('hidden', 'submitbutton', get_string('save', 'quiz'));
+
+//             $mform->addElement('hidden', 'submitbutton');
+//             $mform->setType('submitbutton', PARAM_RAW);
+//             $mform->setDefault('submitbutton', get_string('save', 'quiz'));
+
+            $mform->addElement('submit', 'submitbutton', 'Create override');
         } else {
             $mform->addElement('static', 'description', '', '(Note: No user meets minimum conditions required for creating a user override.)');
         }
