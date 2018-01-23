@@ -28,6 +28,6 @@
 defined('MOODLE_INTERNAL') || die();
 
 
-$plugin->version   = 2017110200;
+$plugin->version   = 2017110205;
 $plugin->requires  = 2017050500;
 $plugin->component = 'quizaccess_heartbeatmonitor';

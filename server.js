@@ -30,6 +30,31 @@ var io			= require('socket.io').listen(http);
 var bodyParser 	= require('body-parser');
 var mysql 		= require('mysql');
 
+// Reading and Parsing moodle config.php file for using db conn in nodejs
+var fs 			= require('fs');
+//var file1 = require('./File1')(io);
+var obj;
+fs.readFile('../../../../config.php', 'utf8', function (err, data) {
+	console.log('in fs');
+  if (err) throw err;
+  obj = data;
+//  var json = '<?= json_encode('+data+') ?>'; // strip off first php line n try
+//  var object = JSON.parse(json);
+  console.log(obj);
+});
+
+var runner = require('child_process');
+
+runner.exec(
+  'php -r \'include("../../../../config.php"); print json_encode($CFG);\'', 
+  function (err, stdout, stderr) {
+    var connection = JSON.parse(stdout).default.default;
+    console.log('in runner');
+    console.log(connection.CFG);
+    // result botdb
+  }
+);
+
 var con = mysql.createConnection({
 	host 	 : "localhost",
 	user 	 : "root",
