@@ -30,10 +30,11 @@ var io			= require('socket.io').listen(http);
 var bodyParser 	= require('body-parser');
 var mysql 		= require('mysql');
 
-// Reading and Parsing moodle config.php file for using db conn in nodejs
+// Reading and Parsing moodle config.php file for using db conn info in nodejs
 var fs 			= require('fs');
-//var file1 = require('./File1')(io);
+
 var obj;
+// Method 1 ----------------------------------------------------------------------------
 //fs.readFile('../../../../config.php', 'utf8', function (err, data) {
 //	console.log('in fs');
 //  if (err) throw err;
@@ -43,28 +44,67 @@ var obj;
 //  console.log(obj);
 //});
 
+// Method 2-----------------------------------------------------------------------------
 var obj = fs.readFileSync('../../../../config.php', 'utf8');
 console.log('here cfg');
-console.log(obj);
+console.log(obj[0]);
+
+// Method 3-----------------------------------------------------------------------------
 
 var runner = require('child_process');
-
 runner.exec(
   'php -r \'define("CLI_SCRIPT", true); include("../../../../config.php"); print json_encode($CFG);\'', 
   function (err, stdout, stderr) {
-	  console.log('hey');
-//	  var obj = JSON.parse(stdout).default.default;
 	  var obj = JSON.parse(stdout);
-    console.log(obj.dbhost);
-    // result botdb
+	  console.log(obj.dbhost);
   }
 );
 
+// Method 4-------------------------------------------------------------------------------
+//var path = require('path');
+//var engine = require('php-parser');
+// 
+//// initialize a new parser instance
+//var parser = new engine({
+//  // some options :
+//  parser: {
+//    extractDoc: true,
+//    php7: true
+//  },
+//  ast: {
+//    withPositions: true
+//  }
+//});
+// 
+//// Retrieve the AST from the specified source
+////var eval = parser.parseEval('echo "Hello World";');
+// 
+//// Retrieve an array of tokens (same as php function token_get_all)
+////var tokens = parser.tokenGetAll('<?php echo "Hello World";');
+// 
+//// Load a static file (Note: this file should exist on your computer)
+//var phpFile = fs.readFileSync('../../../../config.php', 'utf8');
+// 
+//// Log out results
+////console.log( 'Eval parse:', eval );
+////console.log( 'Tokens parse:', tokens );
+//console.log('new code---------------------------');
+//console.log( 'File parse:', parser.parseCode(phpFile) );
+//---------------------------------------------------------------------------------------
+		
+
+//var con = mysql.createConnection({
+//	host 	 : "localhost",
+//	user 	 : "root",
+//	password : "root123",
+//	database : "trialdb"
+//});
+
 var con = mysql.createConnection({
-	host 	 : "localhost",
-	user 	 : "root",
-	password : "root123",
-	database : "trialdb"
+	host 	 : config.dbhost,
+	user 	 : config.dbuser,
+	password : config.dbpass,
+	database : config.dbname
 });
 
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -112,7 +152,10 @@ var record = io.sockets.on('connection', function (socket) {
 //        console.log('in attempt event');
 	    // Insert connection record into the database.
         // 'socketinfo' table has records of all the socket connections and disconnections.
-	    var sql = "INSERT INTO socketinfo (username, quizid, roomid, socketid, socketstatus, ip, timestamp) VALUES" +
+        
+//	    var sql = "INSERT INTO socketinfo (username, quizid, roomid, socketid, socketstatus, ip, timestamp) VALUES" +
+	    var sql = "INSERT INTO {quizaccess_hbmon_socketinfo} (username, quizid, roomid, socketid, socketstatus, ip, timestamp) VALUES" +
+
          			"(" + socket.username + "," 
          				+ socket.quizid + "," 
          				+ socket.roomid + "," 
@@ -123,6 +166,7 @@ var record = io.sockets.on('connection', function (socket) {
 	    con.query(sql, function(err, result) {
 	    	if (err) throw err;
 		});
+	    console.log('Done===================================');
 
 	    // Join the connected socket to the room. 'roomid' is the concatenaton of (username + quizid).
 	    // Here, 'roomid' corresponds to a particular user.

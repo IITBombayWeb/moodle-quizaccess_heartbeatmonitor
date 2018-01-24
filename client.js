@@ -23,7 +23,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-function client(Y, quizid, userid, username, attemptid, sessionkey)
+function client(Y, quizid, userid, username, attemptid, sessionkey, DB)
 {
 	var socket = io('http://127.0.0.1:3000', {
 						'secure':                    false,
