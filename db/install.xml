@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="mod/quiz/accessrule/heartbeatmonitor/db" VERSION="20180123" COMMENT="XMLDB file for Moodle mod/quiz/accessrule/heartbeatmonitor"
+<XMLDB PATH="mod/quiz/accessrule/heartbeatmonitor/db" VERSION="20180124" COMMENT="XMLDB file for Moodle mod/quiz/accessrule/heartbeatmonitor"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../../../lib/xmldb/xmldb.xsd"
 >
@@ -21,11 +21,11 @@
     </TABLE>
     <TABLE NAME="quizaccess_hbmon_livetable1" COMMENT="Default comment for quizaccess_heartbeatmonitor, please edit me">
       <FIELDS>
-        <FIELD NAME="roomid" TYPE="char" LENGTH="40" NOTNULL="true" SEQUENCE="true"/>
-        <FIELD NAME="status" TYPE="char" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
-        <FIELD NAME="timetoconsider" TYPE="char" LENGTH="40" NOTNULL="false" SEQUENCE="false"/>
-        <FIELD NAME="livetime" TYPE="char" LENGTH="40" NOTNULL="false" SEQUENCE="false"/>
-        <FIELD NAME="deadtime" TYPE="char" LENGTH="40" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="roomid" TYPE="char" LENGTH="40" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="status" TYPE="char" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="timetoconsider" TYPE="char" LENGTH="40" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="livetime" TYPE="char" LENGTH="40" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="deadtime" TYPE="char" LENGTH="40" NOTNULL="true" SEQUENCE="false"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="roomid"/>
