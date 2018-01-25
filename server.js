@@ -30,66 +30,37 @@ var io			= require('socket.io').listen(http);
 var bodyParser 	= require('body-parser');
 var mysql 		= require('mysql');
 
-// Reading and Parsing moodle config.php file for using db conn info in nodejs
-var fs 			= require('fs');
 
+//Reading and Parsing moodle config.php file for using db conn in nodejs
+var fs 			= require('fs');
+//var file1 = require('./File1')(io);
 var obj;
-// Method 1 ----------------------------------------------------------------------------
 //fs.readFile('../../../../config.php', 'utf8', function (err, data) {
 //	console.log('in fs');
-//  if (err) throw err;
-//  obj = data;
-////  var json = '<?= json_encode('+data+') ?>'; // strip off first php line n try
-////  var object = JSON.parse(json);
-//  console.log(obj);
+//if (err) throw err;
+//obj = data;
+////var json = '<?= json_encode('+data+') ?>'; // strip off first php line n try
+////var object = JSON.parse(json);
+//console.log(obj);
 //});
 
-// Method 2-----------------------------------------------------------------------------
-var obj = fs.readFileSync('../../../../config.php', 'utf8');
-console.log('here cfg');
-console.log(obj[0]);
-
-// Method 3-----------------------------------------------------------------------------
+//var obj = fs.readFileSync('../../../../config.php', 'utf8');
+//console.log('here cfg===================================');
+//console.log(obj);
 
 var runner = require('child_process');
-runner.exec(
-  'php -r \'define("CLI_SCRIPT", true); include("../../../../config.php"); print json_encode($CFG);\'', 
-  function (err, stdout, stderr) {
-	  var obj = JSON.parse(stdout);
-	  console.log(obj.dbhost);
-  }
-);
 
-// Method 4-------------------------------------------------------------------------------
-//var path = require('path');
-//var engine = require('php-parser');
-// 
-//// initialize a new parser instance
-//var parser = new engine({
-//  // some options :
-//  parser: {
-//    extractDoc: true,
-//    php7: true
-//  },
-//  ast: {
-//    withPositions: true
-//  }
-//});
-// 
-//// Retrieve the AST from the specified source
-////var eval = parser.parseEval('echo "Hello World";');
-// 
-//// Retrieve an array of tokens (same as php function token_get_all)
-////var tokens = parser.tokenGetAll('<?php echo "Hello World";');
-// 
-//// Load a static file (Note: this file should exist on your computer)
-//var phpFile = fs.readFileSync('../../../../config.php', 'utf8');
-// 
-//// Log out results
-////console.log( 'Eval parse:', eval );
-////console.log( 'Tokens parse:', tokens );
-//console.log('new code---------------------------');
-//console.log( 'File parse:', parser.parseCode(phpFile) );
+runner.exec(
+'php -r \'define("CLI_SCRIPT", true); include("../../../../config.php"); print json_encode($CFG);\'', 
+function (err, stdout, stderr) {
+	  console.log('runner=======================================');
+//	  var obj = JSON.parse(stdout).default.default;
+	  obj = JSON.parse(stdout);
+ console.log(obj.dbhost);
+ console.log(obj.dbuser);
+ // result botdb
+}
+);
 //---------------------------------------------------------------------------------------
 		
 
@@ -99,13 +70,10 @@ runner.exec(
 //	password : "root123",
 //	database : "trialdb"
 //});
+console.log('conn create=============================================');
+//console.log(obj.dbhost);
 
-var con = mysql.createConnection({
-	host 	 : config.dbhost,
-	user 	 : config.dbuser,
-	password : config.dbpass,
-	database : config.dbname
-});
+//console.log(con);
 
 app.use(bodyParser.urlencoded({ extended: true }));
 
@@ -139,7 +107,7 @@ var record = io.sockets.on('connection', function (socket) {
 		allsocketids.push(io.sockets.server.eio.clients[clientid].id);
 	}  
 //	console.log('allsocketids: ' + allsocketids);
-		
+	
 	socket.on('attempt', function(data) {
 		// Append some extra data to the socket object.
 	    socket.username 	= "'" + data.username + "'";
@@ -152,7 +120,15 @@ var record = io.sockets.on('connection', function (socket) {
 //        console.log('in attempt event');
 	    // Insert connection record into the database.
         // 'socketinfo' table has records of all the socket connections and disconnections.
-        
+        console.log('con===================================');
+        console.log(obj.dbuser);
+        var con = mysql.createConnection({
+        	host 	 : obj.dbhost,
+        	user 	 : obj.dbuser,
+        	password : obj.dbpass,
+        	database : obj.dbname
+        });
+    	console.log(con);
 //	    var sql = "INSERT INTO socketinfo (username, quizid, roomid, socketid, socketstatus, ip, timestamp) VALUES" +
 	    var sql = "INSERT INTO {quizaccess_hbmon_socketinfo} (username, quizid, roomid, socketid, socketstatus, ip, timestamp) VALUES" +
 
