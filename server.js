@@ -40,11 +40,11 @@ var obj;
 //--------------------------------------------------------------------------------------------------------
 //fs.readFile('../../../../config.php', 'utf8', function (err, data) {
 //	console.log('in fs');
-//if (err) throw err;
-//obj = data;
-////var json = '<?= json_encode('+data+') ?>'; // strip off first php line n try
-////var object = JSON.parse(json);
-//console.log(obj);
+//	if (err) throw err;
+//	obj = data;
+//	//var json = '<?= json_encode('+data+') ?>'; // strip off first php line n try
+//	//var object = JSON.parse(json);
+//	console.log(obj);
 //});
 
 
@@ -53,7 +53,9 @@ var obj;
 //var obj = fs.readFileSync('../../../../config.php', 'utf8');
 //console.log('===============here cfg file===================================');
 //console.log(obj);
-
+//var json = '<?= json_encode('+obj+') ?>'; // strip off first php line n try
+//var object = JSON.parse(json);
+//console.log(object);
 
 //--------------------------------------------------------------------------------------------------------
 //var runner = require('child_process');
@@ -69,7 +71,7 @@ var obj;
 // // result botdb
 //}
 //);
-//
+
 
 
 //--------------------------------------------------------------------------------------------------------
@@ -83,9 +85,13 @@ var obj;
 //             console.log('exec error: ' + error);
 //        }
 //    });
-//// child();
-// 
-// child.stdout.pipe(process.stdout);
+////// child();
+//// 
+//// child.stdout.pipe(process.stdout);
+//child.stdout.removeAllListeners("data");
+//child.stderr.removeAllListeners("data");
+//child.stdout.pipe(process.stdout);
+//child.stderr.pipe(process.stderr);
 // child.on('exit', function() {
 //	 console.log('in child exit');
 //   process.exit();
@@ -93,58 +99,58 @@ var obj;
 
 //--------------------------------------------------------------------------------------------------------
 //initialize the php parser factory class
-var path = require('path');
-var engine = require('php-parser');
-
-// initialize a new parser instance
-var parser = new engine({
-  // some options :
-  parser: {
-    extractDoc: true,
-    php7: true
-  },
-  ast: {
-    withPositions: true
-  }
-});
-
-// Retrieve the AST from the specified source
-var eval = parser.parseEval('echo "Hello World";');
-
-// Retrieve an array of tokens (same as php function token_get_all)
-var tokens = parser.tokenGetAll('<?php echo "Hello World";');
-
-// Load a static file (Note: this file should exist on your computer)
-var phpFile = fs.readFileSync( '../../../../config.php' );
-
-// Log out results
-console.log( 'Eval parse:', eval );
-console.log( 'Tokens parse:', tokens );
-console.log( 'File parse:', parser.parseCode(phpFile) );
+//var path = require('path');
+//var engine = require('php-parser');
+//
+//// initialize a new parser instance
+//var parser = new engine({
+//  // some options :
+//  parser: {
+//    extractDoc: true,
+//    php7: true
+//  },
+//  ast: {
+//    withPositions: true
+//  }
+//});
+//
+//// Retrieve the AST from the specified source
+//var eval = parser.parseEval('echo "Hello World";');
+//
+//// Retrieve an array of tokens (same as php function token_get_all)
+//var tokens = parser.tokenGetAll('<?php echo "Hello World";');
+//
+//// Load a static file (Note: this file should exist on your computer)
+//var phpFile = fs.readFileSync( '../../../../config.php' );
+//
+//// Log out results
+//console.log( 'Eval parse:', eval );
+//console.log( 'Tokens parse:', tokens );
+//console.log( 'File parse:', parser.parseCode(phpFile) );
 
 
 //---------------------------------------------------------------------------------------------------------
-console.log('con===================================');
-//console.log(obj.dbuser);
-var con = mysql.createConnection({
-	host 	 : obj.dbhost,
-	user 	 : obj.dbuser,
-	password : obj.dbpass,
-	database : obj.dbname
-});
-console.log(con);
-
+//console.log('con===================================');
+////console.log(obj.dbuser);
+//var con = mysql.createConnection({
+//	host 	 : obj.dbhost,
+//	user 	 : obj.dbuser,
+//	password : obj.dbpass,
+//	database : obj.dbname
+//});
+//console.log(con);
+var con;
 //var con = mysql.createConnection({
 //	host 	 : "localhost",
-//	user 	 : "root",
-//	password : "root123",
-//	database : "trialdb"
+//	user 	 : "moodle-owner",
+//	password : "Moodle@123",
+//	database : "moodle"
 //});
-console.log('conn create=============================================');
+//console.log('conn create=============================================');
 //console.log(obj.dbhost);
 
 //console.log(con);
-
+//-----------------------------------------------------------------------------------------------------------
 app.use(bodyParser.urlencoded({ extended: true }));
 
 app.get('/', function(req, res){
@@ -162,6 +168,7 @@ var roomwisesockets;
 var roomwisesocketids = [];
 var allsocketscount;
 var allsocketids;
+var cfg;
 
 var record = io.sockets.on('connection', function (socket) {	
 //	console.log( socket.id + ' connected. ts: ' + socket.handshake.issued);
@@ -187,17 +194,22 @@ var record = io.sockets.on('connection', function (socket) {
         socket.statusConnected = "'Connected'";
         socket.timestampC 	= socket.handshake.issued;
         socket.ip 			= "'" + socket.request.connection.remoteAddress + "'";
+        cfg = data.config;
+//        console.log(data.config);
+
+        console.log('--------data.cfg----------------------');
+        obj = data.config;
 //        console.log('in attempt event');
 	    // Insert connection record into the database.
         // 'socketinfo' table has records of all the socket connections and disconnections.
 //        console.log('con===================================');
 //        console.log(obj.dbuser);
-//        var con = mysql.createConnection({
-//        	host 	 : obj.dbhost,
-//        	user 	 : obj.dbuser,
-//        	password : obj.dbpass,
-//        	database : obj.dbname
-//        });
+        con = mysql.createConnection({
+        	host 	 : obj.dbhost,
+        	user 	 : obj.dbuser,
+        	password : obj.dbpass,
+        	database : obj.dbname
+        });
 //    	console.log(con);
 //	    var sql = "INSERT INTO socketinfo (username, quizid, roomid, socketid, socketstatus, ip, timestamp) VALUES" +
 	    var sql = "INSERT INTO mdl_quizaccess_hbmon_socketinfo (username, quizid, roomid, socketid, socketstatus, ip, timestamp) VALUES" +
@@ -235,7 +247,7 @@ var record = io.sockets.on('connection', function (socket) {
            
 	    	// 'livetable1' reflects current status of a user. There is one entry per user in this table. 
 	    	// If exists, fetch previous entry for this user from 'livetable1'.
-	    	var liverecordexistsql = "SELECT * FROM livetable1 WHERE roomid = " + socket.roomid;
+	    	var liverecordexistsql = "SELECT * FROM mdl_quizaccess_hbmon_livetable1 WHERE roomid = " + socket.roomid;
 	    	con.query(liverecordexistsql, function(err, result) {
                 if (err) throw err;
                 
@@ -259,7 +271,7 @@ var record = io.sockets.on('connection', function (socket) {
 //	                        console.log(socket.roomid + ': After cumulation, deadtime is: ' + humanise(deadtime));
 	
 	                        // Update 'status' entry for this user in 'livetable1'.
-	                        var updatelivetablesql = "UPDATE livetable1 SET status = " 	+ socket.currentstatus 
+	                        var updatelivetablesql = "UPDATE mdl_quizaccess_hbmon_livetable1 SET status = " 	+ socket.currentstatus 
 	                        								+ ", deadtime = "  	+ deadtime 
 	                        								+ ", timetoconsider = " + socket.timestampC 
 	                        								+ " where roomid = " + socket.roomid;
@@ -284,7 +296,7 @@ var record = io.sockets.on('connection', function (socket) {
                     }
                 } else {
                 	// Insert current status entry for this user in 'livetable1'.                	
-                    var livetablesql = "INSERT INTO livetable1 (roomid, status, timetoconsider, livetime, deadtime) VALUES" +
+                    var livetablesql = "INSERT INTO mdl_quizaccess_hbmon_livetable1 (roomid, status, timetoconsider, livetime, deadtime) VALUES" +
                                       	"(" + socket.roomid + "," 
                                       		+ socket.currentstatus + "," 
                                       		+ socket.timestampC + ", 0, 0 )";
@@ -318,7 +330,7 @@ var record = io.sockets.on('connection', function (socket) {
 		socket.statusDisconnected = "'Disconnected'";
 		
 	    // Insert disconnection record into database.
-		var sql = "INSERT INTO socketinfo (username, quizid, roomid, socketid, socketstatus, ip, timestamp) VALUES" +
+		var sql = "INSERT INTO mdl_quizaccess_hbmon_socketinfo (username, quizid, roomid, socketid, socketstatus, ip, timestamp) VALUES" +
 				  	"(" + socket.username + "," 
 				  		+ socket.quizid + "," 
 				  		+ socket.roomid + "," 
@@ -353,7 +365,7 @@ var record = io.sockets.on('connection', function (socket) {
 		    socket.currentstatus = "'Dead'";
 		    
 		    // Fetch previous entry for this user from 'livetable1'.
-		    var fetchtimesql = "SELECT timetoconsider, livetime FROM livetable1 WHERE roomid = " + socket.roomid;
+		    var fetchtimesql = "SELECT timetoconsider, livetime FROM mdl_quizaccess_hbmon_livetable1 WHERE roomid = " + socket.roomid;
 		    
 		    con.query(fetchtimesql, function(err, result) {
 		    	if (err) throw err;
@@ -372,7 +384,7 @@ var record = io.sockets.on('connection', function (socket) {
 //		    	console.log(socket.roomid + ': After cumulation, livetime  is: ' + humanise(livetime));
 			
 		    	// Update 'status' entry for this user in 'livetable1'.
-		    	var updatelivetablesql = "UPDATE livetable1 SET status = " + socket.currentstatus 
+		    	var updatelivetablesql = "UPDATE mdl_quizaccess_hbmon_livetable1 SET status = " + socket.currentstatus 
 		    									+ ", timetoconsider = " + socket.timestampD 
 		    									+ ", livetime = " + livetime 
 		    									+ " where roomid = " + socket.roomid;

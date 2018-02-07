@@ -69,11 +69,12 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
 //     	$retcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 //     	curl_close($ch);
 //     	if (200 == $retcode) {
-        $qa             = $DB->get_record('quiz_attempts', array('id'=>$attemptid));
-
+        $qa = $DB->get_record('quiz_attempts', array('id'=>$attemptid));
+        echo '<br><br><br>here----------------------------';
+        print_object(json_encode($CFG));
         // Error..since socket gets connected while reviewing the quiz.. but qa->state is finished..so conflict
                 if($qa->state != 'finished') {
-    	    $PAGE->requires->js_init_call('client', array($quizid, $userid, $username, $attemptid, $sessionkey));
+    	    $PAGE->requires->js_init_call('client', array($quizid, $userid, $username, $attemptid, $sessionkey, json_encode($CFG)));
                 }
 
 

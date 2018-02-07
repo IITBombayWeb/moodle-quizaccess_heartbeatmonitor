@@ -23,8 +23,11 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-function client(Y, quizid, userid, username, attemptid, sessionkey, DB)
+function client(Y, quizid, userid, username, attemptid, sessionkey, cfg)
 {
+//	console.log('in client -----------------------------------------');
+	var obj = JSON.parse(cfg);
+	console.log(obj);
 	var socket = io('http://127.0.0.1:3000', {
 						'secure':                    false,
 					    'connect timeout':           5000,
@@ -48,8 +51,13 @@ function client(Y, quizid, userid, username, attemptid, sessionkey, DB)
 	var roomid = username + '_' + quizid + '_' + attemptid;	
 	
 	socket.on('connect', function() {
+		console.log('in client connect-----------------------------------------');
+		console.log(obj);
 		console.log('after  socket connected ' + socket.id  + ' cur ' + (new Date().getTime()));
-		socket.emit('attempt', { username:username, quizid:quizid, roomid:roomid, attemptid:attemptid });
+//		console.log('in client -----------------------------------------');
+//		console.log(cfg);
+		socket.emit('attempt', { username:username, quizid:quizid, roomid:roomid, attemptid:attemptid, config:obj });
+		
 	});	
 	
 	socket.on('disconnect', function() {
