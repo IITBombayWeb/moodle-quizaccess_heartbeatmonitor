@@ -59,8 +59,8 @@ var obj;
 
 //--------------------------------------------------------------------------------------------------------
 //var runner = require('child_process');
-//
-//var child = runner.exec(
+//console.log('hiiiiiiiiiii----------------------------------------');
+//var child = runner.execSync(
 //'php -r \'define("CLI_SCRIPT", true); include("../../../../config.php"); print json_encode($CFG);\'', 
 //function (err, stdout, stderr) {
 //	  console.log('runner=======================================');
@@ -71,8 +71,44 @@ var obj;
 // // result botdb
 //}
 //);
+//-----------------------------EXEC SYNC------------------------------------------------------------------------
+//var child = require('child_process').execSync('php -r \'define("CLI_SCRIPT", true); include("../../../../config.php"); print json_encode($CFG);\'');//, {stdio:[process.stdin, process.stdout, process.stderr]});
 
+//--------------------------------SPAWN-------------------------------------------------------------------
+var spawn = require('child_process').spawn;
 
+//kick off process of listing files
+//var child = spawn('php -r \'define("CLI_SCRIPT", true); include("../../../../config.php"); print json_encode($CFG);\'');//, ['-l', '/']);
+var child = spawn('php', ['-r', 'define("CLI_SCRIPT", true); include("../../../../config.php"); print json_encode($CFG);']);
+
+//spit stdout to screen
+child.stdout.on('data', function (data) { 
+	console.log('in stdout========================================');
+	var object = JSON.parse(data);
+	console.log(object.dbtype);
+//	process.stdout.write(data);  
+	}
+);
+
+//spit stderr to screen
+child.stderr.on('data', function (data) { 
+	console.log('in stderr========================================');
+	process.stdout.write(data.toString());  
+	}
+);
+
+child.on('close', function (code) { 
+    console.log("Finished with code " + code);
+});
+
+//-------------------------------------------------------------------------------------------------
+//var execSync = require('exec-sync');
+//
+//var exec_output = execSync('php -r \'define("CLI_SCRIPT", true); include("../../../../config.php"); print json_encode($CFG);\'');
+//var obj2 = JSON.parse(exec_output);
+//console.log('in execsync-------------------------------------');
+//console.log(obj2.dbhost);
+//console.log(obj2.dbuser);
 
 //--------------------------------------------------------------------------------------------------------
 //var exec = require('child_process').exec, child;
@@ -130,8 +166,8 @@ var obj;
 
 
 //---------------------------------------------------------------------------------------------------------
-//console.log('con===================================');
-////console.log(obj.dbuser);
+console.log('con===================================');
+//console.log(obj.dbuser);
 //var con = mysql.createConnection({
 //	host 	 : obj.dbhost,
 //	user 	 : obj.dbuser,
@@ -139,7 +175,7 @@ var obj;
 //	database : obj.dbname
 //});
 //console.log(con);
-var con;
+//var con;
 //var con = mysql.createConnection({
 //	host 	 : "localhost",
 //	user 	 : "moodle-owner",
@@ -198,18 +234,18 @@ var record = io.sockets.on('connection', function (socket) {
 //        console.log(data.config);
 
         console.log('--------data.cfg----------------------');
-        obj = data.config;
+//        obj = data.config;
 //        console.log('in attempt event');
 	    // Insert connection record into the database.
         // 'socketinfo' table has records of all the socket connections and disconnections.
 //        console.log('con===================================');
 //        console.log(obj.dbuser);
-        con = mysql.createConnection({
-        	host 	 : obj.dbhost,
-        	user 	 : obj.dbuser,
-        	password : obj.dbpass,
-        	database : obj.dbname
-        });
+//        con = mysql.createConnection({
+//        	host 	 : obj.dbhost,
+//        	user 	 : obj.dbuser,
+//        	password : obj.dbpass,
+//        	database : obj.dbname
+//        });
 //    	console.log(con);
 //	    var sql = "INSERT INTO socketinfo (username, quizid, roomid, socketid, socketstatus, ip, timestamp) VALUES" +
 	    var sql = "INSERT INTO mdl_quizaccess_hbmon_socketinfo (username, quizid, roomid, socketid, socketstatus, ip, timestamp) VALUES" +
