@@ -37,7 +37,7 @@ var fs 			= require('fs');
 var obj;
 
 
-//--------------------------------------------------------------------------------------------------------
+//-------------------------------------PARSE NOT WORKING-------------------------------------------------------------------
 //fs.readFile('../../../../config.php', 'utf8', function (err, data) {
 //	console.log('in fs');
 //	if (err) throw err;
@@ -48,7 +48,7 @@ var obj;
 //});
 
 
-//--------------------------------------------------------------------------------------------------------
+//----------------------------------PARSE NOT WORKING----------------------------------------------------------------------
 
 //var obj = fs.readFileSync('../../../../config.php', 'utf8');
 //console.log('===============here cfg file===================================');
@@ -57,10 +57,10 @@ var obj;
 //var object = JSON.parse(json);
 //console.log(object);
 
-//--------------------------------------------------------------------------------------------------------
+//------------------------------EXEC - WORKS BUT AFTER SCKT CONN--------------------------------------------------------------------------
 //var runner = require('child_process');
 //console.log('hiiiiiiiiiii----------------------------------------');
-//var child = runner.execSync(
+//var child = runner.exec(
 //'php -r \'define("CLI_SCRIPT", true); include("../../../../config.php"); print json_encode($CFG);\'', 
 //function (err, stdout, stderr) {
 //	  console.log('runner=======================================');
@@ -71,37 +71,44 @@ var obj;
 // // result botdb
 //}
 //);
-//-----------------------------EXEC SYNC------------------------------------------------------------------------
+
+//-----------------------------EXEC SYNC - WORKS------------------------------------------------------------------------
 //var child = require('child_process').execSync('php -r \'define("CLI_SCRIPT", true); include("../../../../config.php"); print json_encode($CFG);\'');//, {stdio:[process.stdin, process.stdout, process.stderr]});
+var child = require('child_process').execSync(
+		'php -r \'define("CLI_SCRIPT", true); include("../../../../config.php"); print json_encode($CFG);\'');
+console.log('=======================EXEC SYNC====================================================================');
+//console.log(child.toString());
+var execSync = JSON.parse(child);
+console.log(execSync.dbtype);
 
-//--------------------------------SPAWN-------------------------------------------------------------------
-var spawn = require('child_process').spawn;
+//--------------------------------SPAWN - WORKS BUT AFTER SCKT CONN------------------------------------------------------------------
+//var spawn = require('child_process').spawn;
+//
+////kick off process of listing files
+////var child = spawn('php -r \'define("CLI_SCRIPT", true); include("../../../../config.php"); print json_encode($CFG);\'');//, ['-l', '/']);
+//var child = spawn('php', ['-r', 'define("CLI_SCRIPT", true); include("../../../../config.php"); print json_encode($CFG);']);
+//
+////spit stdout to screen
+//child.stdout.on('data', function (data) { 
+//	console.log('in stdout========================================');
+//	var object = JSON.parse(data);
+//	console.log(object.dbtype);
+////	process.stdout.write(data);  
+//	}
+//);
+//
+////spit stderr to screen
+//child.stderr.on('data', function (data) { 
+//	console.log('in stderr========================================');
+//	process.stdout.write(data.toString());  
+//	}
+//);
+//
+//child.on('close', function (code) { 
+//    console.log("Finished with code " + code);
+//});
 
-//kick off process of listing files
-//var child = spawn('php -r \'define("CLI_SCRIPT", true); include("../../../../config.php"); print json_encode($CFG);\'');//, ['-l', '/']);
-var child = spawn('php', ['-r', 'define("CLI_SCRIPT", true); include("../../../../config.php"); print json_encode($CFG);']);
-
-//spit stdout to screen
-child.stdout.on('data', function (data) { 
-	console.log('in stdout========================================');
-	var object = JSON.parse(data);
-	console.log(object.dbtype);
-//	process.stdout.write(data);  
-	}
-);
-
-//spit stderr to screen
-child.stderr.on('data', function (data) { 
-	console.log('in stderr========================================');
-	process.stdout.write(data.toString());  
-	}
-);
-
-child.on('close', function (code) { 
-    console.log("Finished with code " + code);
-});
-
-//-------------------------------------------------------------------------------------------------
+//----------------------------------NOT WORKING - NOT GETTING INSTALLED--------------------------------------------------------------
 //var execSync = require('exec-sync');
 //
 //var exec_output = execSync('php -r \'define("CLI_SCRIPT", true); include("../../../../config.php"); print json_encode($CFG);\'');
@@ -110,14 +117,15 @@ child.on('close', function (code) {
 //console.log(obj2.dbhost);
 //console.log(obj2.dbuser);
 
-//--------------------------------------------------------------------------------------------------------
+//-----------------------TRYING TO WORK OUT EXEC - WORKS BUT AFTER SCKT CONN----------------------------------------------------------------------
 //var exec = require('child_process').exec, child;
 //
 //child = exec('php -r \'define("CLI_SCRIPT", true); include("../../../../config.php"); print json_encode($CFG);\'',
 //    function (error, stdout, stderr) {
+//        //PARSE THE OUTPUT
 //        console.log('stdout: ' + stdout);
 //        console.log('stderr: ' + stderr);
-//        if (error !== null) {
+//        if (error !== null) {			
 //             console.log('exec error: ' + error);
 //        }
 //    });
@@ -133,7 +141,7 @@ child.on('close', function (code) {
 //   process.exit();
 // });
 
-//--------------------------------------------------------------------------------------------------------
+//-----------------------------------GIVES OUTPUT IN AST FORMAT - HOW TO DECODE??---------------------------------------------------------------------
 //initialize the php parser factory class
 //var path = require('path');
 //var engine = require('php-parser');
@@ -165,7 +173,7 @@ child.on('close', function (code) {
 //console.log( 'File parse:', parser.parseCode(phpFile) );
 
 
-//---------------------------------------------------------------------------------------------------------
+//-----------------------------------DB CONN----------------------------------------------------------------------
 console.log('con===================================');
 //console.log(obj.dbuser);
 //var con = mysql.createConnection({
