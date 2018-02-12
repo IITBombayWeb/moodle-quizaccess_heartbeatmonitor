@@ -86,10 +86,15 @@ class new_form extends moodleform {
 
         // Display live users.
         // Fetch records from database.
-        $servername = "localhost";
-        $dbusername = "root";
-        $dbpassword = "root123";
-        $dbname     = "trialdb";
+//         $servername = "localhost";
+//         $dbusername = "root";
+//         $dbpassword = "root123";
+//         $dbname     = "trialdb";
+
+        $servername = $CFG->dbhost;
+        $dbusername = $CFG->dbuser;
+        $dbpassword = $CFG->dbpass;
+        $dbname     = $CFG->dbname;
 
         // Create connection
         $conn = new mysqli($servername, $dbusername, $dbpassword, $dbname);
@@ -203,15 +208,18 @@ class new_form extends moodleform {
 //             }
 //         }
 
-        $sql1 = 'SELECT * FROM livetable1 WHERE status = "Live" AND deadtime <> 0';
-        $result1 = $conn->query($sql1);
+        $sql1 = 'SELECT * FROM {quizaccess_hbmon_livetable1} WHERE status = "Live" AND deadtime <> 0';
+//         $result1 = $conn->query($sql1);
+        $result1    = $DB->get_records_sql($sql1);
         $deadtime1 = null;
         $userid1 = null;
         $arr_users = array();
-        if ($result1->num_rows > 0) {
+        if (!empty($result1)){
+//         if ($result1->num_rows > 0) {
             // Output data of each row.
-            while($data = $result1->fetch_assoc()) {
-                $roomid1        = $data["roomid"];
+            foreach ($result1 as $record) {
+//             while($data = $result1->fetch_assoc()) {
+                $roomid1        = $record->roomid;
 
                 $arr            = explode("_", $roomid1);
                 $attemptid      = array_splice($arr, -1)[0];
@@ -222,10 +230,10 @@ class new_form extends moodleform {
                 $userid1        = $user->id;
 
                 if($quizid1 == $quiz->id) {
-                    $status1          = $data["status"];
-                    $timetoconsider1  = $data["timetoconsider"];
-                    $livetime1        = $data["livetime"];
-                    $deadtime1        = $data["deadtime"];
+                    $status1          = $record->status;
+                    $timetoconsider1  = $record->timetoconsider;
+                    $livetime1        = $record->livetime;
+                    $deadtime1        = $record->deadtime;
                     //             echo $roomid1 . ' ' . $livetime1;
                     $arr_users[$roomid1] = $user->firstname .  ' ' . $user->lastname;
                 }

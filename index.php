@@ -65,10 +65,16 @@ require_capability('mod/quiz:manage', $context);
 
 // Display live users.
 // Fetch records from database.
-$servername = "localhost";
-$dbusername = "root";
-$dbpassword = "root123";
-$dbname     = "trialdb";
+
+// $servername = "localhost";
+// $dbusername = "root";
+// $dbpassword = "root123";
+// $dbname     = "trialdb";
+
+$servername = $CFG->dbhost;
+$dbusername = $CFG->dbuser;
+$dbpassword = $CFG->dbpass;
+$dbname     = $CFG->dbname;
 
 // Create connection
 $conn = new mysqli($servername, $dbusername, $dbpassword, $dbname);
@@ -79,8 +85,8 @@ if ($conn->connect_error) {
 }
 // echo "Connected successfully";
 
-$sql = 'SELECT * FROM livetable1';  // Select data for a particular quiz and not entire table..insert quizid col in livetable1 for this.
-$result = $conn->query($sql);
+$sql = 'SELECT * FROM {quizaccess_hbmon_livetable1}';  // Select data for a particular quiz and not entire table..insert quizid col in livetable1 for this.
+// $result = $conn->query($sql);
 $arr = array();
 $roomid = null;
 
@@ -90,17 +96,23 @@ $table->id = 'liveusers';
 $table->caption = 'Users attempting quiz';
 $table->head = array('User', 'Socket room id', 'Current status', 'Status update on', 'Quiz time used up', 'Quiz time lost');
 
-if ($result->num_rows > 0) {
+$result    = $DB->get_records_sql($sql);
+// if ($result->num_rows > 0) {
+// echo '<br><br><br>';
+
+if (!empty($result)){
     // Output data of each row.
-    while($data = $result->fetch_assoc()) {
-        $roomid         = $data["roomid"];
+//     while($data = $result->fetch_assoc()) {
+    foreach ($result as $record) {
+//         $roomid         = $data["roomid"];
+        $roomid         = $record->roomid;
         $arr            = explode("_", $roomid);
         $attemptid      = array_splice($arr, -1)[0];
         $qa             = $DB->get_record('quiz_attempts', array('id'=>$attemptid));
 
         // Error..since socket gets connected while reviewing the quiz.. but qa->state is finished..so conflict
         if($qa->state == 'finished') {
-            $sql = 'DELETE FROM livetable1 WHERE roomid = "' . $roomid . '"';
+            $sql = 'DELETE FROM {quizaccess_hbmon_livetable1} WHERE roomid = "' . $roomid . '"';
             $conn->query($sql);
             continue;
         }
@@ -115,10 +127,14 @@ if ($result->num_rows > 0) {
         }
 
         if($quizid1 == $quizid) {
-            $status          = $data["status"];
-            $timetoconsider  = $data["timetoconsider"];
-            $livetime        = $data["livetime"];
-            $deadtime        = $data["deadtime"];
+//             $status          = $data["status"];
+//             $timetoconsider  = $data["timetoconsider"];
+//             $livetime        = $data["livetime"];
+//             $deadtime        = $data["deadtime"];
+            $status          = $record->status;
+            $timetoconsider  = $record->timetoconsider;
+            $livetime        = $record->livetime;
+            $deadtime        = $record->deadtime;
 
             $currentTimestamp = intval(microtime(true)*1000);
 

@@ -78,8 +78,8 @@ var child = require('child_process').execSync(
 		'php -r \'define("CLI_SCRIPT", true); include("../../../../config.php"); print json_encode($CFG);\'');
 console.log('=======================EXEC SYNC====================================================================');
 //console.log(child.toString());
-var execSync = JSON.parse(child);
-console.log(execSync.dbtype);
+obj = JSON.parse(child);
+console.log(obj.dbtype);
 
 //--------------------------------SPAWN - WORKS BUT AFTER SCKT CONN------------------------------------------------------------------
 //var spawn = require('child_process').spawn;
@@ -175,13 +175,13 @@ console.log(execSync.dbtype);
 
 //-----------------------------------DB CONN----------------------------------------------------------------------
 console.log('con===================================');
-//console.log(obj.dbuser);
-//var con = mysql.createConnection({
-//	host 	 : obj.dbhost,
-//	user 	 : obj.dbuser,
-//	password : obj.dbpass,
-//	database : obj.dbname
-//});
+console.log(obj.dbuser);
+var con = mysql.createConnection({
+	host 	 : obj.dbhost,
+	user 	 : obj.dbuser,
+	password : obj.dbpass,
+	database : obj.dbname
+});
 //console.log(con);
 //var con;
 //var con = mysql.createConnection({

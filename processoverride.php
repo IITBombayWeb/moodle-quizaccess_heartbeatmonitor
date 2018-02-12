@@ -138,10 +138,15 @@ if ($fromform = $mform->get_data()) {
 
     // Display live users.
     // Fetch records from database.
-    $servername = "localhost";
-    $dbusername = "root";
-    $dbpassword = "root123";
-    $dbname     = "trialdb";
+//     $servername = "localhost";
+//     $dbusername = "root";
+//     $dbpassword = "root123";
+//     $dbname     = "trialdb";
+
+    $servername = $CFG->dbhost;
+    $dbusername = $CFG->dbuser;
+    $dbpassword = $CFG->dbpass;
+    $dbname     = $CFG->dbname;
 
     // Create connection
     $conn = new mysqli($servername, $dbusername, $dbpassword, $dbname);
@@ -170,7 +175,7 @@ if ($fromform = $mform->get_data()) {
 //                 $userid         = $userdata->id;
 //             }
 
-            $sql = 'SELECT * FROM livetable1 WHERE roomid = "' . $roomid . '"';  // Select data for a particular quiz and not entire table..insert quizid col in livetable1 for this.
+            $sql = 'SELECT * FROM {quizaccess_hbmon_livetable1} WHERE roomid = "' . $roomid . '"';  // Select data for a particular quiz and not entire table..insert quizid col in livetable1 for this.
 //             echo 'sql' . $sql . 'hi';
             $result = $conn->query($sql);
 //             print_object($result);
