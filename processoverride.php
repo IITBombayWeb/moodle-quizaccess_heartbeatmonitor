@@ -143,19 +143,19 @@ if ($fromform = $mform->get_data()) {
 //     $dbpassword = "root123";
 //     $dbname     = "trialdb";
 
-    $servername = $CFG->dbhost;
-    $dbusername = $CFG->dbuser;
-    $dbpassword = $CFG->dbpass;
-    $dbname     = $CFG->dbname;
+//     $servername = $CFG->dbhost;
+//     $dbusername = $CFG->dbuser;
+//     $dbpassword = $CFG->dbpass;
+//     $dbname     = $CFG->dbname;
 
-    // Create connection
-    $conn = new mysqli($servername, $dbusername, $dbpassword, $dbname);
+//     // Create connection
+//     $conn = new mysqli($servername, $dbusername, $dbpassword, $dbname);
 
-    // Check connection
-    if ($conn->connect_error) {
-        die("Connection failed: " . $conn->connect_error);
-    }
-    echo "Connected successfully";
+//     // Check connection
+//     if ($conn->connect_error) {
+//         die("Connection failed: " . $conn->connect_error);
+//     }
+//     echo "Connected successfully";
 
     $roomids = array();
     $roomids = explode(" ", $fromform->users);
@@ -177,12 +177,15 @@ if ($fromform = $mform->get_data()) {
 
             $sql = 'SELECT * FROM {quizaccess_hbmon_livetable1} WHERE roomid = "' . $roomid . '"';  // Select data for a particular quiz and not entire table..insert quizid col in livetable1 for this.
 //             echo 'sql' . $sql . 'hi';
-            $result = $conn->query($sql);
+            $result    = $DB->get_records_sql($sql);
+//             $result = $conn->query($sql);
 //             print_object($result);
-            if ($result->num_rows > 0) {
+            if (!empty($result)){
+//             if ($result->num_rows > 0) {
                 // Output data of each row.
-                while($data = $result->fetch_assoc()) {
-                    $roomid         = $data["roomid"];
+                foreach ($result as $record) {
+//                 while($data = $result->fetch_assoc()) {
+                    $roomid         = $record->roomid;
                     $arr            = explode("_", $roomid);
                     $attemptid      = array_splice($arr, -1)[0];
                     $quizid1        = array_splice($arr, -1)[0];
@@ -194,10 +197,10 @@ if ($fromform = $mform->get_data()) {
                         $userid         = $user->id;
                     }
                     if($quizid1 == $quiz->id) {
-                        $status          = $data["status"];
-                        $timetoconsider  = $data["timetoconsider"];
-                        $livetime        = $data["livetime"];
-                        $deadtime        = $data["deadtime"];
+                        $status          = $record->status;
+                        $timetoconsider  = $record->timetoconsider;
+                        $livetime        = $record->livetime;
+                        $deadtime        = $record->deadtime;
 
                         $currentTimestamp = intval(microtime(true)*1000);
 

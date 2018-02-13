@@ -71,19 +71,19 @@ require_capability('mod/quiz:manage', $context);
 // $dbpassword = "root123";
 // $dbname     = "trialdb";
 
-$servername = $CFG->dbhost;
-$dbusername = $CFG->dbuser;
-$dbpassword = $CFG->dbpass;
-$dbname     = $CFG->dbname;
+// $servername = $CFG->dbhost;
+// $dbusername = $CFG->dbuser;
+// $dbpassword = $CFG->dbpass;
+// $dbname     = $CFG->dbname;
 
-// Create connection
-$conn = new mysqli($servername, $dbusername, $dbpassword, $dbname);
+// // Create connection
+// $conn = new mysqli($servername, $dbusername, $dbpassword, $dbname);
 
-// Check connection
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
-}
-// echo "Connected successfully";
+// // Check connection
+// if ($conn->connect_error) {
+//     die("Connection failed: " . $conn->connect_error);
+// }
+// // echo "Connected successfully";
 
 $sql = 'SELECT * FROM {quizaccess_hbmon_livetable1}';  // Select data for a particular quiz and not entire table..insert quizid col in livetable1 for this.
 // $result = $conn->query($sql);
@@ -104,6 +104,8 @@ if (!empty($result)){
     // Output data of each row.
 //     while($data = $result->fetch_assoc()) {
     foreach ($result as $record) {
+//         echo '<br><br><br>';
+
 //         $roomid         = $data["roomid"];
         $roomid         = $record->roomid;
         $arr            = explode("_", $roomid);
@@ -113,7 +115,13 @@ if (!empty($result)){
         // Error..since socket gets connected while reviewing the quiz.. but qa->state is finished..so conflict
         if($qa->state == 'finished') {
             $sql = 'DELETE FROM {quizaccess_hbmon_livetable1} WHERE roomid = "' . $roomid . '"';
-            $conn->query($sql);
+
+            $table11 = 'quizaccess_hbmon_livetable1';
+            $select = 'roomid = ?'; //is put into the where clause
+            $params = array("' . $roomid . '");
+
+            $DB->delete_records_select($table11, $select, $params);
+//             $conn->query($sql);
             continue;
         }
 

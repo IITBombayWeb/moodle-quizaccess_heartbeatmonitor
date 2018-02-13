@@ -91,18 +91,18 @@ class new_form extends moodleform {
 //         $dbpassword = "root123";
 //         $dbname     = "trialdb";
 
-        $servername = $CFG->dbhost;
-        $dbusername = $CFG->dbuser;
-        $dbpassword = $CFG->dbpass;
-        $dbname     = $CFG->dbname;
+//         $servername = $CFG->dbhost;
+//         $dbusername = $CFG->dbuser;
+//         $dbpassword = $CFG->dbpass;
+//         $dbname     = $CFG->dbname;
 
-        // Create connection
-        $conn = new mysqli($servername, $dbusername, $dbpassword, $dbname);
+//         // Create connection
+//         $conn = new mysqli($servername, $dbusername, $dbpassword, $dbname);
 
-        // Check connection
-        if ($conn->connect_error) {
-            die("Connection failed: " . $conn->connect_error);
-        }
+//         // Check connection
+//         if ($conn->connect_error) {
+//             die("Connection failed: " . $conn->connect_error);
+//         }
         // echo "Connected successfully";
 
 //         $sql = 'SELECT * FROM livetable1';  // Select data for a particular quiz and not entire table..insert quizid col in livetable1 for this.
