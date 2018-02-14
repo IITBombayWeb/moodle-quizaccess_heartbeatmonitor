@@ -210,18 +210,18 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
 
                 // Display live users.
                 // Fetch records from database.
-                $servername = "localhost";
-                $dbusername = "root";
-                $dbpassword = "root123";
-                $dbname     = "trialdb";
+//                 $servername = "localhost";
+//                 $dbusername = "root";
+//                 $dbpassword = "root123";
+//                 $dbname     = "trialdb";
 
-                // Create connection
-                $conn = new mysqli($servername, $dbusername, $dbpassword, $dbname);
+//                 // Create connection
+//                 $conn = new mysqli($servername, $dbusername, $dbpassword, $dbname);
 
-                // Check connection
-                if ($conn->connect_error) {
-                    die("Connection failed: " . $conn->connect_error);
-                }
+//                 // Check connection
+//                 if ($conn->connect_error) {
+//                     die("Connection failed: " . $conn->connect_error);
+//                 }
 //                 echo "Connected successfully";
 
 //                 $roomids = array();
@@ -242,19 +242,22 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
                         //                 $userid         = $userdata->id;
                         //             }
 
-                        $sql = 'SELECT * FROM livetable1 WHERE roomid = "' . $roomid . '" AND status = "Live" AND deadtime > 60000';  // Select data for a particular quiz and not entire table..insert quizid col in livetable1 for this.
+                        $sql = 'SELECT * FROM {quizaccess_hbmon_livetable1} WHERE roomid = "' . $roomid . '" AND status = "Live" AND deadtime > 60000';  // Select data for a particular quiz and not entire table..insert quizid col in livetable1 for this.
 //                                     echo 'sql' . $sql . 'hi';
-                        $result = $conn->query($sql);
+                        $result    = $DB->get_records_sql($sql);
+//                         $result = $conn->query($sql);
 //                                     print_object($result);
 //                                     echo '<br>heyyyy';
-                        if ($result->num_rows > 0) {
+                        if (!empty($result)){
+//                         if ($result->num_rows > 0) {
                             // Output data of each row.
 //                             echo '<br>data obj';
 //                             print_object($data);
-                            if($data = $result->fetch_assoc()) {
+                            foreach ($result as $record) {
+//                             if($data = $result->fetch_assoc()) {
 //                                 echo '<br>data obj';
 //                                 print_object($data);
-                                $roomid         = $data["roomid"];
+                                $roomid         = $record->roomid;
                                 $arr            = explode("_", $roomid);
                                 $attemptid      = array_splice($arr, -1)[0];
                                 $quizid1        = array_splice($arr, -1)[0];
@@ -266,10 +269,10 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
                                     $userid         = $user->id;
                                 }
                                 if($quizid1 == $quiz->id) {
-                                    $status          = $data["status"];
-                                    $timetoconsider  = $data["timetoconsider"];
-                                    $livetime        = $data["livetime"];
-                                    $deadtime        = $data["deadtime"];
+                                    $status          = $record->status;
+                                    $timetoconsider  = $record->timetoconsider;
+                                    $livetime        = $record->livetime;
+                                    $deadtime        = $record->deadtime;
 
                                     $currentTimestamp = intval(microtime(true)*1000);
 
@@ -296,9 +299,13 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
                                     $timelimit = $quiz->timelimit + intval($deadtime / 1000);
                                     $livetime = $livetime + $deadtime;
                                     $deadtime = 0;
-                                    $updatelivetablesql = 'UPDATE livetable1 SET deadtime = 0 WHERE roomid = "' . $roomid . '"';
+                                    $updatelivetablesql = 'UPDATE {quizaccess_hbmon_livetable1} SET deadtime = 0 WHERE roomid = "' . $roomid . '"';
 //                                     echo '<br><br><br>' . $updatelivetablesql;
-                                    $result1 = $conn->query($updatelivetablesql);
+//                                     $result1 = $conn->query($updatelivetablesql);
+
+                                    $table11 = 'quizaccess_hbmon_livetable1';
+                                    $dataobject = array('roomid' => $roomid);
+                                    $result1 = $DB->update_record($table11, $dataobject, $bulk=false);
 //                                     echo '<br><br><br>update res ' . $result1;
                                     print_object($result1);
 

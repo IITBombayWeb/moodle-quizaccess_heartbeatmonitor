@@ -73,7 +73,6 @@ class new_form extends moodleform {
         $cmid = $this->cm->id;
         $quizid = $this->quiz->id;
 
-
         $mform = $this->_form;
 
         // Post data for overrideedit.php.
@@ -211,10 +210,12 @@ class new_form extends moodleform {
         $sql1 = 'SELECT * FROM {quizaccess_hbmon_livetable1} WHERE status = "Live" AND deadtime <> 0';
 //         $result1 = $conn->query($sql1);
         $result1    = $DB->get_records_sql($sql1);
-        $deadtime1 = null;
-        $userid1 = null;
-        $arr_users = array();
-        if (!empty($result1)){
+        $deadtime1  = null;
+        $userid1    = null;
+        $arr_users  = array();
+
+        if (!empty($result1)) {
+            print_object($result1);
 //         if ($result1->num_rows > 0) {
             // Output data of each row.
             foreach ($result1 as $record) {

@@ -118,9 +118,10 @@ if (!empty($result)){
 
             $table11 = 'quizaccess_hbmon_livetable1';
             $select = 'roomid = ?'; //is put into the where clause
-            $params = array("' . $roomid . '");
+            $params = array($roomid);
 
-            $DB->delete_records_select($table11, $select, $params);
+            $delete = $DB->delete_records_select($table11, $select, $params);
+//             print_object($delete);
 //             $conn->query($sql);
             continue;
         }
