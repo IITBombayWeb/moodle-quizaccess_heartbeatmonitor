@@ -49,8 +49,8 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
 
         $PAGE->requires->js( new moodle_url('http://127.0.0.1:3000/socket.io/socket.io.js'), true );
         $PAGE->requires->js( new moodle_url($CFG->wwwroot . '/mod/quiz/accessrule/heartbeatmonitor/client.js') );
-
-        if($attemptid  = required_param('attempt', PARAM_INT)) {
+        $attemptid  = required_param('attempt', PARAM_INT);
+        if($attemptid) {
         $attemptid  = required_param('attempt', PARAM_INT);
         $sessionkey = sesskey();
         $userid     = $_SESSION['USER']->id;
@@ -303,10 +303,12 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
 //                                     echo '<br><br><br>' . $updatelivetablesql;
 //                                     $result1 = $conn->query($updatelivetablesql);
 
-                                    $table11 = 'quizaccess_hbmon_livetable1';
-                                    $dataobject = array('roomid' => $roomid);
-                                    $result1 = $DB->update_record($table11, $dataobject, $bulk=false);
+//                                     $table11 = 'quizaccess_hbmon_livetable1';
+//                                     $dataobject = array('id' => 1, 'roomid' => $roomid, 'deadtime' => 0);
+//                                     $result1 = $DB->update_record($table11, $dataobject, $bulk=false);
 //                                     echo '<br><br><br>update res ' . $result1;
+                                    $params = array();
+                                    $result1 = $DB->execute($updatelivetablesql);
                                     print_object($result1);
 
                                     $fromform->userid = $userid;
