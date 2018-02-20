@@ -215,7 +215,7 @@ class new_form extends moodleform {
         $arr_users  = array();
 
         if (!empty($result1)) {
-            print_object($result1);
+//             print_object($result1);
 //         if ($result1->num_rows > 0) {
             // Output data of each row.
             foreach ($result1 as $record) {
