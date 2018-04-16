@@ -95,6 +95,7 @@ $table->id = 'liveusers';
 // $table->caption = get_string('liveusers', 'quizaccess_heartbeatmonitor');
 $table->caption = 'Users attempting quiz';
 $table->head = array('User', 'Socket room id', 'Current status', 'Status update on', 'Quiz time used up', 'Quiz time lost');
+// $table->head = array('User', 'Socket room id', 'Current status', 'Status update on', 'Quiz time used up', 'Quiz time lost', 'Total extra time granted');
 
 $result    = $DB->get_records_sql($sql);
 // if ($result->num_rows > 0) {
@@ -113,7 +114,7 @@ if (!empty($result)){
         $qa             = $DB->get_record('quiz_attempts', array('id'=>$attemptid));
 
         // Error..since socket gets connected while reviewing the quiz.. but qa->state is finished..so conflict
-        if($qa->state == 'finished') {
+        if(!$qa || $qa->state == 'finished') {
             $sql = 'DELETE FROM {quizaccess_hbmon_livetable1} WHERE roomid = "' . $roomid . '"';
 
             $table11 = 'quizaccess_hbmon_livetable1';
