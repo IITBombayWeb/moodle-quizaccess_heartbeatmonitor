@@ -28,7 +28,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot . '/mod/quiz/accessrule/accessrulebase.php');
-
+require_once($CFG->dirroot . '/mod/quiz/accessrule/heartbeatmonitor/createoverride.php');
 
 /**
  * A rule implementing heartbeat monitor.
@@ -76,6 +76,8 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
 //     	$retcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 //     	curl_close($ch);
 //     	if (200 == $retcode) {
+
+        // code here
             $qa = $DB->get_record('quiz_attempts', array('id'=>$attemptid));
             echo '<br><br><br> qa state: ' . $qa->state;
             // Error..since socket gets connected while reviewing the quiz.. but qa->state is finished..so conflict
@@ -83,12 +85,18 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
         	    $PAGE->requires->js_init_call('client', array($quizid, $userid, $username, $attemptid, $sessionkey, json_encode($CFG)));
 
             } else {
-                $sql = 'SELECT o.*
-                            FROM {quiz_overrides} o
-                            JOIN {user} u ON o.userid = u.id
-                            WHERE o.quiz = :quizid
-                                AND u.id = :userid
-                            ORDER BY o.id DESC
+//                 $sql = 'SELECT o.*
+//                             FROM {quiz_overrides} o
+//                             JOIN {user} u ON o.userid = u.id
+//                             WHERE o.quiz = :quizid
+//                                 AND u.id = :userid
+//                             ORDER BY o.id DESC
+//                             LIMIT 1';
+                $sql = 'SELECT *
+                            FROM {quiz_overrides}
+                            WHERE quiz = :quizid
+                                AND userid = :userid
+                            ORDER BY id DESC
                             LIMIT 1';
                 $params['quizid'] = $quiz->id;
                 $params['userid'] = $userid;
@@ -110,13 +118,13 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
         global $DB, $CFG;
         $context = context_module::instance($cmid);
 //         echo '<br><br><br> cr-ovrr cmid '.$cmid;
-        $varcmid = $cmid;
+//         $varcmid = $cmid;
         $groupmode = null;
         $action = null;
-        include_once($CFG->dirroot . '/mod/quiz/accessrule/heartbeatmonitor/processoverride.php');
+//         include_once($CFG->dirroot . '/mod/quiz/accessrule/heartbeatmonitor/processoverride.php');
 //         echo '<br><br><br> cr-ovrr after cmid '.$cmid;
         $override = null;
-        $cmid = $varcmid;
+//         $cmid = $varcmid;
 
         // Add or edit an override.
 //         require_capability('mod/quiz:manageoverrides', $context);
@@ -133,8 +141,8 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
         }
 
         // True if group-based override.
-        $action = null;
-        $groupmode = !empty($data->groupid) || ($action === 'addgroup' && empty($overrideid));
+//         $action = null;
+//         $groupmode = !empty($data->groupid) || ($action === 'addgroup' && empty($overrideid));
 
         // Setup the form data required for processing as in overrideedit.php file.
         $fromform = new stdClass();
@@ -153,7 +161,9 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
         $fromform->submitbutton = 'Save';
 //         echo '<br><br><br>rule cmid ' . $cmid;
 //         print_object($fromform);
-        my_override($cmid, $roomid, $fromform, $quiz);
+        $myobj = new createoverride();
+        $myobj->my_override($cmid, $roomid, $fromform, $quiz);
+//         my_override($cmid, $roomid, $fromform, $quiz);
     }
 
 //     public function my_override($roomid, $fromfrom) {

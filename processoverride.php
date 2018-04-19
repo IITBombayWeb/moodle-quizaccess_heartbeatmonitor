@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * This page handles editing and creation of quiz overrides
+ * This page handles editing and creation of quiz overrides.
  *
  * @package   mod_quiz
  * @copyright 2010 Matt Petro
@@ -23,19 +23,22 @@
  */
 
 
-require_once($CFG->dirroot . '/config.php');
+// require_once($CFG->dirroot . '/config.php');
+require_once('../../../../config.php');
 require_once($CFG->dirroot . '/mod/quiz/lib.php');
 require_once($CFG->dirroot . '/mod/quiz/locallib.php');
 require_once($CFG->dirroot . '/mod/quiz/override_form.php');
 require_once($CFG->dirroot . '/mod/quiz/accessrule/heartbeatmonitor/timelimit_override_form1.php');
+require_once($CFG->dirroot . '/mod/quiz/accessrule/heartbeatmonitor/createoverride.php');
+
 
 $cmid       = optional_param('cmid', 0, PARAM_INT);
 $overrideid = optional_param('id', 0, PARAM_INT);
 $action     = optional_param('action', null, PARAM_ALPHA);
 $reset      = optional_param('reset', false, PARAM_BOOL);
-// echo '<br><br><br>';
+echo '<br><br><br>';
 $override = null;
-$mform = null;
+// $mform = null;
 // if ($overrideid) {
 
 //     if (! $override = $DB->get_record('quiz_overrides', array('id' => $overrideid))) {
@@ -50,7 +53,9 @@ $mform = null;
 if ($cmid) {
     list($course, $cm) = get_course_and_cm_from_cmid($cmid, 'quiz');
     $quiz = $DB->get_record('quiz', array('id' => $cm->instance), '*', MUST_EXIST);
-
+} else {
+    print_error('invalidcoursemodule');
+}
     $course = $DB->get_record('course', array('id'=>$cm->course), '*', MUST_EXIST);
 
     $url = new moodle_url('/mod/quiz/accessrule/heartbeatmonitor/processoverride.php');
@@ -77,16 +82,16 @@ if ($cmid) {
         //     $data = clone $override;
         // } else {
         // Creating a new override.
-//         $data = new stdClass();
+        $data = new stdClass();
         // }
 
         // Merge quiz defaults with data.
-//         $keys = array('timeopen', 'timeclose', 'timelimit', 'attempts', 'password');
-//         foreach ($keys as $key) {
-//             if (!isset($data->{$key}) || $reset) {
-//                 $data->{$key} = $quiz->{$key};
-//             }
-//         }
+        $keys = array('timeopen', 'timeclose', 'timelimit', 'attempts', 'password');
+        foreach ($keys as $key) {
+            if (!isset($data->{$key}) || $reset) {
+                $data->{$key} = $quiz->{$key};
+            }
+        }
 
         // If we are duplicating an override, then clear the user/group and override id
         // since they will change.
@@ -97,7 +102,7 @@ if ($cmid) {
         // }
 
         // True if group-based override.
-//         $groupmode = !empty($data->groupid) || ($action === 'addgroup' && empty($overrideid));
+        $groupmode = !empty($data->groupid) || ($action === 'addgroup' && empty($overrideid));
 
         $overridelisturl = new moodle_url('/mod/quiz/accessrule/heartbeatmonitor/showoverrides.php', array('cmid'=>$cm->id));
         // if (!$groupmode) {
@@ -120,30 +125,31 @@ if ($cmid) {
         // } else
         $indexurl = new moodle_url('/mod/quiz/accessrule/heartbeatmonitor/index.php', array('quizid'=>$quiz->id, 'courseid'=>$course->id, 'cmid'=>$cmid));
 
-}
-// else {
-//     print_error('invalidcoursemodule');
-// }
-if (isset($mform)) {
+//-----------------------------
+
+// if (isset($mform)) {
     if($mform->is_cancelled()) {
         redirect($indexurl);
     }
     if ($fromform = $mform->get_data()) {
-
+        echo "in povrd";
+//         print_object($fromform);
         $roomids = array();
         $roomids = explode(" ", $fromform->users);
-        print_object($roomids);
+//         print_object($roomids);
         foreach ($roomids as $roomid) {
             // One common function for duplicate code in rule.php and processoverride.php
-            my_override($cmid, $roomid, $fromfrom, $quiz);
+            $myobj = new createoverride();
+            $myobj->my_override($cmid, $roomid, $fromform, $quiz);
+//             my_override($cmid, $roomid, $fromfrom, $quiz);
         }
 
         if (!empty($fromform->submitbutton)) {
             redirect($overridelisturl);
         }
     }
-}
-
+// }
+/*
 function my_override($cmid, $roomid, $fromform, $quiz) {
     global $DB;
 //     echo "<br><br><br>cmid " . $cmid;
@@ -325,9 +331,9 @@ function my_override($cmid, $roomid, $fromform, $quiz) {
             }
         }
     }
-}
+}*/
 
-if ($cmid) {
+// if ($cmid) {
     // Print the form.
     $pagetitle = get_string('editoverride', 'quiz');
     $PAGE->navbar->add($pagetitle);
@@ -340,4 +346,4 @@ if ($cmid) {
     $mform->display();
 
     echo $OUTPUT->footer();
-}
+// }
