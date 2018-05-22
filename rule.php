@@ -80,11 +80,62 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
         // code here
             $qa = $DB->get_record('quiz_attempts', array('id'=>$attemptid));
             echo '<br><br><br> qa state: ' . $qa->state;
+
+            $roomid = $username . '_' . $quizid . '_' . $attemptid;
+            $state = $qa->state;
+
+            STATIC $flag = 0;
             // Error..since socket gets connected while reviewing the quiz.. but qa->state is finished..so conflict
             if($qa->state != 'finished') {
+                echo '<br>in if not finished qa state 1';
+                echo '<br>ts before : ' . (int)(microtime(true)*1000);
         	    $PAGE->requires->js_init_call('client', array($quizid, $userid, $username, $attemptid, $sessionkey, json_encode($CFG)));
+//         	    sleep(20);
+        	    echo '<br>ts : ' . (int)(microtime(true)*1000); //
 
+            }
+
+
+            if($qa->state != 'finished') {
+                echo '<br>in if not finished qa state 2';
+                $select_sql11 = 'SELECT *
+                        FROM {quizaccess_hbmon_livetable1}
+                        WHERE roomid = "' . $roomid . '"';
+                $records11 = $DB->get_records_sql($select_sql11);
+
+                print_object($records11);
+
+        	    $select_sql = 'SELECT *
+                        FROM {quizaccess_hbmon_livetable1}
+                        WHERE roomid = "' . $roomid . '"
+                                AND status = "Live"
+                                AND deadtime > 60000';
+        	    $records = $DB->get_records_sql($select_sql);
+
+        	    if (!empty($records)){
+        	        foreach ($records as $record) {
+        	            if($roomid == $record->roomid){
+    //     	                if($qa->state != 'finished') {
+            	                echo '<br>in record if rule.php';
+            	                $this->create_override($roomid, $cmid, $quiz);
+    //         	                $flag = 1;
+//         	                } else {
+    //     	                    echo '<br>in record else rule.php';
+    //     	                    $this->create_override($roomid, $cmid, $quiz, $state);
+    //     	                }
+        	            }
+        	            break;
+        	        }
+        	    }
+
+//     	    if ($flag == 1){
+//     	        echo 'in recordif rule.php';
+//     	        $this->create_override($roomid, $cmid, $quiz, $state);
+//     	        $flag = 0;
+//     	    }
             } else {
+                echo '<br> in else';
+            /*
 //                 $sql = 'SELECT o.*
 //                             FROM {quiz_overrides} o
 //                             JOIN {user} u ON o.userid = u.id
@@ -105,16 +156,34 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
                     print_object($override);
     //                 echo '<br><br><br> qa state: ' . $qa->state;
                     quiz_delete_override($quiz, $override->id);
+
+                }
+//                 */
+                echo '<br><br><br> qa state: ' . $qa->state;
+                $roomid = $username . '_' . $quizid . '_' . $attemptid;
+                echo '<br>rum : ' . $roomid;
+                $select_sql = 'SELECT *
+                        FROM {quizaccess_hbmon_livetable1}
+                        WHERE roomid = "' . $roomid . '"';
+//                                 AND status = "Dead"';
+//                                 AND deadtime > 60000';
+                $records = $DB->get_records_sql($select_sql);
+                print_object($records);
+
+                if (!empty($records)){
+                    foreach ($records as $record) {
+                        if($roomid == $record->roomid){
+                            echo '<br>in record else rule.php';
+                            $this->create_override($roomid, $cmid, $quiz, $state);
+                        }
+                    }
                 }
             }
 //     	}
-            $roomid = $username . '_' . $quizid . '_' . $attemptid;
-            $this->create_override($roomid, $cmid, $quiz);
-
         }
     }
 
-    protected function create_override($roomid, $cmid, $quiz) {
+    protected function create_override($roomid, $cmid, $quiz, $state = null) {
         global $DB, $CFG;
         $context = context_module::instance($cmid);
 //         echo '<br><br><br> cr-ovrr cmid '.$cmid;
@@ -161,9 +230,15 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
         $fromform->submitbutton = 'Save';
 //         echo '<br><br><br>rule cmid ' . $cmid;
 //         print_object($fromform);
-        $myobj = new createoverride();
-        $myobj->my_override($cmid, $roomid, $fromform, $quiz);
-//         my_override($cmid, $roomid, $fromform, $quiz);
+        if($state === 'finished') {
+            echo 'in if state finished';
+            $myobj = new createoverride();
+            $myobj->reset_timelimit_override($cmid, $roomid, $fromform, $quiz);
+        } else {
+            $myobj = new createoverride();
+            $myobj->my_override($cmid, $roomid, $fromform, $quiz);
+//             my_override($cmid, $roomid, $fromform, $quiz);
+        }
     }
 
 //     public function my_override($roomid, $fromfrom) {
@@ -328,5 +403,41 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
 //             }
 //         }
 //     }
+
+    public static function add_settings_form_fields(
+            mod_quiz_mod_form $quizform, MoodleQuickForm $mform) {
+                $mform->addElement('select', 'honestycheckrequired',
+                        get_string('honestycheckrequired', 'quizaccess_heartbeatmonitor'),
+                        array(
+                                0 => get_string('notrequired', 'quizaccess_heartbeatmonitor'),
+                                1 => get_string('honestycheckrequiredoption', 'quizaccess_heartbeatmonitor'),
+                        ));
+                $mform->addHelpButton('honestycheckrequired',
+                        'honestycheckrequired', 'quizaccess_heartbeatmonitor');
+
+    }
+    public static function save_settings($quiz) {
+        global $DB;
+//         if (empty($quiz->honestycheckrequired)) {
+//             $DB->delete_records('quizaccess_honestycheck', array('quizid' => $quiz->id));
+//         } else {
+//             if (!$DB->record_exists('quizaccess_honestycheck', array('quizid' => $quiz->id))) {
+//                 $record = new stdClass();
+//                 $record->quizid = $quiz->id;
+//                 $record->honestycheckrequired = 1;
+//                 $DB->insert_record('quizaccess_honestycheck', $record);
+//             }
+//         }
+    }
+    public static function delete_settings($quiz) {
+        global $DB;
+//         $DB->delete_records('quizaccess_honestycheck', array('quizid' => $quiz->id));
+    }
+    public static function get_settings_sql($quizid) {
+//         return array(
+//                 'honestycheckrequired',
+//                 'LEFT JOIN {quizaccess_honestycheck} honestycheck ON honestycheck.quizid = quiz.id',
+//                 array());
+    }
 }
 

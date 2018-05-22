@@ -33,4 +33,13 @@ $string['calculatetime'] = 'Calculate time';
 $string['liveusers'] = 'Live users';
 $string['nodatafound'] = 'No data found.';
 $string['heading'] = '{$a} | Heartbeat monitor ';
+$string['honestycheckheader'] = 'Please read the following message';
+$string['honestychecklabel'] = 'I have read and agree to the above statement.';
+$string['honestycheckrequired'] = 'Hearbeat monitoring';
+$string['honestycheckrequired_help'] = 'If you enable this option, quiz connections and disconnections will be monitored through the plugin.';
+$string['honestycheckrequiredoption'] = 'required';
+$string['honestycheckstatement'] = 'I understand that it is important that the attempt I am about to make is all my own work. I understand what constitutes plagiarism or cheating, and I will not undertake such activities.';
+$string['notrequired'] = 'not required';
+// $string['pluginname'] = 'Acknowledge plagiarism statement access rule';
+$string['youmustagree'] = 'You must agree to this statement before you start the quiz.';
 

@@ -315,6 +315,8 @@ var record = io.sockets.on('connection', function (socket) {
 //	                        console.log(socket.roomid + ': After cumulation, deadtime is: ' + humanise(deadtime));
 	
 	                        // Update 'status' entry for this user in 'livetable1'.
+	                        console.log('=====================updating live status==========================');
+	                        console.log('----curr. status-------'+socket.currentstatus+'-------------------------');
 	                        var updatelivetablesql = "UPDATE mdl_quizaccess_hbmon_livetable1 SET status = " 	+ socket.currentstatus 
 	                        								+ ", deadtime = "  	+ deadtime 
 	                        								+ ", timetoconsider = " + socket.timestampC 
@@ -322,6 +324,7 @@ var record = io.sockets.on('connection', function (socket) {
 	                        con.query(updatelivetablesql, function(err, result) {
 	                            if (err) throw err;
 	                        });
+	                        console.log('===== cur ts check ==== ' + (new Date().getTime()));
 //                        } else {	
 //                        	// Add ques switch time to the live time.
 //                        	// Compute cumulative livetime.
