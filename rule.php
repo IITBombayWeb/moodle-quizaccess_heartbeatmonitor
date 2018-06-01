@@ -439,5 +439,9 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
 //                 'LEFT JOIN {quizaccess_honestycheck} honestycheck ON honestycheck.quizid = quiz.id',
 //                 array());
     }
+    public function is_preflight_check_required($attemptid) {
+        echo '<br><br>in preflight<br>';
+        return false;
+    }
 }
 
