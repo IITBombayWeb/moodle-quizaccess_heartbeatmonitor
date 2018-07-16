@@ -92,6 +92,21 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
         	    $PAGE->requires->js_init_call('client', array($quizid, $userid, $username, $attemptid, $sessionkey, json_encode($CFG)));
 //         	    sleep(20);
         	    echo '<br>ts : ' . (int)(microtime(true)*1000); //
+//         	    $select_sql11 = 'SELECT *
+//                         FROM {quizaccess_hbmon_livetable1}
+//                         WHERE roomid = "' . $roomid . '"';
+//         	    $records11 = $DB->get_records_sql($select_sql11);
+//         	    echo '<br>======================records11';
+//         	    print_object($records11);
+
+//         	    if (!empty($records)){
+//         	        echo '<br> here in !emp rec';
+//         	        foreach ($records as $record) {
+//         	            echo '<br> here in !emp rec';
+//         	            if($roomid == $record->roomid){
+
+//         	    $this->setup_attempt_page($page);
+//         	    setup_attempt_page($page);
 
             }
 
@@ -102,21 +117,26 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
                         FROM {quizaccess_hbmon_livetable1}
                         WHERE roomid = "' . $roomid . '"';
                 $records11 = $DB->get_records_sql($select_sql11);
-
+                echo '<br>======================records11';
                 print_object($records11);
 
         	    $select_sql = 'SELECT *
                         FROM {quizaccess_hbmon_livetable1}
-                        WHERE roomid = "' . $roomid . '"
-                                AND status = "Live"
-                                AND deadtime > 60000';
+                        WHERE roomid = "' . $roomid . '"'.
+                              /*  AND status = "Live" */
+                                'AND deadtime > 60000';
         	    $records = $DB->get_records_sql($select_sql);
+        	    echo '<br>==========================records';
+        	    print_object($records);
+
 
         	    if (!empty($records)){
+        	        echo '<br> here in !emp rec';
         	        foreach ($records as $record) {
+        	            echo '<br> here in !emp rec';
         	            if($roomid == $record->roomid){
     //     	                if($qa->state != 'finished') {
-            	                echo '<br>in record if rule.php';
+            	                echo '<br>1111======================in record if rule.php';
             	                $this->create_override($roomid, $cmid, $quiz);
     //         	                $flag = 1;
 //         	                } else {
@@ -129,7 +149,7 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
         	    }
 
 //     	    if ($flag == 1){
-//     	        echo 'in recordif rule.php';
+//     	        echo '<br>=================2222in recordif rule.php';
 //     	        $this->create_override($roomid, $cmid, $quiz, $state);
 //     	        $flag = 0;
 //     	    }
@@ -173,7 +193,7 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
                 if (!empty($records)){
                     foreach ($records as $record) {
                         if($roomid == $record->roomid){
-                            echo '<br>in record else rule.php';
+                            echo '<br>========================in record else rule.php';
                             $this->create_override($roomid, $cmid, $quiz, $state);
                         }
                     }
@@ -185,6 +205,7 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
 
     protected function create_override($roomid, $cmid, $quiz, $state = null) {
         global $DB, $CFG;
+        echo '<br> in create ovrrde func<br>';
         $context = context_module::instance($cmid);
 //         echo '<br><br><br> cr-ovrr cmid '.$cmid;
 //         $varcmid = $cmid;
@@ -235,6 +256,7 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
             $myobj = new createoverride();
             $myobj->reset_timelimit_override($cmid, $roomid, $fromform, $quiz);
         } else {
+            echo 'in if state not finished';
             $myobj = new createoverride();
             $myobj->my_override($cmid, $roomid, $fromform, $quiz);
 //             my_override($cmid, $roomid, $fromform, $quiz);
@@ -439,9 +461,9 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
 //                 'LEFT JOIN {quizaccess_honestycheck} honestycheck ON honestycheck.quizid = quiz.id',
 //                 array());
     }
-    public function is_preflight_check_required($attemptid) {
-        echo '<br><br>in preflight<br>';
-        return false;
-    }
+//     public function is_preflight_check_required($attemptid) {
+//         echo '<br><br>in preflight<br>';
+//         return false;
+//     }
 }
 

@@ -43,6 +43,7 @@ class createoverride {
 
     public function my_override($cmid, $roomid, $fromform, $quiz) {
         global $DB;
+        echo '<br>in my ovrrrde<br>';
         //     echo "<br><br><br>cmid " . $cmid;
         list($course, $cm) = get_course_and_cm_from_cmid($cmid, 'quiz');
         //     $quiz = $DB->get_record('quiz', array('id' => $cm->instance), '*', MUST_EXIST);
@@ -63,16 +64,19 @@ class createoverride {
 //         }
 
         if($roomid) {
+            echo '<br>my ovrr rum <br>' . $roomid;
             // Select data for a particular quiz and not entire table..insert quizid col in livetable1 for this.
             $select_sql = 'SELECT *
                         FROM {quizaccess_hbmon_livetable1}
-                        WHERE roomid = "' . $roomid . '"
-                                AND status = "Live"
-                                AND deadtime > 60000';
+                        WHERE roomid = "' . $roomid . '"'.
+                            /*    AND status = "Live"*/
+                                'AND deadtime > 60000';
             $records = $DB->get_records_sql($select_sql);
+            echo '<br>my ovrr recs<br>';
+            print_object($records);
 
             if (!empty($records)){
-                echo 'creating override now';
+                echo '<br>creating override now';
                 // Process data of each row.
                 foreach ($records as $record) {
                     $roomid         = $record->roomid;
