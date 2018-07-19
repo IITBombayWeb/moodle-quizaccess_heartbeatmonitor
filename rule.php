@@ -43,24 +43,209 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
         return new self($quizobj, $timenow);
     }
 
-    public function setup_attempt_page($page) {
+    public function prevent_access() {
         global $CFG, $PAGE, $_SESSION, $DB;
 
         $PAGE->requires->jquery();
         $PAGE->requires->js( new moodle_url('http://127.0.0.1:3000/socket.io/socket.io.js'), true );
         $PAGE->requires->js( new moodle_url($CFG->wwwroot . '/mod/quiz/accessrule/heartbeatmonitor/client.js') );
 
-        $attemptid  = required_param('attempt', PARAM_INT);
+        //         $attemptid  = required_param('attempt', PARAM_INT);
+
+        // use this to delete user-override when the attempt finishes
+        //        $this->current_attempt_finished();
+
+        //         if($attemptid) {
+
+        //         $attemptid  = required_param('attempt', PARAM_INT);
+        //         echo '<br><br><br> sess obj===============';
+        //         print_object($_SESSION);
+//         echo '<br><br><br><br> in prev access<br>';
+        $sessionkey = sesskey();
+        $userid     = $_SESSION['USER']->id;
+        $username   = $_SESSION['USER']->username;
+
+        $quizid     = $this->quizobj->get_quizid();
+        $cmid       = $this->quizobj->get_cmid();
+        //         echo '<br><br><br> quiz cmid '.$cmid;
+        $context    = $this->quizobj->get_context();
+
+        //         print_object($this->quizobj);   // for quiz timeopen, timeclose etc.
+        $quiz = $this->quizobj->get_quiz();
+//         echo '<br><br><br> --------this obj---------------';
+//         print_object($this);
+//         echo '<br><br><br> --------page obj---------------';
+//         print_object($PAGE);
+        //     	$url = 'http://127.0.0.1:3000/';
+        //     	$ch = curl_init($url);
+        //     	curl_setopt($ch, CURLOPT_NOBODY, true);
+        //     	curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+        //     	curl_exec($ch);
+        //     	$retcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        //     	curl_close($ch);
+        //     	if (200 == $retcode) {
+
+        $select_sql111 = 'SELECT *
+                    FROM {quiz_attempts}
+                    WHERE userid = ' . $userid . '
+                    AND quiz = ' . $quizid . '
+                    ORDER BY id DESC
+                    LIMIT 1 ';
+        $records111 = $DB->get_record_sql($select_sql111);
+//                 echo '<br><br><br> rec: ====================' . $records111->id;
+//                 print_object($records111);
+if ($records111){
+        $attemptid = $records111->id;
+
+        // code here
+        $qa = $DB->get_record('quiz_attempts', array('id'=>$attemptid));
+        //             echo '<br><br><br> qa state: ' . $qa->state;
+
+        $roomid = $username . '_' . $quizid . '_' . $attemptid;
+        $state = $qa->state;
+
+        STATIC $flag = 0;
+        // Error..since socket gets connected while reviewing the quiz.. but qa->state is finished..so conflict
+        if($qa->state != 'finished') {
+//                             echo '<br>in if not finished qa state 1';
+            //                 echo '<br>ts before : ' . (int)(microtime(true)*1000);
+            $PAGE->requires->js_init_call('client', array($quizid, $userid, $username, $attemptid, $sessionkey, json_encode($CFG)));
+            //         	    sleep(20);
+            //         	    echo '<br>ts : ' . (int)(microtime(true)*1000); //
+            //         	    $select_sql11 = 'SELECT *
+            //                         FROM {quizaccess_hbmon_livetable1}
+            //                         WHERE roomid = "' . $roomid . '"';
+            //         	    $records11 = $DB->get_records_sql($select_sql11);
+            //         	    echo '<br>======================records11';
+            //         	    print_object($records11);
+
+            //         	    if (!empty($records)){
+            //         	        echo '<br> here in !emp rec';
+            //         	        foreach ($records as $record) {
+            //         	            echo '<br> here in !emp rec';
+            //         	            if($roomid == $record->roomid){
+
+            //         	    $this->setup_attempt_page($page);
+            //         	    setup_attempt_page($page);
+
+        }
+
+//======================================================================================================
+        if($qa->state != 'finished') {
+            //                 echo '<br>in if not finished qa state 2';
+            $select_sql11 = 'SELECT *
+                    FROM {quizaccess_hbmon_livetable1}
+                    WHERE roomid = "' . $roomid . '"';
+            $records11 = $DB->get_records_sql($select_sql11);
+            //                 echo '<br>======================records11';
+            //                 print_object($records11);
+
+            $select_sql = 'SELECT *
+                    FROM {quizaccess_hbmon_livetable1}
+                    WHERE roomid = "' . $roomid . '"'.
+                    /*  AND status = "Live" */
+            'AND deadtime > 60000';
+            $records = $DB->get_records_sql($select_sql);
+            //         	    echo '<br>==========================records';
+            //         	    print_object($records);
+
+
+            if (!empty($records)){
+                //         	        echo '<br> here in !emp rec';
+                foreach ($records as $record) {
+                    //         	            echo '<br> here in !emp rec';
+                    if($roomid == $record->roomid){
+                        //     	                if($qa->state != 'finished') {
+                        //             	                echo '<br>1111======================in record if rule.php';
+                        $this->create_override($roomid, $cmid, $quiz);
+                        //         	                $flag = 1;
+                        //         	                } else {
+                        //     	                    echo '<br>in record else rule.php';
+                            //     	                    $this->create_override($roomid, $cmid, $quiz, $state);
+                            //     	                }
+                        }
+                        break;
+                }
+            }
+
+            //     	    if ($flag == 1){
+            //     	        echo '<br>=================2222in recordif rule.php';
+            //     	        $this->create_override($roomid, $cmid, $quiz, $state);
+            //     	        $flag = 0;
+            //     	    }
+        } else {
+            //                 echo '<br> in else';
+            /*
+             //                 $sql = 'SELECT o.*
+             //                             FROM {quiz_overrides} o
+             //                             JOIN {user} u ON o.userid = u.id
+             //                             WHERE o.quiz = :quizid
+             //                                 AND u.id = :userid
+             //                             ORDER BY o.id DESC
+             //                             LIMIT 1';
+             $sql = 'SELECT *
+             FROM {quiz_overrides}
+             WHERE quiz = :quizid
+             AND userid = :userid
+             ORDER BY id DESC
+             LIMIT 1';
+             $params['quizid'] = $quiz->id;
+             $params['userid'] = $userid;
+             $override = $DB->get_record_sql($sql, $params);
+             if ($override) {
+             print_object($override);
+             //                 echo '<br><br><br> qa state: ' . $qa->state;
+             quiz_delete_override($quiz, $override->id);
+
+             }
+             //                 */
+            //                 echo '<br><br><br> qa state: ' . $qa->state;
+            $roomid = $username . '_' . $quizid . '_' . $attemptid;
+            //                 echo '<br>rum : ' . $roomid;
+            $select_sql = 'SELECT *
+                    FROM {quizaccess_hbmon_livetable1}
+                    WHERE roomid = "' . $roomid . '"';
+            //                                 AND status = "Dead"';
+            //                                 AND deadtime > 60000';
+            $records = $DB->get_records_sql($select_sql);
+            //                 print_object($records);
+
+            if (!empty($records)){
+                foreach ($records as $record) {
+                    if($roomid == $record->roomid){
+                        //                             echo '<br>========================in record else rule.php';
+                        $this->create_override($roomid, $cmid, $quiz, $state);
+                    }
+                }
+            }
+        }
+}
+//======================================================================================================
+//         return false;
+    }
+
+    public function setup_attempt_page($page) {
+//     public function prevent_access() {
+        global $CFG, $PAGE, $_SESSION, $DB;
+//         echo '<br><br><br><br> in setup atmpt pg<br>';
+//         $PAGE->requires->jquery();
+//         $PAGE->requires->js( new moodle_url('http://127.0.0.1:3000/socket.io/socket.io.js'), true );
+//         $PAGE->requires->js( new moodle_url($CFG->wwwroot . '/mod/quiz/accessrule/heartbeatmonitor/client.js') );
+
+//         $attemptid  = required_param('attempt', PARAM_INT);
 
         // use this to delete user-override when the attempt finishes
 //        $this->current_attempt_finished();
 
-        if($attemptid) {
+//         if($attemptid) {
 
 //         $attemptid  = required_param('attempt', PARAM_INT);
+//         echo '<br><br><br> sess obj===============';
+//         print_object($_SESSION);
         $sessionkey = sesskey();
         $userid     = $_SESSION['USER']->id;
         $username   = $_SESSION['USER']->username;
+
         $quizid     = $this->quizobj->get_quizid();
         $cmid       = $this->quizobj->get_cmid();
 //         echo '<br><br><br> quiz cmid '.$cmid;
@@ -77,135 +262,148 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
 //     	curl_close($ch);
 //     	if (200 == $retcode) {
 
+        $select_sql111 = 'SELECT *
+                        FROM {quiz_attempts}
+                        WHERE userid = ' . $userid . '
+                        AND quiz = ' . $quizid . '
+                        ORDER BY id DESC
+                        LIMIT 1 ';
+        $records111 = $DB->get_record_sql($select_sql111);
+//         echo '<br><br><br> rec: ====================' . $records111->id;
+//         print_object($records111);
+        $attemptid = $records111->id;
+
         // code here
             $qa = $DB->get_record('quiz_attempts', array('id'=>$attemptid));
-            echo '<br><br><br> qa state: ' . $qa->state;
+//             echo '<br><br><br> qa state: ' . $qa->state;
 
             $roomid = $username . '_' . $quizid . '_' . $attemptid;
             $state = $qa->state;
 
             STATIC $flag = 0;
             // Error..since socket gets connected while reviewing the quiz.. but qa->state is finished..so conflict
-            if($qa->state != 'finished') {
-                echo '<br>in if not finished qa state 1';
-                echo '<br>ts before : ' . (int)(microtime(true)*1000);
-        	    $PAGE->requires->js_init_call('client', array($quizid, $userid, $username, $attemptid, $sessionkey, json_encode($CFG)));
-//         	    sleep(20);
-        	    echo '<br>ts : ' . (int)(microtime(true)*1000); //
-//         	    $select_sql11 = 'SELECT *
+//--------------------------------------------------------------------------------------------------------
+//             if($qa->state != 'finished') {
+// //                 echo '<br>in if not finished qa state 1';
+// //                 echo '<br>ts before : ' . (int)(microtime(true)*1000);
+//         	    $PAGE->requires->js_init_call('client', array($quizid, $userid, $username, $attemptid, $sessionkey, json_encode($CFG)));
+// //         	    sleep(20);
+// //         	    echo '<br>ts : ' . (int)(microtime(true)*1000); //
+// //         	    $select_sql11 = 'SELECT *
+// //                         FROM {quizaccess_hbmon_livetable1}
+// //                         WHERE roomid = "' . $roomid . '"';
+// //         	    $records11 = $DB->get_records_sql($select_sql11);
+// //         	    echo '<br>======================records11';
+// //         	    print_object($records11);
+
+// //         	    if (!empty($records)){
+// //         	        echo '<br> here in !emp rec';
+// //         	        foreach ($records as $record) {
+// //         	            echo '<br> here in !emp rec';
+// //         	            if($roomid == $record->roomid){
+
+// //         	    $this->setup_attempt_page($page);
+// //         	    setup_attempt_page($page);
+
+//             }
+//------------------------------------------------------------------------------------
+
+//             if($qa->state != 'finished') {
+// //                 echo '<br>in if not finished qa state 2';
+//                 $select_sql11 = 'SELECT *
 //                         FROM {quizaccess_hbmon_livetable1}
 //                         WHERE roomid = "' . $roomid . '"';
-//         	    $records11 = $DB->get_records_sql($select_sql11);
-//         	    echo '<br>======================records11';
-//         	    print_object($records11);
+//                 $records11 = $DB->get_records_sql($select_sql11);
+// //                 echo '<br>======================records11';
+// //                 print_object($records11);
+
+//         	    $select_sql = 'SELECT *
+//                         FROM {quizaccess_hbmon_livetable1}
+//                         WHERE roomid = "' . $roomid . '"'.
+//                               /*  AND status = "Live" */
+//                                 'AND deadtime > 60000';
+//         	    $records = $DB->get_records_sql($select_sql);
+// //         	    echo '<br>==========================records';
+// //         	    print_object($records);
+
 
 //         	    if (!empty($records)){
-//         	        echo '<br> here in !emp rec';
+// //         	        echo '<br> here in !emp rec';
 //         	        foreach ($records as $record) {
-//         	            echo '<br> here in !emp rec';
+// //         	            echo '<br> here in !emp rec';
 //         	            if($roomid == $record->roomid){
+//     //     	                if($qa->state != 'finished') {
+// //             	                echo '<br>1111======================in record if rule.php';
+//             	                $this->create_override($roomid, $cmid, $quiz);
+//     //         	                $flag = 1;
+// //         	                } else {
+//     //     	                    echo '<br>in record else rule.php';
+//     //     	                    $this->create_override($roomid, $cmid, $quiz, $state);
+//     //     	                }
+//         	            }
+//         	            break;
+//         	        }
+//         	    }
 
-//         	    $this->setup_attempt_page($page);
-//         	    setup_attempt_page($page);
-
-            }
-
-
-            if($qa->state != 'finished') {
-                echo '<br>in if not finished qa state 2';
-                $select_sql11 = 'SELECT *
-                        FROM {quizaccess_hbmon_livetable1}
-                        WHERE roomid = "' . $roomid . '"';
-                $records11 = $DB->get_records_sql($select_sql11);
-                echo '<br>======================records11';
-                print_object($records11);
-
-        	    $select_sql = 'SELECT *
-                        FROM {quizaccess_hbmon_livetable1}
-                        WHERE roomid = "' . $roomid . '"'.
-                              /*  AND status = "Live" */
-                                'AND deadtime > 60000';
-        	    $records = $DB->get_records_sql($select_sql);
-        	    echo '<br>==========================records';
-        	    print_object($records);
-
-
-        	    if (!empty($records)){
-        	        echo '<br> here in !emp rec';
-        	        foreach ($records as $record) {
-        	            echo '<br> here in !emp rec';
-        	            if($roomid == $record->roomid){
-    //     	                if($qa->state != 'finished') {
-            	                echo '<br>1111======================in record if rule.php';
-            	                $this->create_override($roomid, $cmid, $quiz);
-    //         	                $flag = 1;
-//         	                } else {
-    //     	                    echo '<br>in record else rule.php';
-    //     	                    $this->create_override($roomid, $cmid, $quiz, $state);
-    //     	                }
-        	            }
-        	            break;
-        	        }
-        	    }
-
-//     	    if ($flag == 1){
-//     	        echo '<br>=================2222in recordif rule.php';
-//     	        $this->create_override($roomid, $cmid, $quiz, $state);
-//     	        $flag = 0;
-//     	    }
-            } else {
-                echo '<br> in else';
-            /*
-//                 $sql = 'SELECT o.*
-//                             FROM {quiz_overrides} o
-//                             JOIN {user} u ON o.userid = u.id
-//                             WHERE o.quiz = :quizid
-//                                 AND u.id = :userid
-//                             ORDER BY o.id DESC
+// //     	    if ($flag == 1){
+// //     	        echo '<br>=================2222in recordif rule.php';
+// //     	        $this->create_override($roomid, $cmid, $quiz, $state);
+// //     	        $flag = 0;
+// //     	    }
+//             } else {
+// //                 echo '<br> in else';
+//             /*
+// //                 $sql = 'SELECT o.*
+// //                             FROM {quiz_overrides} o
+// //                             JOIN {user} u ON o.userid = u.id
+// //                             WHERE o.quiz = :quizid
+// //                                 AND u.id = :userid
+// //                             ORDER BY o.id DESC
+// //                             LIMIT 1';
+//                 $sql = 'SELECT *
+//                             FROM {quiz_overrides}
+//                             WHERE quiz = :quizid
+//                                 AND userid = :userid
+//                             ORDER BY id DESC
 //                             LIMIT 1';
-                $sql = 'SELECT *
-                            FROM {quiz_overrides}
-                            WHERE quiz = :quizid
-                                AND userid = :userid
-                            ORDER BY id DESC
-                            LIMIT 1';
-                $params['quizid'] = $quiz->id;
-                $params['userid'] = $userid;
-                $override = $DB->get_record_sql($sql, $params);
-                if ($override) {
-                    print_object($override);
-    //                 echo '<br><br><br> qa state: ' . $qa->state;
-                    quiz_delete_override($quiz, $override->id);
+//                 $params['quizid'] = $quiz->id;
+//                 $params['userid'] = $userid;
+//                 $override = $DB->get_record_sql($sql, $params);
+//                 if ($override) {
+//                     print_object($override);
+//     //                 echo '<br><br><br> qa state: ' . $qa->state;
+//                     quiz_delete_override($quiz, $override->id);
 
-                }
-//                 */
-                echo '<br><br><br> qa state: ' . $qa->state;
-                $roomid = $username . '_' . $quizid . '_' . $attemptid;
-                echo '<br>rum : ' . $roomid;
-                $select_sql = 'SELECT *
-                        FROM {quizaccess_hbmon_livetable1}
-                        WHERE roomid = "' . $roomid . '"';
-//                                 AND status = "Dead"';
-//                                 AND deadtime > 60000';
-                $records = $DB->get_records_sql($select_sql);
-                print_object($records);
+//                 }
+// //                 */
+// //                 echo '<br><br><br> qa state: ' . $qa->state;
+//                 $roomid = $username . '_' . $quizid . '_' . $attemptid;
+// //                 echo '<br>rum : ' . $roomid;
+//                 $select_sql = 'SELECT *
+//                         FROM {quizaccess_hbmon_livetable1}
+//                         WHERE roomid = "' . $roomid . '"';
+// //                                 AND status = "Dead"';
+// //                                 AND deadtime > 60000';
+//                 $records = $DB->get_records_sql($select_sql);
+// //                 print_object($records);
 
-                if (!empty($records)){
-                    foreach ($records as $record) {
-                        if($roomid == $record->roomid){
-                            echo '<br>========================in record else rule.php';
-                            $this->create_override($roomid, $cmid, $quiz, $state);
-                        }
-                    }
-                }
-            }
-//     	}
-        }
+//                 if (!empty($records)){
+//                     foreach ($records as $record) {
+//                         if($roomid == $record->roomid){
+// //                             echo '<br>========================in record else rule.php';
+//                             $this->create_override($roomid, $cmid, $quiz, $state);
+//                         }
+//                     }
+//                 }
+//             }
+// //     	}
+// //         }
+//------------------------------------------------------------------------------------------------------
     }
 
     protected function create_override($roomid, $cmid, $quiz, $state = null) {
         global $DB, $CFG;
-        echo '<br> in create ovrrde func<br>';
+//         echo '<br> in create ovrrde func<br>';
         $context = context_module::instance($cmid);
 //         echo '<br><br><br> cr-ovrr cmid '.$cmid;
 //         $varcmid = $cmid;
@@ -252,11 +450,11 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
 //         echo '<br><br><br>rule cmid ' . $cmid;
 //         print_object($fromform);
         if($state === 'finished') {
-            echo 'in if state finished';
+//             echo 'in if state finished';
             $myobj = new createoverride();
             $myobj->reset_timelimit_override($cmid, $roomid, $fromform, $quiz);
         } else {
-            echo 'in if state not finished';
+//             echo 'in if state not finished';
             $myobj = new createoverride();
             $myobj->my_override($cmid, $roomid, $fromform, $quiz);
 //             my_override($cmid, $roomid, $fromform, $quiz);

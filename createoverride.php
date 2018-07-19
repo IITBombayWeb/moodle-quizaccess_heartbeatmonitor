@@ -43,7 +43,7 @@ class createoverride {
 
     public function my_override($cmid, $roomid, $fromform, $quiz) {
         global $DB;
-        echo '<br>in my ovrrrde<br>';
+//         echo '<br>in my ovrrrde<br>';
         //     echo "<br><br><br>cmid " . $cmid;
         list($course, $cm) = get_course_and_cm_from_cmid($cmid, 'quiz');
         //     $quiz = $DB->get_record('quiz', array('id' => $cm->instance), '*', MUST_EXIST);
@@ -64,7 +64,7 @@ class createoverride {
 //         }
 
         if($roomid) {
-            echo '<br>my ovrr rum <br>' . $roomid;
+//             echo '<br>my ovrr rum <br>' . $roomid;
             // Select data for a particular quiz and not entire table..insert quizid col in livetable1 for this.
             $select_sql = 'SELECT *
                         FROM {quizaccess_hbmon_livetable1}
@@ -72,11 +72,11 @@ class createoverride {
                             /*    AND status = "Live"*/
                                 'AND deadtime > 60000';
             $records = $DB->get_records_sql($select_sql);
-            echo '<br>my ovrr recs<br>';
-            print_object($records);
+//             echo '<br>my ovrr recs<br>';
+//             print_object($records);
 
             if (!empty($records)){
-                echo '<br>creating override now';
+//                 echo '<br>creating override now';
                 // Process data of each row.
                 foreach ($records as $record) {
                     $roomid         = $record->roomid;
@@ -184,7 +184,7 @@ class createoverride {
 
                             // Determine which override created event to fire.
                             $params['objectid'] = $fromform->id;
-                            echo '<br><br><br>params obj id: ' . $params['objectid'];
+//                             echo '<br><br><br>params obj id: ' . $params['objectid'];
                             //                         if (!$groupmode) {
                             $params['relateduserid'] = $fromform->userid;
                             $event = \mod_quiz\event\user_override_created::create($params);
@@ -239,7 +239,7 @@ class createoverride {
     public function reset_timelimit_override($cmid, $roomid, $fromform, $quiz) {
         global $DB;
         $context = context_module::instance($cmid);
-        echo '<br><br><br>in reset override';
+//         echo '<br><br><br>in reset override';
 //         $roomid         = $record->roomid;
         $arr            = explode("_", $roomid);
         $attemptid      = array_splice($arr, -1)[0];
@@ -263,8 +263,8 @@ class createoverride {
                 $fromform->{$key} = null;
             }
         }
-        echo "---new override to reset timelimit to default quiz time----";
-        print_object($fromform);
+//         echo "---new override to reset timelimit to default quiz time----";
+//         print_object($fromform);
 
         // See if we are replacing an existing override.
         $userorgroupchanged = false;
@@ -324,7 +324,7 @@ class createoverride {
 
             // Determine which override created event to fire.
             $params['objectid'] = $fromform->id;
-            echo '<br><br><br>params obj id: ' . $params['objectid'];
+//             echo '<br><br><br>params obj id: ' . $params['objectid'];
             //                         if (!$groupmode) {
             $params['relateduserid'] = $fromform->userid;
             $event = \mod_quiz\event\user_override_created::create($params);
