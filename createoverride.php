@@ -43,17 +43,14 @@ class createoverride {
 
     public function my_override($cmid, $roomid, $fromform, $quiz) {
         global $DB;
-//         echo '<br>in my ovrrrde<br>';
-        //     echo "<br><br><br>cmid " . $cmid;
         list($course, $cm) = get_course_and_cm_from_cmid($cmid, 'quiz');
-        //     $quiz = $DB->get_record('quiz', array('id' => $cm->instance), '*', MUST_EXIST);
+//         $quiz = $DB->get_record('quiz', array('id' => $cm->instance), '*', MUST_EXIST);
 
         $course = $DB->get_record('course', array('id'=>$cm->course), '*', MUST_EXIST);
         $context = context_module::instance($cm->id);
 
         // Creating a new override.
 //         $data = new stdClass();
-        // }
 
         // Merge quiz defaults with data.
 //         $keys = array('timeopen', 'timeclose', 'timelimit', 'attempts', 'password');
@@ -64,19 +61,15 @@ class createoverride {
 //         }
 
         if($roomid) {
-//             echo '<br>my ovrr rum <br>' . $roomid;
             // Select data for a particular quiz and not entire table..insert quizid col in livetable1 for this.
             $select_sql = 'SELECT *
-                        FROM {quizaccess_hbmon_livetable1}
-                        WHERE roomid = "' . $roomid . '"'.
-                            /*    AND status = "Live"*/
+                                FROM {quizaccess_hbmon_livetable1}
+                                WHERE roomid = "' . $roomid . '"'.
+                            //    AND status = "Live"
                                 'AND deadtime > 60000';
             $records = $DB->get_records_sql($select_sql);
-//             echo '<br>my ovrr recs<br>';
-//             print_object($records);
 
             if (!empty($records)){
-//                 echo '<br>creating override now';
                 // Process data of each row.
                 foreach ($records as $record) {
                     $roomid         = $record->roomid;
@@ -184,52 +177,35 @@ class createoverride {
 
                             // Determine which override created event to fire.
                             $params['objectid'] = $fromform->id;
-//                             echo '<br><br><br>params obj id: ' . $params['objectid'];
-                            //                         if (!$groupmode) {
-                            $params['relateduserid'] = $fromform->userid;
-                            $event = \mod_quiz\event\user_override_created::create($params);
-                            //                         } else {
-                            //                             $params['other']['groupid'] = $fromform->groupid;
-                            //                             $event = \mod_quiz\event\group_override_created::create($params);
-                            //                         }
+                            // if (!$groupmode) {
+                                $params['relateduserid'] = $fromform->userid;
+                                $event = \mod_quiz\event\user_override_created::create($params);
+                            // } else {
+                                // $params['other']['groupid'] = $fromform->groupid;
+                                // $event = \mod_quiz\event\group_override_created::create($params);
+                            // }
 
                             // Trigger the override created event.
                             $event->trigger();
                         }
 
                         quiz_update_open_attempts(array('quizid'=>$quiz->id));
-                        //                     if ($groupmode) {
+                        // if ($groupmode) {
                         // Priorities may have shifted, so we need to update all of the calendar events for group overrides.
-                        //                         quiz_update_events($quiz);
-                        //                     } else {
+                            // quiz_update_events($quiz);
+                        // } else {
                         // User override. We only need to update the calendar event for this user override.
-                        quiz_update_events($quiz, $fromform);
-                        //                     }
+                            quiz_update_events($quiz, $fromform);
+                        // }
 
-
-                        //--------------------------------------------------------------------------
+                        //======================================================
                         // Reset database record.
                         $livetime = $livetime + $deadtime;
                         $deadtime = 0;
                         $update_sql = 'UPDATE {quizaccess_hbmon_livetable1}
-                                    SET deadtime = 0
-                                    WHERE roomid = "' . $roomid . '"';
+                                            SET deadtime = 0
+                                            WHERE roomid = "' . $roomid . '"';
                         $update_sql_result = $DB->execute($update_sql);
-
-                        // Delete the override...cannot..
-                        // since the attempt has to finish or else next override for same attempt
-                        // will be added to the standard quiz time and not the changed one for this user.
-                        //                     quiz_delete_override($quiz, $override->id);
-
-                        // Try this.
-                        //                     $update_table = 'quizaccess_hbmon_livetable1';
-                        // //                     $dataobject = array('id' => 1, 'roomid' => $roomid, 'deadtime' => 0);
-                        //                     $dataobject->id = 1;
-                        //                     $dataobject->roomid = $roomid;
-                        //                     $dataobject->deadtime = 0;
-                        //                     $result1 = $DB->update_record($update_table, $dataobject, $bulk=false);
-                        //                     echo '<br><br><br>update res ';
-                        //                     print_object($result1);
                     }
                 }
             }
@@ -239,8 +215,7 @@ class createoverride {
     public function reset_timelimit_override($cmid, $roomid, $fromform, $quiz) {
         global $DB;
         $context = context_module::instance($cmid);
-//         echo '<br><br><br>in reset override';
-//         $roomid         = $record->roomid;
+
         $arr            = explode("_", $roomid);
         $attemptid      = array_splice($arr, -1)[0];
         $my_quizid      = array_splice($arr, -1)[0];
@@ -248,7 +223,7 @@ class createoverride {
 
         $user = $DB->get_record('user', array('username'=>$username));
         $quiz = $DB->get_record('quiz', array('id'=>$my_quizid));
-        //                     $qa = $DB->get_record('quiz_attempts', array('id'=>$attemptid));
+//         $qa = $DB->get_record('quiz_attempts', array('id'=>$attemptid));
         $userid = $user->id;
 
         // Process the data.
@@ -263,8 +238,6 @@ class createoverride {
                 $fromform->{$key} = null;
             }
         }
-//         echo "---new override to reset timelimit to default quiz time----";
-//         print_object($fromform);
 
         // See if we are replacing an existing override.
         $userorgroupchanged = false;
@@ -297,11 +270,11 @@ class createoverride {
 
         // Set the common parameters for one of the events we may be triggering.
         $params = array(
-                'context'   => $context,
-                'other'     => array(
+                    'context'   => $context,
+                    'other'     => array(
                         'quizid' => $quiz->id
-                )
-        );
+                        )
+                    );
         if (!empty($override->id)) {
             $fromform->id = $override->id;
             $DB->update_record('quiz_overrides', $fromform);
@@ -324,28 +297,25 @@ class createoverride {
 
             // Determine which override created event to fire.
             $params['objectid'] = $fromform->id;
-//             echo '<br><br><br>params obj id: ' . $params['objectid'];
-            //                         if (!$groupmode) {
-            $params['relateduserid'] = $fromform->userid;
-            $event = \mod_quiz\event\user_override_created::create($params);
-            //                         } else {
-            //                             $params['other']['groupid'] = $fromform->groupid;
-            //                             $event = \mod_quiz\event\group_override_created::create($params);
-            //                         }
+            // if (!$groupmode) {
+                $params['relateduserid'] = $fromform->userid;
+                $event = \mod_quiz\event\user_override_created::create($params);
+            // } else {
+                // $params['other']['groupid'] = $fromform->groupid;
+                // $event = \mod_quiz\event\group_override_created::create($params);
+            // }
 
             // Trigger the override created event.
             $event->trigger();
+        }
+
+        quiz_update_open_attempts(array('quizid'=>$quiz->id));
+        // if ($groupmode) {
+        // Priorities may have shifted, so we need to update all of the calendar events for group overrides.
+            // quiz_update_events($quiz);
+        // } else {
+        // User override. We only need to update the calendar event for this user override.
+            quiz_update_events($quiz, $fromform);
+        // }
     }
-
-    quiz_update_open_attempts(array('quizid'=>$quiz->id));
-    //                     if ($groupmode) {
-    // Priorities may have shifted, so we need to update all of the calendar events for group overrides.
-    //                         quiz_update_events($quiz);
-    //                     } else {
-    // User override. We only need to update the calendar event for this user override.
-        quiz_update_events($quiz, $fromform);
-        //                     }
-
-    }
-
 }

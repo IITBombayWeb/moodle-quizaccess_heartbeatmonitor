@@ -26,10 +26,7 @@
 
 
 require_once('../../../../config.php');
-// require_once($CFG->dirroot.'/mod/quiz/lib.php');
-// require_once($CFG->dirroot.'/mod/quiz/locallib.php');
-// require_once($CFG->dirroot.'/mod/quiz/override_form.php');
-require_once($CFG->dirroot . '/mod/quiz/accessrule/heartbeatmonitor/timelimit_override_form.php');
+// require_once($CFG->dirroot . '/mod/quiz/accessrule/heartbeatmonitor/timelimit_override_form.php');
 require_once($CFG->dirroot . '/mod/quiz/accessrule/heartbeatmonitor/timelimit_override_form1.php');
 require_once($CFG->dirroot . '/mod/quiz/accessrule/heartbeatmonitor/intermediate_form.php');
 require_once($CFG->dirroot . '/mod/quiz/override_form.php');
@@ -40,7 +37,6 @@ $courseid   = required_param('courseid', PARAM_INT);
 $cmid       = required_param('cmid', PARAM_INT);
 // $mode = optional_param('mode', '', PARAM_ALPHA); // One of 'user' or 'group', default is 'group'.
 
-// echo '<br><br><br>';
 list($course, $cm) = get_course_and_cm_from_cmid($cmid, 'quiz');
 $quiz = $DB->get_record('quiz', array('id' => $cm->instance), '*', MUST_EXIST);
 

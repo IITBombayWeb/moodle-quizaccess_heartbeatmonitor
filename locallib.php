@@ -33,13 +33,13 @@ defined('MOODLE_INTERNAL') || die();
  * It is being called from quiz_extend_settings_navigation function.
  */
 function heartbeatmonitor_accessrule_extend_navigation($accessrulenode, $cm) {
-    $url        = new moodle_url('/mod/quiz/accessrule/heartbeatmonitor/index.php'
+    $url = new moodle_url('/mod/quiz/accessrule/heartbeatmonitor/index.php'
             , array(
             'quizid' => $cm->instance,
             'courseid' => $cm->course,
             'cmid' => $cm->id
     ));
-    $node       = navigation_node::create(get_string('pluginname', 'quizaccess_heartbeatmonitor'), $url,
+    $node = navigation_node::create(get_string('pluginname', 'quizaccess_heartbeatmonitor'), $url,
             navigation_node::TYPE_SETTING, null, 'quiz_accessrule_heartbeatmonitor', new pix_icon('i/item', ''));
     $accessrulenode->add_node($node);
 }
