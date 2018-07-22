@@ -148,7 +148,7 @@ var record = io.sockets.on('connection', function (socket) {
 	                        con.query(updatelivetablesql, function(err, result) {
 	                            if (err) throw err;
 	                        });
-	                        console.log('-- Curr. TS --' + (new Date().getTime()));
+	                        console.log('-- Curr. TS -- ' + (new Date().getTime()));
 //                        } else {	
 //                        	// Add ques switch time to the live time.
 //                        	// Compute cumulative livetime.
@@ -292,5 +292,5 @@ app.get('/livestatus', function(req, res) {
 });
 
 http.listen(port, function() {
-	console.log('Listening on port ' + port);
+	console.log('-- Listening on port ' + port + ' --');
 });

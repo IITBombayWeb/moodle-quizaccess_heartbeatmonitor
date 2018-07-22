@@ -25,7 +25,6 @@
 
 function client(Y, quizid, userid, username, attemptid, sessionkey, cfg)
 {
-//	console.log('in client -----------------------------------------');
 	var obj = JSON.parse(cfg);
 	console.log(obj);
 	var socket = io('http://127.0.0.1:3000', {
@@ -51,17 +50,15 @@ function client(Y, quizid, userid, username, attemptid, sessionkey, cfg)
 	var roomid = username + '_' + quizid + '_' + attemptid;	
 	
 	socket.on('connect', function() {
-		console.log('in client connect-----------------------------------------');
+		console.log('-- In client \'connect\' event --');
 		console.log(obj);
-		console.log('after  socket connected ' + socket.id  + ' cur ' + (new Date().getTime()));
-//		console.log('in client -----------------------------------------');
-//		console.log(cfg);
+		console.log('-- After socket connected - ' + socket.id  + '. Curr. TS - ' + (new Date().getTime()));
 		socket.emit('attempt', { username:username, quizid:quizid, roomid:roomid, attemptid:attemptid, config:obj });
 		
 	});	
 	
 	socket.on('disconnect', function() {
-		console.log('after  socket disconnected ' + socket.id  + ' cur ' + (new Date().getTime()));
+		console.log('-- After socket disconnected - ' + socket.id  + '. Curr. TS - ' + (new Date().getTime()));
 	});
 }
 

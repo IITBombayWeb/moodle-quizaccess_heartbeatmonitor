@@ -23,7 +23,6 @@
  */
 
 
-// require_once($CFG->dirroot . '/config.php');
 require_once('../../../../config.php');
 require_once($CFG->dirroot . '/mod/quiz/lib.php');
 require_once($CFG->dirroot . '/mod/quiz/locallib.php');
@@ -31,319 +30,87 @@ require_once($CFG->dirroot . '/mod/quiz/override_form.php');
 require_once($CFG->dirroot . '/mod/quiz/accessrule/heartbeatmonitor/timelimit_override_form1.php');
 require_once($CFG->dirroot . '/mod/quiz/accessrule/heartbeatmonitor/createoverride.php');
 
-
 $cmid       = optional_param('cmid', 0, PARAM_INT);
 $overrideid = optional_param('id', 0, PARAM_INT);
 $action     = optional_param('action', null, PARAM_ALPHA);
 $reset      = optional_param('reset', false, PARAM_BOOL);
-echo '<br><br><br>';
-$override = null;
-// $mform = null;
-// if ($overrideid) {
+$override   = null;
 
-//     if (! $override = $DB->get_record('quiz_overrides', array('id' => $overrideid))) {
-//         print_error('invalidoverrideid', 'quiz');
-//     }
-//     if (! $quiz = $DB->get_record('quiz', array('id' => $override->quiz))) {
-//         print_error('invalidcoursemodule');
-//     }
-//     list($course, $cm) = get_course_and_cm_from_instance($quiz, 'quiz');
-
-// } else
 if ($cmid) {
     list($course, $cm) = get_course_and_cm_from_cmid($cmid, 'quiz');
     $quiz = $DB->get_record('quiz', array('id' => $cm->instance), '*', MUST_EXIST);
 } else {
     print_error('invalidcoursemodule');
 }
-    $course = $DB->get_record('course', array('id'=>$cm->course), '*', MUST_EXIST);
+$course = $DB->get_record('course', array('id'=>$cm->course), '*', MUST_EXIST);
 
-    $url = new moodle_url('/mod/quiz/accessrule/heartbeatmonitor/processoverride.php');
-    if ($action) {
-        $url->param('action', $action);
+$url = new moodle_url('/mod/quiz/accessrule/heartbeatmonitor/processoverride.php');
+if ($action) {
+    $url->param('action', $action);
+}
+
+$url->param('cmid', $cmid);
+
+$PAGE->set_url($url);
+
+require_login($course, false, $cm);
+
+$context = context_module::instance($cm->id);
+
+// Add or edit an override.
+require_capability('mod/quiz:manageoverrides', $context);
+
+// Creating a new override.
+$data = new stdClass();
+
+// Merge quiz defaults with data.
+$keys = array('timeopen', 'timeclose', 'timelimit', 'attempts', 'password');
+foreach ($keys as $key) {
+    if (!isset($data->{$key}) || $reset) {
+        $data->{$key} = $quiz->{$key};
     }
-        // if ($overrideid) {
-        //     $url->param('id', $overrideid);
-        // } else {
-        $url->param('cmid', $cmid);
-        // }
+}
 
-        $PAGE->set_url($url);
+// True if group-based override.
+$groupmode = !empty($data->groupid) || ($action === 'addgroup' && empty($overrideid));
 
-        require_login($course, false, $cm);
+$overridelisturl = new moodle_url('/mod/quiz/accessrule/heartbeatmonitor/showoverrides.php', array('cmid'=>$cm->id));
+$overridelisturl->param('mode', 'user');
 
-        $context = context_module::instance($cm->id);
+// Setup the form.
+$users = array();
+$mform = new timelimit_override_form1($url, $cm, $quiz, $context, $users, $override);
+$mform->set_data($data);
 
-        // Add or edit an override.
-        require_capability('mod/quiz:manageoverrides', $context);
+$indexurl = new moodle_url('/mod/quiz/accessrule/heartbeatmonitor/index.php', array('quizid'=>$quiz->id, 'courseid'=>$course->id, 'cmid'=>$cmid));
 
-        // if ($overrideid) {
-        //     // Editing an override.
-        //     $data = clone $override;
-        // } else {
-        // Creating a new override.
-        $data = new stdClass();
-        // }
-
-        // Merge quiz defaults with data.
-        $keys = array('timeopen', 'timeclose', 'timelimit', 'attempts', 'password');
-        foreach ($keys as $key) {
-            if (!isset($data->{$key}) || $reset) {
-                $data->{$key} = $quiz->{$key};
-            }
-        }
-
-        // If we are duplicating an override, then clear the user/group and override id
-        // since they will change.
-        // if ($action === 'duplicate') {
-        //     $override->id = null;
-        //     $override->userid = null;
-        //     $override->groupid = null;
-        // }
-
-        // True if group-based override.
-        $groupmode = !empty($data->groupid) || ($action === 'addgroup' && empty($overrideid));
-
-        $overridelisturl = new moodle_url('/mod/quiz/accessrule/heartbeatmonitor/showoverrides.php', array('cmid'=>$cm->id));
-        // if (!$groupmode) {
-        $overridelisturl->param('mode', 'user');
-        // }
-
-        // Setup the form.
-        // $mform = new quiz_override_form($url, $cm, $quiz, $context, $groupmode, $override);
-        $users = array();
-        $mform = new timelimit_override_form1($url, $cm, $quiz, $context, $users, $override);
-        $mform->set_data($data);
-
-        // if ($mform->is_cancelled()) {
-        //     redirect($overridelisturl);
-
-        // } else if (optional_param('resetbutton', 0, PARAM_ALPHA)) {
-        //     $url->param('reset', true);
-        //     redirect($url);
-
-        // } else
-        $indexurl = new moodle_url('/mod/quiz/accessrule/heartbeatmonitor/index.php', array('quizid'=>$quiz->id, 'courseid'=>$course->id, 'cmid'=>$cmid));
-
-//-----------------------------
-
-// if (isset($mform)) {
-    if($mform->is_cancelled()) {
-        redirect($indexurl);
-    }
-    if ($fromform = $mform->get_data()) {
-        echo "in povrd";
-//         print_object($fromform);
-        $roomids = array();
-        $roomids = explode(" ", $fromform->users);
-//         print_object($roomids);
-        foreach ($roomids as $roomid) {
-            // One common function for duplicate code in rule.php and processoverride.php
-            $myobj = new createoverride();
-            $myobj->my_override($cmid, $roomid, $fromform, $quiz);
-//             my_override($cmid, $roomid, $fromfrom, $quiz);
-        }
-
-        if (!empty($fromform->submitbutton)) {
-            redirect($overridelisturl);
-        }
-    }
-// }
-/*
-function my_override($cmid, $roomid, $fromform, $quiz) {
-    global $DB;
-//     echo "<br><br><br>cmid " . $cmid;
-    list($course, $cm) = get_course_and_cm_from_cmid($cmid, 'quiz');
-//     $quiz = $DB->get_record('quiz', array('id' => $cm->instance), '*', MUST_EXIST);
-
-    $course = $DB->get_record('course', array('id'=>$cm->course), '*', MUST_EXIST);
-    $context = context_module::instance($cm->id);
-
-
-    // Creating a new override.
-    $data = new stdClass();
-    // }
-
-    // Merge quiz defaults with data.
-    $keys = array('timeopen', 'timeclose', 'timelimit', 'attempts', 'password');
-    foreach ($keys as $key) {
-        if (!isset($data->{$key}) || $reset) {
-            $data->{$key} = $quiz->{$key};
-        }
+if($mform->is_cancelled()) {
+    redirect($indexurl);
+}
+if ($fromform = $mform->get_data()) {
+    $roomids = array();
+    $roomids = explode(" ", $fromform->users);
+    foreach ($roomids as $roomid) {
+        // One common function for duplicate code in rule.php and processoverride.php
+        $myobj = new createoverride();
+        $myobj->my_override($cmid, $roomid, $fromform, $quiz);
     }
 
-    if($roomid) {
-        // Select data for a particular quiz and not entire table..insert quizid col in livetable1 for this.
-        $select_sql = 'SELECT *
-                        FROM {quizaccess_hbmon_livetable1}
-                        WHERE roomid = "' . $roomid . '"
-                                AND status = "Live"
-                                AND deadtime > 60000';
-        $records = $DB->get_records_sql($select_sql);
-
-        if (!empty($records)){
-            // Process data of each row.
-            foreach ($records as $record) {
-                $roomid         = $record->roomid;
-                $arr            = explode("_", $roomid);
-                $attemptid      = array_splice($arr, -1)[0];
-                $my_quizid      = array_splice($arr, -1)[0];
-                $username       = implode("_", $arr);
-
-                $user = $DB->get_record('user', array('username'=>$username));
-                if($user) {
-                    $userid = $user->id;
-                } else {
-                    $userid = null;
-                }
-
-                if($my_quizid == $quiz->id) {
-                    $status          = $record->status;
-                    $timetoconsider  = $record->timetoconsider;
-                    $livetime        = $record->livetime;
-                    $deadtime        = $record->deadtime;
-
-                    $currentTimestamp = intval(microtime(true)*1000);
-
-                    if ($status == 'Live') {
-                        $livetime = ($currentTimestamp - $timetoconsider) + $livetime;
-                    } else {
-                        $deadtime = ($currentTimestamp - $timetoconsider) + $deadtime;
-                    }
-
-                    $timelimit = $quiz->timelimit + intval($deadtime / 1000);
-                    $fromform->userid = $userid;
-                    $fromform->timelimit = $timelimit;
-
-                    // Reset database record.
-                    $livetime = $livetime + $deadtime;
-                    $deadtime = 0;
-                    $update_sql = 'UPDATE {quizaccess_hbmon_livetable1}
-                                    SET deadtime = 0
-                                    WHERE roomid = "' . $roomid . '"';
-                    $update_sql_result = $DB->execute($update_sql);
-
-                    // Delete the override...cannot..
-                    // since the attempt has to finish or else next override for same attempt
-                    // will be added to the standard quiz time and not the changed one for this user.
-//                     quiz_delete_override($quiz, $override->id);
-
-                    // Try this.
-//                     $update_table = 'quizaccess_hbmon_livetable1';
-// //                     $dataobject = array('id' => 1, 'roomid' => $roomid, 'deadtime' => 0);
-//                     $dataobject->id = 1;
-//                     $dataobject->roomid = $roomid;
-//                     $dataobject->deadtime = 0;
-//                     $result1 = $DB->update_record($update_table, $dataobject, $bulk=false);
-//                     echo '<br><br><br>update res ';
-//                     print_object($result1);
-
-                    // Process the data.
-                    $fromform->quiz = $quiz->id;
-
-                    // Replace unchanged values with null.
-                    foreach ($keys as $key) {
-                        if ($fromform->{$key} == $quiz->{$key}) {
-                            $fromform->{$key} = null;
-                        }
-                    }
-
-                    // See if we are replacing an existing override.
-                    $userorgroupchanged = false;
-                    if (empty($override->id)) {
-                        $userorgroupchanged = true;
-                    } else if (!empty($fromform->userid)) {
-                        $userorgroupchanged = $fromform->userid !== $override->userid;
-                    } else {
-                        $userorgroupchanged = $fromform->groupid !== $override->groupid;
-                    }
-
-                    if ($userorgroupchanged) {
-                        $conditions = array(
-                                'quiz'      => $quiz->id,
-                                'userid'    => empty($fromform->userid)? null : $fromform->userid,
-                                'groupid'   => empty($fromform->groupid)? null : $fromform->groupid);
-                        if ($oldoverride = $DB->get_record('quiz_overrides', $conditions)) {
-                            // There is an old override, so we merge any new settings on top of
-                            // the older override.
-                            foreach ($keys as $key) {
-                                if (is_null($fromform->{$key})) {
-                                    $fromform->{$key} = $oldoverride->{$key};
-                                }
-                            }
-                            // Set the course module id before calling quiz_delete_override().
-                            $quiz->cmid = $cm->id;
-                            quiz_delete_override($quiz, $oldoverride->id);
-                        }
-                    }
-
-                    // Set the common parameters for one of the events we may be triggering.
-                    $params = array(
-                            'context'   => $context,
-                            'other'     => array(
-                                    'quizid' => $quiz->id
-                            )
-                    );
-                    if (!empty($override->id)) {
-                        $fromform->id = $override->id;
-                        $DB->update_record('quiz_overrides', $fromform);
-
-                        // Determine which override updated event to fire.
-                        $params['objectid'] = $override->id;
-                        if (!$groupmode) {
-                            $params['relateduserid'] = $fromform->userid;
-                            $event = \mod_quiz\event\user_override_updated::create($params);
-                        } else {
-                            $params['other']['groupid'] = $fromform->groupid;
-                            $event = \mod_quiz\event\group_override_updated::create($params);
-                        }
-
-                        // Trigger the override updated event.
-                        $event->trigger();
-                    } else {
-                        unset($fromform->id);
-                        $fromform->id = $DB->insert_record('quiz_overrides', $fromform);
-
-                        // Determine which override created event to fire.
-                        $params['objectid'] = $fromform->id;
-                        echo '<br><br><br>params obj id: ' . $params['objectid'];
-//                         if (!$groupmode) {
-                            $params['relateduserid'] = $fromform->userid;
-                            $event = \mod_quiz\event\user_override_created::create($params);
-//                         } else {
-//                             $params['other']['groupid'] = $fromform->groupid;
-//                             $event = \mod_quiz\event\group_override_created::create($params);
-//                         }
-
-                        // Trigger the override created event.
-                        $event->trigger();
-                    }
-
-                    quiz_update_open_attempts(array('quizid'=>$quiz->id));
-//                     if ($groupmode) {
-                        // Priorities may have shifted, so we need to update all of the calendar events for group overrides.
-//                         quiz_update_events($quiz);
-//                     } else {
-                        // User override. We only need to update the calendar event for this user override.
-                        quiz_update_events($quiz, $fromform);
-//                     }
-                }
-            }
-        }
+    if (!empty($fromform->submitbutton)) {
+        redirect($overridelisturl);
     }
-}*/
+}
 
-// if ($cmid) {
-    // Print the form.
-    $pagetitle = get_string('editoverride', 'quiz');
-    $PAGE->navbar->add($pagetitle);
-    $PAGE->set_pagelayout('admin');
-    $PAGE->set_title($pagetitle);
-    $PAGE->set_heading($course->fullname);
-    echo $OUTPUT->header();
-    echo $OUTPUT->heading(format_string($quiz->name, true, array('context' => $context)));
+// Print the form.
+$pagetitle = get_string('editoverride', 'quiz');
+$PAGE->navbar->add($pagetitle);
+$PAGE->set_pagelayout('admin');
+$PAGE->set_title($pagetitle);
+$PAGE->set_heading($course->fullname);
 
-    $mform->display();
+echo $OUTPUT->header();
+echo $OUTPUT->heading(format_string($quiz->name, true, array('context' => $context)));
 
-    echo $OUTPUT->footer();
-// }
+$mform->display();
+
+echo $OUTPUT->footer();

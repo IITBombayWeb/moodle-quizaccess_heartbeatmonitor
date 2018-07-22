@@ -26,7 +26,6 @@
 
 
 require_once('../../../../config.php');
-// require_once($CFG->dirroot . '/mod/quiz/accessrule/heartbeatmonitor/timelimit_override_form.php');
 require_once($CFG->dirroot . '/mod/quiz/accessrule/heartbeatmonitor/timelimit_override_form1.php');
 require_once($CFG->dirroot . '/mod/quiz/accessrule/heartbeatmonitor/intermediate_form.php');
 require_once($CFG->dirroot . '/mod/quiz/override_form.php');
@@ -73,19 +72,15 @@ $table->head = array('User', 'Socket room id', 'Current status', 'Status update 
 // $table->head = array('User', 'Socket room id', 'Current status', 'Status update on', 'Quiz time used up', 'Quiz time lost', 'Total extra time granted');
 
 $result    = $DB->get_records_sql($sql);
-// if ($result->num_rows > 0) {
-// echo '<br><br><br>';
 
 if (!empty($result)){
     // Output data of each row.
-//     while($data = $result->fetch_assoc()) {
     foreach ($result as $record) {
         $roomid         = $record->roomid;
         $arr            = explode("_", $roomid);
         $attemptid      = array_splice($arr, -1)[0];
         $qa             = $DB->get_record('quiz_attempts', array('id'=>$attemptid));
 
-        // Error..since socket gets connected while reviewing the quiz.. but qa->state is finished..so conflict
         if(!$qa || $qa->state == 'finished') {
             $sql = 'DELETE FROM {quizaccess_hbmon_livetable1} WHERE roomid = "' . $roomid . '"';
 
@@ -164,12 +159,8 @@ if (!empty($result)){
 }
 
 // Setup the form.
-// $timelimit = $quiz->timelimit + intval($deadtime1 / 1000);
-// $overrideediturl = new moodle_url('/mod/quiz/overrideedit.php');
 $processoverrideurl = new moodle_url('/mod/quiz/accessrule/heartbeatmonitor/processoverride.php');
 $indexurl = new moodle_url('/mod/quiz/accessrule/heartbeatmonitor/index.php');
-$intermediaryurl = new moodle_url('/mod/quiz/accessrule/heartbeatmonitor/intermediary.php', array('quizid'=>$quizid, 'courseid'=>$courseid, 'cmid'=>$cmid));
-
 
 // $mform = new timelimit_override_form($overrideediturl, $cm, $quiz, $context, $userid1, $timelimit);
 // come back to this page..fetch checked records and then redirect to processoverride as in ovrrdedit.php.

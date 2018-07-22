@@ -28,7 +28,6 @@ require_once ($CFG->libdir . '/formslib.php');
  */
 class intermediate_form extends moodleform {
 
-
     /**
      * Form definition method.
      */

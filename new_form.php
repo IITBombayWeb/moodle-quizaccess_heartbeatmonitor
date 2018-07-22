@@ -59,10 +59,9 @@ class new_form extends moodleform {
     function definition() {
         global $CFG, $DB;
 
-        $cmid = $this->cm->id;
+        $cmid   = $this->cm->id;
         $quizid = $this->quiz->id;
-
-        $mform = $this->_form;
+        $mform  = $this->_form;
 
         // Post data for overrideedit.php.
         list($course, $cm) = get_course_and_cm_from_cmid($cmid, 'quiz');
@@ -80,11 +79,8 @@ class new_form extends moodleform {
         $arr_users  = array();
 
         if (!empty($result1)) {
-//         if ($result1->num_rows > 0) {
-
             // Output data of each row.
             foreach ($result1 as $record) {
-//             while($data = $result1->fetch_assoc()) {
                 $roomid1        = $record->roomid;
                 $arr            = explode("_", $roomid1);
                 $attemptid      = array_splice($arr, -1)[0];
@@ -104,11 +100,9 @@ class new_form extends moodleform {
         }
 
         // Setup the form.
-        $timelimit = $quiz->timelimit + intval($deadtime1 / 1000);
-        // $overrideediturl = new moodle_url('/mod/quiz/overrideedit.php');
+        $timelimit          = $quiz->timelimit + intval($deadtime1 / 1000);
         $processoverrideurl = new moodle_url('/mod/quiz/accessrule/heartbeatmonitor/processoverride.php');
-        $indexurl = new moodle_url('/mod/quiz/accessrule/heartbeatmonitor/index.php');
-        $intermediaryurl = new moodle_url('/mod/quiz/accessrule/heartbeatmonitor/intermediary.php', array('quizid'=>$quizid, 'courseid'=>$courseid, 'cmid'=>$cmid));
+        $indexurl           = new moodle_url('/mod/quiz/accessrule/heartbeatmonitor/index.php');
 
         // Display table.
         $mform->addElement('header', 'createoverrides', 'Create user override');
@@ -128,12 +122,5 @@ class new_form extends moodleform {
         } else {
             $mform->addElement('static', 'description', '', '(Note: No user meets minimum conditions required for creating a user override.)');
         }
-
-    }
-
-    function secondsToTime($seconds) {
-        $dtF = new DateTime('@0');
-        $dtT = new DateTime("@$seconds");
-        return $dtF->diff($dtT)->format('%a d, %h h : %i m : %s s');
     }
 }

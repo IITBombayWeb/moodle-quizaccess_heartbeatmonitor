@@ -23,12 +23,10 @@
  */
 
 
-// require_once(__DIR__ . '/../../../config.php');
 require_once('../../../../config.php');
 require_once($CFG->dirroot.'/mod/quiz/lib.php');
 require_once($CFG->dirroot.'/mod/quiz/locallib.php');
 require_once($CFG->dirroot.'/mod/quiz/override_form.php');
-
 
 $cmid = required_param('cmid', PARAM_INT);
 $mode = optional_param('mode', '', PARAM_ALPHA); // One of 'user' or 'group', default is 'group'.
@@ -96,10 +94,10 @@ if ($groupmode) {
     $colname = get_string('user');
     list($sort, $params) = users_order_by_sql('u');
     $sql = 'SELECT o.*, ' . get_all_user_name_fields(true, 'u') . '
-            FROM {quiz_overrides} o
-            JOIN {user} u ON o.userid = u.id
-            WHERE o.quiz = :quizid
-            ORDER BY ' . $sort;
+                FROM {quiz_overrides} o
+                JOIN {user} u ON o.userid = u.id
+                WHERE o.quiz = :quizid
+                ORDER BY ' . $sort;
     $params['quizid'] = $quiz->id;
 }
 
@@ -115,17 +113,16 @@ $table->head = array(
         get_string('action'),
 );
 
-$userurl = new moodle_url('/user/view.php', array());
-$groupurl = new moodle_url('/group/overview.php', array('id' => $cm->course));
+$userurl    = new moodle_url('/user/view.php', array());
+$groupurl   = new moodle_url('/group/overview.php', array('id' => $cm->course));
 
-$overridedeleteurl = new moodle_url('/mod/quiz/overridedelete.php');
-$overrideediturl = new moodle_url('/mod/quiz/overrideedit.php');
+$overridedeleteurl   = new moodle_url('/mod/quiz/overridedelete.php');
+$overrideediturl     = new moodle_url('/mod/quiz/overrideedit.php');
 $heartbeatmonitorurl = new moodle_url('/mod/quiz/accessrule/heartbeatmonitor/index.php');
 
 $hasinactive = false; // Whether there are any inactive overrides.
 
 foreach ($overrides as $override) {
-
     $fields = array();
     $values = array();
     $active = true;

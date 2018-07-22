@@ -61,7 +61,7 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
         $cmid       = $this->quizobj->get_cmid();
         $context    = $this->quizobj->get_context();
 
-//         print_object($this->quizobj);   // For quiz timeopen, timeclose etc.
+//         print_object($this->quizobj);   // Contains quiz timeopen, timeclose etc.
 
         $quiz = $this->quizobj->get_quiz();
 
@@ -83,21 +83,15 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
         $records_fetch_attemptid = $DB->get_record_sql($sql_fetch_attemptid);
 
         if ($records_fetch_attemptid){
-            $attemptid = $records_fetch_attemptid->id;
+            $attemptid  = $records_fetch_attemptid->id;
+            $qa         = $DB->get_record('quiz_attempts', array('id'=>$attemptid));
+            $state      = $qa->state;
+            $roomid     = $username . '_' . $quizid . '_' . $attemptid;
 
-            // code here
-            $qa = $DB->get_record('quiz_attempts', array('id'=>$attemptid));
-            $state = $qa->state;
-
-            $roomid = $username . '_' . $quizid . '_' . $attemptid;
-            STATIC $flag = 0;
-
-            // Error..since socket gets connected while reviewing the quiz.. but qa->state is finished..so conflict
             if($qa->state != 'finished') {
                 $PAGE->requires->js_init_call('client', array($quizid, $userid, $username, $attemptid, $sessionkey, json_encode($CFG)));
             }
 
-            //======================================================================================================
             if($qa->state != 'finished') {
                 // If deadtime is there, then create override.
                 $select_sql = 'SELECT *
@@ -110,7 +104,7 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
                 if (!empty($records)){
                     foreach ($records as $record) {
                         if($roomid == $record->roomid){
-//                             $this->create_override($roomid, $cmid, $quiz);
+                            $this->create_override($roomid, $cmid, $quiz);
                         }
                         break;
                     }
@@ -143,13 +137,12 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
                 if (!empty($records)){
                     foreach ($records as $record) {
                         if($roomid == $record->roomid){
-//                             $this->create_override($roomid, $cmid, $quiz, $state);
+                            $this->create_override($roomid, $cmid, $quiz, $state);
                         }
                     }
                 }
             }
         }
-        //======================================================================================================
 //         return false;
     }
 
@@ -188,7 +181,6 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
         $fromform->mform_isexpanded_id_override = 1;
         $fromform->userid = '';
         $fromform->password = '';
-//         $fromform['timeopen'] = 1505125800;
         $fromform->timeopen = $quiz->timeopen;
         $fromform->timeclose = $quiz->timeclose;
         $fromform->timelimit = 0;

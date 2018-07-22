@@ -58,14 +58,10 @@ class timelimit_override_form1 extends moodleform {
         $this->cm = $cm;
         $this->quiz = $quiz;
         $this->context = $context;
-//         $this->userid = empty($userid) ? 0 : $userid;
         $this->users = empty($users) ? null : $users;
-
         $this->timelimit = $timelimit;
-//         $this->a = $a;
 
         parent::__construct($submiturl, null, 'post');
-
     }
 
     /**
@@ -101,12 +97,12 @@ class timelimit_override_form1 extends moodleform {
         $mform->setType('mform_isexpanded_id_override', PARAM_INT);
         $mform->setDefault('mform_isexpanded_id_override', 1);
 
-//         // User ID.
+//         User ID.
 //         $mform->addElement('hidden', 'userid');
 //         $mform->setType('userid', PARAM_INT);
 //         $mform->setDefault('userid', $this->userid);
 
-        // User IDs.
+//         User IDs.
 //         $mform->addElement('hidden', 'userid');
 //         $mform->setType('userid', PARAM_TEXT);
 //         $mform->setDefault('userid', $this->userid);
@@ -125,18 +121,15 @@ class timelimit_override_form1 extends moodleform {
         $mform->addElement('hidden', 'timeopen');
         $mform->setType('timeopen', PARAM_INT);
         $mform->setDefault('timeopen', $this->quiz->timeopen);
-//         $mform->setDefault('timeopen', 1505125800);
 
         $mform->addElement('hidden', 'timeclose');
         $mform->setType('timeclose', PARAM_INT);
         $mform->setDefault('timeclose', $this->quiz->timeclose);
-//         $mform->setDefault('timeclose', 1512209160);
 
         // Time limit.
         $mform->addElement('hidden', 'timelimit');
         $mform->setType('timelimit', PARAM_INT);
         $mform->setDefault('timelimit', $this->timelimit);
-//         $mform->setDefault('timelimit', 9000);
 
         // Number of attempts.
         $mform->addElement('hidden', 'attempts');
