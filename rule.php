@@ -52,6 +52,7 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
 
         // Use this to delete user-override when the attempt finishes.
 //         $this->current_attempt_finished();
+        echo '<br><br><br>-- In prevent access --';
 
         $sessionkey = sesskey();
         $userid     = $_SESSION['USER']->id;
@@ -87,12 +88,14 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
             $qa         = $DB->get_record('quiz_attempts', array('id'=>$attemptid));
             $state      = $qa->state;
             $roomid     = $username . '_' . $quizid . '_' . $attemptid;
+            echo '<br>-- qa state - ' . $qa->state;
 
             if($qa->state != 'finished') {
                 $PAGE->requires->js_init_call('client', array($quizid, $userid, $username, $attemptid, $sessionkey, json_encode($CFG)));
             }
 
             if($qa->state != 'finished') {
+                echo '<br>-- qa state - ' . $qa->state;
                 // If deadtime is there, then create override.
                 $select_sql = 'SELECT *
                                     FROM {quizaccess_hbmon_livetable1}
@@ -109,29 +112,72 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
                         break;
                     }
                 }
-            } else {
+            }
+        }
+//         return false;
+    }
+
+    public function setup_attempt_page($page) {
+        global $CFG, $PAGE, $_SESSION, $DB;
+
+        $PAGE->requires->jquery();
+        $PAGE->requires->js( new moodle_url('http://127.0.0.1:3000/socket.io/socket.io.js'), true );
+        $PAGE->requires->js( new moodle_url($CFG->wwwroot . '/mod/quiz/accessrule/heartbeatmonitor/client.js') );
+
+        // Use this to delete user-override when the attempt finishes.
+//         $this->current_attempt_finished();
+        echo '<br><br><br>-- In setup attempt --';
+
+        $sessionkey = sesskey();
+        $userid     = $_SESSION['USER']->id;
+        $username   = $_SESSION['USER']->username;
+
+        $quizid     = $this->quizobj->get_quizid();
+        $cmid       = $this->quizobj->get_cmid();
+        $context    = $this->quizobj->get_context();
+
+//         print_object($this->quizobj);   // Contains quiz timeopen, timeclose etc.
+
+        $quiz = $this->quizobj->get_quiz();
+
+        $sql_fetch_attemptid = 'SELECT *
+                                    FROM {quiz_attempts}
+                                    WHERE userid = ' . $userid . '
+                                    AND quiz = ' . $quizid . '
+                                    ORDER BY id DESC
+                                    LIMIT 1 ';
+        $records_fetch_attemptid = $DB->get_record_sql($sql_fetch_attemptid);
+
+        if ($records_fetch_attemptid){
+            $attemptid  = $records_fetch_attemptid->id;
+            $qa         = $DB->get_record('quiz_attempts', array('id'=>$attemptid));
+            $state      = $qa->state;
+            $roomid     = $username . '_' . $quizid . '_' . $attemptid;
+            echo '<br>-- qa state - ' . $qa->state;
+
+            if($qa->state == 'finished') {
+                echo '<br>-- qa state - ' . $qa->state;
                 // Reset override to quiz timelimit. Initially, we were deleting the override.
                 /*
                  $sql = 'SELECT *
-                            FROM {quiz_overrides}
-                            WHERE quiz = :quizid
-                            AND userid = :userid
-                            ORDER BY id DESC
-                            LIMIT 1';
+                             FROM {quiz_overrides}
+                             WHERE quiz = :quizid
+                             AND userid = :userid
+                             ORDER BY id DESC
+                             LIMIT 1';
                  $params['quizid'] = $quiz->id;
                  $params['userid'] = $userid;
                  $override = $DB->get_record_sql($sql, $params);
                  if ($override) {
                      quiz_delete_override($quiz, $override->id);
-
                  }
-                */
+                 */
                 $roomid = $username . '_' . $quizid . '_' . $attemptid;
                 $select_sql = 'SELECT *
                                     FROM {quizaccess_hbmon_livetable1}
                                     WHERE roomid = "' . $roomid . '"';
-                                //    AND status = "Dead"';
-                                //    AND deadtime > 60000';
+                                    // AND status = "Dead"';
+                                    // AND deadtime > 60000';
                 $records = $DB->get_records_sql($select_sql);
 
                 if (!empty($records)){
@@ -143,7 +189,6 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
                 }
             }
         }
-//         return false;
     }
 
     protected function create_override($roomid, $cmid, $quiz, $state = null) {
