@@ -23,6 +23,11 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+//var express   = require('express');
+//var app       = express();
+//var server    = app.listen(3033);
+//var io        = require('socket.io').listen(server);
+
 var app 		= require('express')();
 var http 		= require('http').createServer(app);
 var io			= require('socket.io').listen(http);
@@ -33,17 +38,28 @@ var obj;
 
 
 // EXEC SYNC - WORKS
-var child = require('child_process').execSync('php -r \'define("CLI_SCRIPT", true); include("../../../../config.php"); print json_encode($CFG);\'');
-obj = JSON.parse(child);
+//var child = require('child_process').execSync('php -r \'define("CLI_SCRIPT", true); include("../../../../config.php"); print json_encode($CFG);\'');
+//var child = require('child_process').execSync('php -r \'define("CLI_SCRIPT", true); include("/var/www/html/moodle/config.php"); print json_encode($CFG);\'');
+//obj = JSON.parse(child);
 
 // DB CONN
 console.log('-- Connecting to the db --');
-console.log(obj.dbuser);
+//console.log(obj.dbhost);
+//console.log(obj.dbuser);
+//console.log(obj.dbpass);
+//console.log(obj.dbname);
+//var con = mysql.createConnection({
+//	host 	 : obj.dbhost,
+//	user 	 : obj.dbuser,
+//	password : obj.dbpass,
+//	database : obj.dbname
+//});
+
 var con = mysql.createConnection({
-	host 	 : obj.dbhost,
-	user 	 : obj.dbuser,
-	password : obj.dbpass,
-	database : obj.dbname
+	host 	 : 'localhost',
+	user 	 : 'moodle-owner',
+	password : 'Moodle@123',
+	database : 'moodle'
 });
 
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -57,9 +73,9 @@ var allsocketids;
 var cfg;
 
 var record = io.sockets.on('connection', function (socket) {	
-	console.log('In \'connect\' event. Connected sockets - ' + io.sockets.server.eio.clientsCount);
+//	console.log('In \'connect\' event. Connected sockets - ' + io.sockets.server.eio.clientsCount);
 	allsocketscount = io.sockets.server.eio.clientsCount;
-	console.log('Socket connected - ' + socket.id + '. TS - ' + (socket.handshake.issued) + '. Curr. TS - ' + (new Date().getTime()));
+//	console.log('Socket connected - ' + socket.id + '. TS - ' + (socket.handshake.issued) + '. Curr. TS - ' + (new Date().getTime()));
 	
 	var allclients = io.sockets.server.eio.clients;
 	allsocketids = [];
@@ -139,8 +155,8 @@ var record = io.sockets.on('connection', function (socket) {
 //	                        console.log(socket.roomid + ' - After cumulation, deadtime is - ' + humanise(deadtime));
 	
 	                        // Update 'status' entry for this user in 'livetable1'.
-	                        console.log('-- Updating live status --');
-	                        console.log('-- Curr. status -- ' + socket.currentstatus);
+//	                        console.log('-- Updating live status --');
+//	                        console.log('-- Curr. status -- ' + socket.currentstatus);
 	                        var updatelivetablesql = "UPDATE mdl_quizaccess_hbmon_livetable1 SET status = " 	+ socket.currentstatus 
 	                        								+ ", deadtime = "  	+ deadtime 
 	                        								+ ", timetoconsider = " + socket.timestampC 
@@ -148,7 +164,7 @@ var record = io.sockets.on('connection', function (socket) {
 	                        con.query(updatelivetablesql, function(err, result) {
 	                            if (err) throw err;
 	                        });
-	                        console.log('-- Curr. TS -- ' + (new Date().getTime()));
+//	                        console.log('-- Curr. TS -- ' + (new Date().getTime()));
 //                        } else {	
 //                        	// Add ques switch time to the live time.
 //                        	// Compute cumulative livetime.
@@ -181,8 +197,8 @@ var record = io.sockets.on('connection', function (socket) {
 	
 	
 	socket.on('disconnect', function() {
-		console.log(socket.id + ' disconnected. Curr. TS - ' + (new Date().getTime()));
-		console.log('In \'disconnect\' event. Connected sockets - ' + io.sockets.server.eio.clientsCount);
+//		console.log(socket.id + ' disconnected. Curr. TS - ' + (new Date().getTime()));
+//		console.log('In \'disconnect\' event. Connected sockets - ' + io.sockets.server.eio.clientsCount);
 		
 		allsocketscount = io.sockets.server.eio.clientsCount;
 		var allclients = io.sockets.server.eio.clients;
@@ -288,6 +304,17 @@ app.get('/livestatus', function(req, res) {
         	result[i].allsocketscount = allsocketscount;
         }
         res.send(result);
+    });
+});
+
+//console.log(http);
+http.on('listening',function(){
+    console.log('-- Ok, server is running --');
+});
+
+http.on('connection', function(socket) {
+    socket.on('data', function(buf) {
+        console.log('received',buf.toString('utf8'));
     });
 });
 

@@ -30,6 +30,7 @@ defined('MOODLE_INTERNAL') || die();
 require_once($CFG->dirroot . '/mod/quiz/accessrule/accessrulebase.php');
 require_once($CFG->dirroot . '/mod/quiz/accessrule/heartbeatmonitor/createoverride.php');
 
+
 /**
  * A rule implementing heartbeat monitor.
  *
@@ -49,10 +50,41 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
         $PAGE->requires->jquery();
         $PAGE->requires->js( new moodle_url('http://127.0.0.1:3000/socket.io/socket.io.js'), true );
         $PAGE->requires->js( new moodle_url($CFG->wwwroot . '/mod/quiz/accessrule/heartbeatmonitor/client.js') );
+//         $PAGE->requires->js( new moodle_url($CFG->wwwroot . '/mod/quiz/accessrule/heartbeatmonitor/server.js') );
 
         // Use this to delete user-override when the attempt finishes.
 //         $this->current_attempt_finished();
         echo '<br><br><br>-- In prevent access --';
+
+        //===========================================================
+
+        $socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
+        $phpws_result = socket_connect($socket, '127.0.0.1', 3000);
+//         if(!$phpws_result) {
+//             die('cannot connect '.socket_strerror(socket_last_error()).PHP_EOL);
+//         }
+        $bytes = socket_write($socket, "Hello World");
+        echo "wrote ".number_format($bytes).' bytes to socket'.PHP_EOL;
+
+        //===========================================================
+
+        echo '<br>-- shell output -- ';
+//         $shell_output = shell_exec("node var/www/html/moodle/mod/quiz/accessrule/heartbeatmonitor/server.js");
+//         print_object($shell_output);
+
+//         exec("node $CFG->wwwroot" . "/mod/quiz/accessrule/heartbeatmonitor/server.js &", $output);
+//         print_object($output);
+
+//         exec("node /var/www/html/moodle/mod/quiz/accessrule/heartbeatmonitor/server.js 2>&1", $output);
+//         print_object($output);
+
+        if(!$phpws_result) {
+//             die('cannot connect '.socket_strerror(socket_last_error()).PHP_EOL);
+            exec("node /var/www/html/moodle/mod/quiz/accessrule/heartbeatmonitor/server.js 2>&1", $output);
+            print_object($output);
+        }
+
+        //===========================================================
 
         $sessionkey = sesskey();
         $userid     = $_SESSION['USER']->id;
@@ -128,6 +160,17 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
 //         $this->current_attempt_finished();
         echo '<br><br><br>-- In setup attempt --';
 
+//         $socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
+//         $phpws_result = socket_connect($socket, '127.0.0.1', 3000);
+//         if(!$phpws_result) {
+//             die('cannot connect '.socket_strerror(socket_last_error()).PHP_EOL);
+//         }
+//         $bytes = socket_write($socket, "Hello World");
+//         echo "wrote ".number_format($bytes).' bytes to socket'.PHP_EOL;
+
+//         exec("node /var/www/html/moodle/mod/quiz/accessrule/heartbeatmonitor/server.js 2>&1", $output);
+//         print_object($output);
+
         $sessionkey = sesskey();
         $userid     = $_SESSION['USER']->id;
         $username   = $_SESSION['USER']->username;
@@ -140,6 +183,7 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
 
         $quiz = $this->quizobj->get_quiz();
 
+        // To do - Get attempt id from url here.
         $sql_fetch_attemptid = 'SELECT *
                                     FROM {quiz_attempts}
                                     WHERE userid = ' . $userid . '
