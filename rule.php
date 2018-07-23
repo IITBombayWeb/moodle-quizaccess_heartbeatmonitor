@@ -58,13 +58,17 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
 
         //===========================================================
 
-        $socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
-        $phpws_result = socket_connect($socket, '127.0.0.1', 3000);
+//         $socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
+//         $phpws_result = socket_connect($socket, '127.0.0.1', 3000);
 //         if(!$phpws_result) {
-//             die('cannot connect '.socket_strerror(socket_last_error()).PHP_EOL);
+//             exec("node /var/www/html/moodle/mod/quiz/accessrule/heartbeatmonitor/server.js 2>&1", $output);
+// //             die('cannot connect '.socket_strerror(socket_last_error()).PHP_EOL);
+//         } else {
+//             $bytes = socket_write($socket, "Hello World");
+//             echo "wrote ".number_format($bytes).' bytes to socket'.PHP_EOL;
 //         }
-        $bytes = socket_write($socket, "Hello World");
-        echo "wrote ".number_format($bytes).' bytes to socket'.PHP_EOL;
+//         $bytes = socket_write($socket, "Hello World");
+//         echo "wrote ".number_format($bytes).' bytes to socket'.PHP_EOL;
 
         //===========================================================
 
@@ -78,11 +82,11 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
 //         exec("node /var/www/html/moodle/mod/quiz/accessrule/heartbeatmonitor/server.js 2>&1", $output);
 //         print_object($output);
 
-        if(!$phpws_result) {
-//             die('cannot connect '.socket_strerror(socket_last_error()).PHP_EOL);
-            exec("node /var/www/html/moodle/mod/quiz/accessrule/heartbeatmonitor/server.js 2>&1", $output);
-            print_object($output);
-        }
+//         if(!$phpws_result) {
+// //             die('cannot connect '.socket_strerror(socket_last_error()).PHP_EOL);
+//             exec("node /var/www/html/moodle/mod/quiz/accessrule/heartbeatmonitor/server.js 2>&1", $output);
+//             print_object($output);
+//         }
 
         //===========================================================
 
@@ -162,14 +166,11 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
 
 //         $socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
 //         $phpws_result = socket_connect($socket, '127.0.0.1', 3000);
-//         if(!$phpws_result) {
-//             die('cannot connect '.socket_strerror(socket_last_error()).PHP_EOL);
-//         }
-//         $bytes = socket_write($socket, "Hello World");
-//         echo "wrote ".number_format($bytes).' bytes to socket'.PHP_EOL;
 
-//         exec("node /var/www/html/moodle/mod/quiz/accessrule/heartbeatmonitor/server.js 2>&1", $output);
-//         print_object($output);
+//         if(!$phpws_result) {
+//             exec("node /var/www/html/moodle/mod/quiz/accessrule/heartbeatmonitor/server.js 2>&1", $output);
+//             print_object($output);
+//         }
 
         $sessionkey = sesskey();
         $userid     = $_SESSION['USER']->id;
@@ -180,6 +181,22 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
         $context    = $this->quizobj->get_context();
 
 //         print_object($this->quizobj);   // Contains quiz timeopen, timeclose etc.
+
+//         $socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
+//         $phpws_result = socket_connect($socket, '127.0.0.1', 3000);
+
+//         if(!$phpws_result) {
+//         if(!($phpws_result = socket_connect($socket, '127.0.0.1', 3000))) {
+//                         die('cannot connect '.socket_strerror(socket_last_error()).PHP_EOL);
+//                         exec("node /var/www/html/moodle/mod/quiz/accessrule/heartbeatmonitor/server.js 2>&1", $output);
+//                         print_object($output);
+//             $cmd = 'node /var/www/html/moodle/mod/quiz/accessrule/heartbeatmonitor/server.js';
+//             $res = shell_exec($cmd);
+//             print_object($res);
+//         } else {
+//             $bytes = socket_write($socket, "Hello World");
+//             echo "wrote ".number_format($bytes).' bytes to socket'.PHP_EOL;
+//         }
 
         $quiz = $this->quizobj->get_quiz();
 

@@ -43,7 +43,7 @@ var obj;
 //obj = JSON.parse(child);
 
 // DB CONN
-console.log('-- Connecting to the db --');
+//console.log('-- Connecting to the db --');
 //console.log(obj.dbhost);
 //console.log(obj.dbuser);
 //console.log(obj.dbpass);
@@ -85,7 +85,7 @@ var record = io.sockets.on('connection', function (socket) {
 	}  
 	
 	socket.on('attempt', function(data) {
-		console.log('-- In attempt event --');
+//		console.log('-- In attempt event --');
 		
 		// Append some extra data to the socket object.
 	    socket.username 		= "'" + data.username + "'";
@@ -108,7 +108,7 @@ var record = io.sockets.on('connection', function (socket) {
 	    con.query(sql, function(err, result) {
 	    	if (err) throw err;
 		});
-	    console.log('-- Insert done --');
+//	    console.log('-- Insert done --');
 
 	    // Join the connected socket to the room. 'roomid' is the concatenaton of (username + quizid).
 	    // Here, 'roomid' corresponds to a particular user.
@@ -308,16 +308,16 @@ app.get('/livestatus', function(req, res) {
 });
 
 //console.log(http);
-http.on('listening',function(){
-    console.log('-- Ok, server is running --');
-});
-
-http.on('connection', function(socket) {
-    socket.on('data', function(buf) {
-        console.log('received',buf.toString('utf8'));
-    });
-});
+//http.on('listening',function(){
+//    console.log('-- Ok, server is running --');
+//});
+//
+//http.on('connection', function(socket) {
+//    socket.on('data', function(buf) {
+//        console.log('received',buf.toString('utf8'));
+//    });
+//});
 
 http.listen(port, function() {
-	console.log('-- Listening on port ' + port + ' --');
+//	console.log('-- Listening on port ' + port + ' --');
 });
