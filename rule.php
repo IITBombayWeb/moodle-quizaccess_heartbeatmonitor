@@ -41,6 +41,11 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
 
     public static function make(quiz $quizobj, $timenow, $canignoretimelimits) {
         // This rule is always used, even if the quiz has no open or close date.
+        global $DB;
+
+        if (empty($quizobj->get_quiz()->hbmonrequired)) {
+            return null;
+        }
         return new self($quizobj, $timenow);
     }
 
@@ -55,9 +60,11 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
         // Use this to delete user-override when the attempt finishes.
 //         $this->current_attempt_finished();
         echo '<br><br><br>-- In prevent access --';
+//         print_object($this->get_superceded_rules());
 
         //===========================================================
 
+        // Testing node server status using php web sockets.
 //         $socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
 //         $phpws_result = socket_connect($socket, '127.0.0.1', 3000);
 //         if(!$phpws_result) {
@@ -73,6 +80,7 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
         //===========================================================
 
         echo '<br>-- shell output -- ';
+        // Start node server.
 //         $shell_output = shell_exec("node var/www/html/moodle/mod/quiz/accessrule/heartbeatmonitor/server.js");
 //         print_object($shell_output);
 
@@ -128,24 +136,28 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
 
             if($qa->state != 'finished') {
                 $PAGE->requires->js_init_call('client', array($quizid, $userid, $username, $attemptid, $sessionkey, json_encode($CFG)));
-            }
 
-            if($qa->state != 'finished') {
-                echo '<br>-- qa state - ' . $qa->state;
-                // If deadtime is there, then create override.
-                $select_sql = 'SELECT *
-                                    FROM {quizaccess_hbmon_livetable1}
-                                    WHERE roomid = "' . $roomid . '"' .
-                                    /*  AND status = "Live" */
-                                    'AND deadtime > 60000';
-                $records = $DB->get_records_sql($select_sql);
+                $hbmonmodesql = "SELECT hbmonmode
+                                    FROM {quizaccess_enable_hbmon}
+                                    WHERE quizid = $quizid";
+                $hbmonmode = $DB->get_field_sql($hbmonmodesql);
+                if ($hbmonmode) {
+                    echo '<br>-- qa state - ' . $qa->state;
+                    // If deadtime is there, then create override.
+                    $select_sql = 'SELECT *
+                                        FROM {quizaccess_hbmon_livetable1}
+                                        WHERE roomid = "' . $roomid . '"' .
+                                        /*  AND status = "Live" */
+                                        'AND deadtime > 60000';
+                    $records = $DB->get_records_sql($select_sql);
 
-                if (!empty($records)){
-                    foreach ($records as $record) {
-                        if($roomid == $record->roomid){
-                            $this->create_override($roomid, $cmid, $quiz);
+                    if (!empty($records)){
+                        foreach ($records as $record) {
+                            if($roomid == $record->roomid){
+                                $this->create_override($roomid, $cmid, $quiz);
+                            }
+                            break;
                         }
-                        break;
                     }
                 }
             }
@@ -155,6 +167,13 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
 
     public function setup_attempt_page($page) {
         global $CFG, $PAGE, $_SESSION, $DB;
+
+//         // If heartbeat monitoring is on 'auto' mode.
+//         $hbmonmodesql = "SELECT hbmonmode
+//                             FROM {quizaccess_enable_hbmon}
+//                             WHERE quizid = $quizid";
+//         $hbmonmode = $DB->get_field_sql($hbmonmodesql);
+//         if ($hbmonmode) {
 
         $PAGE->requires->jquery();
         $PAGE->requires->js( new moodle_url('http://127.0.0.1:3000/socket.io/socket.io.js'), true );
@@ -183,14 +202,14 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
 //         print_object($this->quizobj);   // Contains quiz timeopen, timeclose etc.
 
 //         $socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
-//         $phpws_result = socket_connect($socket, '127.0.0.1', 3000);
+// //         $phpws_result = socket_connect($socket, '127.0.0.1', 3000);
 
-//         if(!$phpws_result) {
+// //         if(!$phpws_result) {
 //         if(!($phpws_result = socket_connect($socket, '127.0.0.1', 3000))) {
-//                         die('cannot connect '.socket_strerror(socket_last_error()).PHP_EOL);
-//                         exec("node /var/www/html/moodle/mod/quiz/accessrule/heartbeatmonitor/server.js 2>&1", $output);
-//                         print_object($output);
-//             $cmd = 'node /var/www/html/moodle/mod/quiz/accessrule/heartbeatmonitor/server.js';
+// //             die('cannot connect '.socket_strerror(socket_last_error()).PHP_EOL);
+// //             exec("node /var/www/html/moodle/mod/quiz/accessrule/heartbeatmonitor/server.js &");
+// //             print_object($output);
+//             $cmd = 'node /var/www/html/moodle/mod/quiz/accessrule/heartbeatmonitor/server.js &';
 //             $res = shell_exec($cmd);
 //             print_object($res);
 //         } else {
@@ -250,6 +269,7 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
                 }
             }
         }
+//         }
     }
 
     protected function create_override($roomid, $cmid, $quiz, $state = null) {
@@ -301,5 +321,81 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
             $myobj->my_override($cmid, $roomid, $fromform, $quiz);
         }
     }
-}
 
+    public function get_superceded_rules() {
+        return array();
+    }
+
+    public static function add_settings_form_fields(
+            mod_quiz_mod_form $quizform, MoodleQuickForm $mform) {
+        $hbmonsettingsarray   = array();
+
+        $hbmonsettingsarray[] = $mform->createElement('select', 'hbmonrequired',
+                get_string('hbmonrequired', 'quizaccess_heartbeatmonitor'), array(
+                        0 => get_string('notrequired', 'quizaccess_heartbeatmonitor'),
+                        1 => get_string('hbmonrequiredoption', 'quizaccess_heartbeatmonitor')
+                ));
+
+//         $hbmonsettingsarray[] = $mform->createElement('advcheckbox', 'allowifunassigned', '', 'Allow Unmapped', '', array(0, 1));
+//         $mform->disabledIf('allowifunassigned', 'hbmonrequired', 'neq', 1);
+
+        $radioarray = array();
+        $hbmonsettingsarray[]= $mform->createElement('radio', 'hbmonmode', '', get_string('automatic', 'quizaccess_heartbeatmonitor'), 1);
+        $hbmonsettingsarray[]= $mform->createElement('radio', 'hbmonmode', '', get_string('manual', 'quizaccess_heartbeatmonitor'), 0);
+//         $mform->addGroup($radioarray, 'radioar', '', array(' '), false);
+//         $hbmonsettingsarray[] = $radioarray;
+        $mform->disabledIf('hbmonmode', 'hbmonrequired', 'neq', 1);
+
+        $mform->addGroup($hbmonsettingsarray, 'enablehbmon', get_string('hbmonrequired', 'quizaccess_heartbeatmonitor'), array(' '), false);
+        $mform->addHelpButton('enablehbmon', 'hbmonrequired', 'quizaccess_heartbeatmonitor');
+        $mform->setAdvanced('enablehbmon', true);
+    }
+
+    public static function validate_settings_form_fields(array $errors,
+            array $data, $files, mod_quiz_mod_form $quizform) {
+        return $errors;
+    }
+
+    public static function get_browser_security_choices() {
+        return array();
+    }
+
+    public static function save_settings($quiz) {
+        global $DB;
+        if (empty($quiz->hbmonrequired)) {
+            $DB->delete_records('quizaccess_enable_hbmon', array('quizid' => $quiz->id));
+        } else {
+            if (!$DB->record_exists('quizaccess_enable_hbmon', array('quizid' => $quiz->id))) {
+                $record = new stdClass();
+                $record->quizid = $quiz->id;
+                $record->hbmonrequired = 1;
+                $record->hbmonmode = $quiz->hbmonmode;
+                $DB->insert_record('quizaccess_enable_hbmon', $record);
+            } else {
+                $select = "quizid = $quiz->id";
+                $id = $DB->get_field_select('quizaccess_enable_hbmon', 'id', $select);
+                $record = new stdClass();
+                $record->id = $id;
+                $record->hbmonmode = $quiz->hbmonmode;
+                $DB->update_record('quizaccess_enable_hbmon', $record);
+            }
+        }
+    }
+
+    public static function delete_settings($quiz) {
+        global $DB;
+        $DB->delete_records('quizaccess_enable_hbmon', array('quizid' => $quiz->id));
+    }
+
+    public static function get_settings_sql($quizid) {
+        return array(
+                'hbmonrequired',
+                'LEFT JOIN {quizaccess_enable_hbmon} enable_hbmon ON enable_hbmon.quizid = quiz.id',
+                array()
+        );
+    }
+
+     public static function get_extra_settings($quizid) {
+         return array();
+     }
+}

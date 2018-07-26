@@ -88,6 +88,11 @@ if($mform->is_cancelled()) {
     redirect($indexurl);
 }
 if ($fromform = $mform->get_data()) {
+    echo '<br>-- fromform obj --';
+    print_object($fromform);
+    echo '<br>-- quiz obj --';
+    print_object($quiz);
+
     $roomids = array();
     $roomids = explode(" ", $fromform->users);
     foreach ($roomids as $roomid) {

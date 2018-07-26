@@ -106,6 +106,11 @@ class createoverride {
 
                         //--------------------------------------------------------------------------
 
+//                         echo '<br>-- fromfrom obj --';
+//                         print_object($fromform);
+//                         echo '<br>-- fromfrom obj --';
+//                         print_object($quiz);
+
                         // Process the data.
                         $fromform->quiz = $quiz->id;
                         $fromform->userid = $userid;

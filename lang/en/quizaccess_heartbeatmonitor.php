@@ -43,3 +43,14 @@ $string['notrequired'] = 'not required';
 // $string['pluginname'] = 'Acknowledge plagiarism statement access rule';
 $string['youmustagree'] = 'You must agree to this statement before you start the quiz.';
 
+$string['notrequired'] = 'No';
+$string['hbmonrequired'] = 'Enable heartbeat monitoring';
+$string['hbmonrequired_help'] = 'Heartbeat monitoring system is used to track the online status
+                                    of the users attempting the quiz, keep record of time lost due to
+                                    network disconnections and accordingly, auto-increment the quiz timelimit.
+                                    If you enable this option, users will be automatically granted extra time
+                                    depending upon the amount of time they have lost.';
+$string['hbmonrequiredoption'] = 'Yes';
+$string['automatic'] = 'Automatic';
+$string['manual'] = 'Manual';
+

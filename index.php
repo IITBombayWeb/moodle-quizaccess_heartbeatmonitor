@@ -109,8 +109,17 @@ if (!empty($result)){
             $currentTimestamp = intval(microtime(true)*1000);
 
             if ($status == 'Live') {
+                echo '<br><br><br>';
+                echo '<br> $livetime ts ' . $livetime;
+
                 $livetime = ($currentTimestamp - $timetoconsider) + $livetime;
+
+                echo '<br> curr ts ' . $currentTimestamp;
+                echo '<br> $timetoconsider ts ' . $timetoconsider;
+                echo '<br> $livetime ts ' . $livetime;
                 $statustodisplay = '<font color="green"><i>Online</i></font>';
+
+
             } else {
                 $deadtime = ($currentTimestamp - $timetoconsider) + $deadtime;
                 $statustodisplay = '<font color="red"><i>Offline</i></font>';
