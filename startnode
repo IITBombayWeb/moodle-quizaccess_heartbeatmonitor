@@ -1,0 +1,3 @@
+#!/bin/bash
+#start-stop-daemon -C -b -m -p ./node.pid  -d . --start --exec /home/fossee/.nvm/versions/node/v8.5.0/bin/node server.js
+start-stop-daemon  -C -b -m -p ./node.pid  -d . --start --exec /home/fossee/.nvm/versions/node/v8.5.0/bin/node server.js

@@ -39,28 +39,28 @@ var obj;
 
 // EXEC SYNC - WORKS
 //var child = require('child_process').execSync('php -r \'define("CLI_SCRIPT", true); include("../../../../config.php"); print json_encode($CFG);\'');
-//var child = require('child_process').execSync('php -r \'define("CLI_SCRIPT", true); include("/var/www/html/moodle/config.php"); print json_encode($CFG);\'');
-//obj = JSON.parse(child);
+var child = require('child_process').execSync('php -r \'define("CLI_SCRIPT", true); include("/var/www/html/moodle/config.php"); print json_encode($CFG);\'');
+obj = JSON.parse(child);
 
 // DB CONN
-//console.log('-- Connecting to the db --');
+console.log('-- Connecting to the db --');
 //console.log(obj.dbhost);
 //console.log(obj.dbuser);
 //console.log(obj.dbpass);
 //console.log(obj.dbname);
-//var con = mysql.createConnection({
-//	host 	 : obj.dbhost,
-//	user 	 : obj.dbuser,
-//	password : obj.dbpass,
-//	database : obj.dbname
-//});
-
 var con = mysql.createConnection({
-	host 	 : 'localhost',
-	user 	 : 'moodle-owner',
-	password : 'Moodle@123',
-	database : 'moodle'
+	host 	 : obj.dbhost,
+	user 	 : obj.dbuser,
+	password : obj.dbpass,
+	database : obj.dbname
 });
+
+//var con = mysql.createConnection({
+//	host 	 : 'localhost',
+//	user 	 : 'moodle-owner',
+//	password : 'Moodle@123',
+//	database : 'moodle'
+//});
 
 app.use(bodyParser.urlencoded({ extended: true }));
 
@@ -75,7 +75,7 @@ var cfg;
 var record = io.sockets.on('connection', function (socket) {	
 //	console.log('In \'connect\' event. Connected sockets - ' + io.sockets.server.eio.clientsCount);
 	allsocketscount = io.sockets.server.eio.clientsCount;
-//	console.log('Socket connected - ' + socket.id + '. TS - ' + (socket.handshake.issued) + '. Curr. TS - ' + (new Date().getTime()));
+	console.log('Socket connected - ' + socket.id + '. TS - ' + (socket.handshake.issued) + '. Curr. TS - ' + (new Date().getTime()));
 	
 	var allclients = io.sockets.server.eio.clients;
 	allsocketids = [];
@@ -93,9 +93,14 @@ var record = io.sockets.on('connection', function (socket) {
         socket.roomid 			= "'" + data.roomid + "'";
         socket.socketid 		= "'" + socket.id + "'";
         socket.statusConnected 	= "'Connected'";
-        socket.timestampC 		= socket.handshake.issued;
+        socket.timestampC1 		= socket.handshake.issued;
+        socket.timestampC 		= Math.floor((socket.timestampC1)/1000);
         socket.ip 				= "'" + socket.request.connection.remoteAddress + "'";
         cfg = data.config;
+        
+        console.log('-- Time stamps --');
+        console.log('-- Socket time stamp --' + socket.timestampC);
+        console.log('-- Current time stamp --' + Math.floor((new Date().getTime())/1000));
 
         var sql = "INSERT INTO mdl_quizaccess_hbmon_socketinfo (username, quizid, roomid, socketid, socketstatus, ip, timestamp) VALUES" +
          			"(" + socket.username + "," 
@@ -212,7 +217,8 @@ var record = io.sockets.on('connection', function (socket) {
 	
 		if(socket.roomid != undefined) {			
 			// Construct record for the disconnected socket.
-			socket.timestampD = new Date().getTime();
+			socket.timestampD = Math.floor((new Date().getTime())/1000);
+//			socket.timestampD = time();
 			socket.statusDisconnected = "'Disconnected'";
 			
 		    // Insert disconnection record into database.

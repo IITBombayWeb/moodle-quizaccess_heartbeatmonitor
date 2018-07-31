@@ -52,13 +52,13 @@ function client(Y, quizid, userid, username, attemptid, sessionkey, cfg)
 	socket.on('connect', function() {
 		console.log('-- In client \'connect\' event --');
 		console.log(obj);
-		console.log('-- After socket connected - ' + socket.id  + '. Curr. TS - ' + (new Date().getTime()));
+		console.log('-- After socket connected - ' + socket.id  + '. Curr. TS - ' + Math.floor(new Date().getTime()/1000));
 		socket.emit('attempt', { username:username, quizid:quizid, roomid:roomid, attemptid:attemptid, config:obj });
 		
 	});	
 	
 	socket.on('disconnect', function() {
-		console.log('-- After socket disconnected - ' + socket.id  + '. Curr. TS - ' + (new Date().getTime()));
+		console.log('-- After socket disconnected - ' + socket.id  + '. Curr. TS - ' + Math.floor(new Date().getTime())/1000);
 	});
 }
 

@@ -142,18 +142,19 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
                                     WHERE quizid = $quizid";
                 $hbmonmode = $DB->get_field_sql($hbmonmodesql);
                 if ($hbmonmode) {
-                    echo '<br>-- qa state - ' . $qa->state;
+                    echo '<br>-- In rule crtovrrde -- <br>-- qa state - ' . $qa->state;
                     // If deadtime is there, then create override.
                     $select_sql = 'SELECT *
                                         FROM {quizaccess_hbmon_livetable1}
                                         WHERE roomid = "' . $roomid . '"' .
                                         /*  AND status = "Live" */
-                                        'AND deadtime > 60000';
+                                        'AND deadtime > 60';
                     $records = $DB->get_records_sql($select_sql);
 
                     if (!empty($records)){
                         foreach ($records as $record) {
                             if($roomid == $record->roomid){
+                                echo '<br>-- In rule crtovrrd 2 --';
                                 $this->create_override($roomid, $cmid, $quiz);
                             }
                             break;

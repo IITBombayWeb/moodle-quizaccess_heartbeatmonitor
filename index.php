@@ -28,6 +28,7 @@
 require_once('../../../../config.php');
 require_once($CFG->dirroot . '/mod/quiz/accessrule/heartbeatmonitor/timelimit_override_form1.php');
 require_once($CFG->dirroot . '/mod/quiz/accessrule/heartbeatmonitor/intermediate_form.php');
+require_once($CFG->dirroot . '/mod/quiz/accessrule/heartbeatmonitor/startnode_form.php');
 require_once($CFG->dirroot . '/mod/quiz/override_form.php');
 require_once($CFG->dirroot . '/mod/quiz/accessrule/heartbeatmonitor/new_form.php');
 
@@ -106,17 +107,17 @@ if (!empty($result)){
             $livetime        = $record->livetime;
             $deadtime        = $record->deadtime;
 
-            $currentTimestamp = intval(microtime(true)*1000);
+            $currentTimestamp = intval(microtime(true));
 
             if ($status == 'Live') {
-                echo '<br><br><br>';
-                echo '<br> $livetime ts ' . $livetime;
+//                 echo '<br><br><br>';
+//                 echo '<br> $livetime ts ' . $livetime;
 
                 $livetime = ($currentTimestamp - $timetoconsider) + $livetime;
 
-                echo '<br> curr ts ' . $currentTimestamp;
-                echo '<br> $timetoconsider ts ' . $timetoconsider;
-                echo '<br> $livetime ts ' . $livetime;
+//                 echo '<br> curr ts ' . $currentTimestamp;
+//                 echo '<br> $timetoconsider ts ' . $timetoconsider;
+//                 echo '<br> $livetime ts ' . $livetime;
                 $statustodisplay = '<font color="green"><i>Online</i></font>';
 
 
@@ -125,8 +126,10 @@ if (!empty($result)){
                 $statustodisplay = '<font color="red"><i>Offline</i></font>';
             }
 
-            $humanisedlivetime = secondsToTime(intval($livetime / 1000));
-            $humaniseddeadtime = secondsToTime(intval($deadtime / 1000));
+//             $humanisedlivetime = secondsToTime(intval($livetime));
+            $humanisedlivetime = format_time($livetime);
+//             $humaniseddeadtime = secondsToTime(intval($deadtime));
+            $humaniseddeadtime = format_time($deadtime);
 
             $table->rowclasses['roomid'] = $roomid;
             $row = new html_table_row();
@@ -144,7 +147,8 @@ if (!empty($result)){
             $cell2 = new html_table_cell($statustodisplay);
             $cell2->id = 'status';
 
-            $cell3 = new html_table_cell(userdate(intval($timetoconsider / 1000)));
+            $cell3 = new html_table_cell(userdate(intval($timetoconsider)));
+//             $cell3 = new html_table_cell(format_time($timetoconsider));
             $cell3->id = 'timetoconsider';
 
             $cell4 = new html_table_cell($humanisedlivetime);
@@ -182,6 +186,46 @@ $PAGE->set_heading($course->fullname);
 echo $OUTPUT->header();
 echo $OUTPUT->heading(format_string($quiz->name, true, array('context' => $context)));
 
+$startnode_form = new startnode_form($url, $quiz, $course, $cm);
+// $startnode_form->set_data($nodesv);
+// Start node server from here.
+// echo 'Start node server';
+
+$nodesv = 0;
+if($nodestatus = $startnode_form->get_data()) {
+//     echo '<br><br><br>-- In node status --';
+//     print_object($nodestatus);
+    if($nodestatus->submitbutton == 'Start') {
+//         echo '<br>-- In start--';
+        $socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
+        $phpws_result = @socket_connect($socket, '127.0.0.1', 3000);
+        if(!$phpws_result) {
+            $nodesv = 1;
+
+//             exec("node /var/www/html/moodle/mod/quiz/accessrule/heartbeatmonitor/server.js 2>&1 &", $output);
+//             exec("node /var/www/html/moodle/mod/quiz/accessrule/heartbeatmonitor/server.js > /dev/null 2>/dev/null &", $output); // Works
+
+            $cmd = "node /var/www/html/moodle/mod/quiz/accessrule/heartbeatmonitor/server.js";
+//             $outputfile = '/var/www/html/moodle/mod/quiz/accessrule/heartbeatmonitor/exec_output.text';
+            $pidfile = '/var/www/html/moodle/mod/quiz/accessrule/heartbeatmonitor/exec_pid.text';
+//             exec(sprintf("%s > %s 2>&1 & echo $! >> %s", $cmd, $outputfile, $pidfile));
+
+            $outputfile = '/dev/null';
+            exec(sprintf("%s > %s & echo $! >> %s", $cmd, $outputfile, $pidfile), $execoutput);
+
+//             exec("start-stop-daemon -C -b -m -p ./node.pid  -d . --start --exec /home/fossee/.nvm/versions/node/v8.5.0/bin/node server.js",$execoutput);
+//             die('cannot connect '.socket_strerror(socket_last_error()).PHP_EOL);
+//             exec("/var/www/html/moodle/mod/quiz/accessrule/heartbeatmonitor/startnode");
+//             print_object($execoutput);
+        }
+    } else {
+        // Kill node.
+        exec("killall node 2>&1", $output1);
+//         print_object($output1);
+    }
+}
+$startnode_form->display();
+
 $mform = new new_form($url, $cm, $quiz, $context);
 if($fromform = $mform->get_data()) {
     if($fromform->users) {
@@ -207,10 +251,21 @@ if($fromform = $mform->get_data()) {
 
         $mform1->display();
     }
-}  else if(empty($table->data)) {
+} else if(empty($table->data)) {
+//     echo '<br>';
+//     echo 'Live users data';
+//     echo html_writer::label('Live users data', null);
+    echo '<h4>';
+    echo html_writer::nonempty_tag('liveuserstblcaption', 'Live users data');
+    echo '</h4>';
+//     echo '<br>';
     echo $OUTPUT->notification(get_string('nodatafound', 'quizaccess_heartbeatmonitor'), 'info');
 
 } else {
+    echo '<h4>';
+    echo html_writer::nonempty_tag('liveuserstblcaption', 'Live users data');
+    echo '</h4>';
+
     // Display table.
     echo html_writer::table($table);
     echo '<br>';

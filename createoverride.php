@@ -66,7 +66,7 @@ class createoverride {
                                 FROM {quizaccess_hbmon_livetable1}
                                 WHERE roomid = "' . $roomid . '"'.
                             //    AND status = "Live"
-                                'AND deadtime > 60000';
+                                'AND deadtime > 60';
             $records = $DB->get_records_sql($select_sql);
 
             if (!empty($records)){
@@ -94,7 +94,8 @@ class createoverride {
                         $livetime        = $record->livetime;
                         $deadtime        = $record->deadtime;
 
-                        $currentTimestamp = intval(microtime(true)*1000);
+//                         $currentTimestamp = intval(microtime(true)*1000);
+                        $currentTimestamp = time();
 
                         if ($status == 'Live') {
                             $livetime = ($currentTimestamp - $timetoconsider) + $livetime;
@@ -102,7 +103,8 @@ class createoverride {
                             $deadtime = ($currentTimestamp - $timetoconsider) + $deadtime;
                         }
 
-                        $timelimit = $quiz->timelimit + intval($deadtime / 1000);
+//                         $timelimit = $quiz->timelimit + intval($deadtime / 1000);
+                        $timelimit = $quiz->timelimit + $deadtime;
 
                         //--------------------------------------------------------------------------
 
