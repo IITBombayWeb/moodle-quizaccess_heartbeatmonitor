@@ -40,7 +40,7 @@ var obj;
 // EXEC SYNC - WORKS
 //var child = require('child_process').execSync('php -r \'define("CLI_SCRIPT", true); include("../../../../config.php"); print json_encode($CFG);\'');
 var child = require('child_process').execSync('php -r \'define("CLI_SCRIPT", true); include("/var/www/html/moodle/config.php"); print json_encode($CFG);\'');
-//obj = JSON.parse(child);
+obj = JSON.parse(child);
 
 // DB CONN
 //console.log('-- Connecting to the db --');

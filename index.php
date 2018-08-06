@@ -195,36 +195,47 @@ $startnode_form = new startnode_form($url, $quiz, $course, $cm);
 // echo 'Start node server';
 $startnode_form->display();
 
-$nodesv = 0;
+$node_up = 0;
 $execoutput = '';
 if($nodestatus = $startnode_form->get_data()) {
 //     echo '<br><br><br>-- In node status --';
 //     print_object($nodestatus);
+
+    $outputfile = "/var/www/html/moodle/mod/quiz/accessrule/heartbeatmonitor/exec_output.text";
+    $pidfile = '/var/www/html/moodle/mod/quiz/accessrule/heartbeatmonitor/exec_pid.text';
+
     if($nodestatus->submitbutton == 'Start') {
 //         echo '<br>-- In start--';
         $socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
         $phpws_result = @socket_connect($socket, '127.0.0.1', 3000);
         if(!$phpws_result) {
 
-            $nodesv = 1;
-
 //             exec("node /var/www/html/moodle/mod/quiz/accessrule/heartbeatmonitor/server.js 2>&1 &", $output);
 //             exec("node /var/www/html/moodle/mod/quiz/accessrule/heartbeatmonitor/server.js > /dev/null 2>/dev/null &", $output); // Works
 
             // Works!
             $cmd = "node /var/www/html/moodle/mod/quiz/accessrule/heartbeatmonitor/server.js";
-            $outputfile = "/var/www/html/moodle/mod/quiz/accessrule/heartbeatmonitor/exec_output.text";
-            $pidfile = '/var/www/html/moodle/mod/quiz/accessrule/heartbeatmonitor/exec_pid.text';
+
             file_put_contents($outputfile, '');
             file_put_contents($pidfile, '');
             exec(sprintf("%s > %s 2>&1 & echo $! >> %s", $cmd, $outputfile, $pidfile));
 
+            while(trim(file_get_contents($outputfile)) == false) {
+                $socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
+                $phpws_result = @socket_connect($socket, '127.0.0.1', 3000);
+                if(!$phpws_result) {
+                    sleep(2);
+                } else {
+                    $node_up = 1;
+                    break;
+                }
+            }
 //             // Doesn't work when no err!
 //             $cmd1 = "node /var/www/html/moodle/mod/quiz/accessrule/heartbeatmonitor/server.js 2>&1";
 //             $outputfile1 = '/dev/null';
 //             exec(sprintf("%s > %s & echo $! >> %s", $cmd, $outputfile1, $pidfile), $execoutput);
 
-
+/*
             echo '<br>-- Printing execoutput --';
             print_object($execoutput);
 
@@ -232,12 +243,12 @@ if($nodestatus = $startnode_form->get_data()) {
             //$cmd = "node /var/www/html/moodle/mod/quiz/accessrule/heartbeatmonitor/server.js 2> " . $execoutput;
 //             exec(sprintf("%s > %s & echo $! >> %s", $cmd, $outputfile1, $pidfile), $execoutput);
 
-            sleep(5);
+            sleep(10);
             echo '<br>-- Printing op file --';
             print_object(file_get_contents($outputfile));
 
             echo '<br>-- Printing err --';
-            $err = explode("<br>", file_get_contents($outputfile));
+            $err = file_get_contents($outputfile);
             print_object($err);
 
             echo '<br>-- Echoing op file --';
@@ -253,7 +264,7 @@ if($nodestatus = $startnode_form->get_data()) {
 //             fclose($myfile);
 
             if(!empty($outputfile)) {
-                echo $OUTPUT->notification('Error:<br>' . implode("<br>", $err));
+                echo $OUTPUT->notification('Error:<br>' . $err);
 //                 echo readfile($outputfile);
             }
 
@@ -266,14 +277,28 @@ if($nodestatus = $startnode_form->get_data()) {
 //             die('cannot connect '.socket_strerror(socket_last_error()).PHP_EOL);
 //             exec("/var/www/html/moodle/mod/quiz/accessrule/heartbeatmonitor/startnode");
 //             print_object($execoutput);
+*/
+
+            if(!$node_up) {
+                $err = nl2br(file_get_contents($outputfile));
+                $err2 = nl2br(file_get_contents("/var/www/html/moodle/mod/quiz/accessrule/heartbeatmonitor/exec_output.text"));
+                echo $OUTPUT->notification('Error:<br>' . $err);
+            }
         }
     } else {
         // Kill node.
-        exec("killall node");
+
+//         exec("killall node");
 //         exec("kill " . $pidfile);
 // print_object($pidfile);
 //         file_put_contents($pidfile, '');
 //         print_object($output1);
+        $socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
+        $phpws_result = @socket_connect($socket, '127.0.0.1', 3000);
+        if($phpws_result) {
+            $cmd = "kill " . file_get_contents($pidfile);
+            exec($cmd);
+        }
     }
 }
 
