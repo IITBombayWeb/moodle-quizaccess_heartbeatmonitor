@@ -1,8 +1,13 @@
-Socket connected - 5Mx9oPtB-szq5fKJAAAA. TS - 1533036648195. Curr. TS - 1533036648203
--- Time stamps --
--- Socket time stamp --1533036648
--- Current time stamp --1533036648
-Socket connected - kaHBDzMb_U34EUKsAAAB. TS - 1533036651437. Curr. TS - 1533036651437
--- Time stamps --
--- Socket time stamp --1533036651
--- Current time stamp --1533036651
+/var/www/html/moodle/mod/quiz/accessrule/heartbeatmonitor/server.js:52
+	host 	 : obj.dbhost,
+	     	      ^
+
+TypeError: Cannot read property 'dbhost' of undefined
+    at Object.<anonymous> (/var/www/html/moodle/mod/quiz/accessrule/heartbeatmonitor/server.js:52:14)
+    at Module._compile (module.js:410:26)
+    at Object.Module._extensions..js (module.js:417:10)
+    at Module.load (module.js:344:32)
+    at Function.Module._load (module.js:301:12)
+    at Function.Module.runMain (module.js:442:10)
+    at startup (node.js:136:18)
+    at node.js:966:3

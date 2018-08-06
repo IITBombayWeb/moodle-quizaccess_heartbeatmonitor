@@ -31,6 +31,8 @@ require_once($CFG->dirroot . '/mod/quiz/accessrule/heartbeatmonitor/intermediate
 require_once($CFG->dirroot . '/mod/quiz/accessrule/heartbeatmonitor/startnode_form.php');
 require_once($CFG->dirroot . '/mod/quiz/override_form.php');
 require_once($CFG->dirroot . '/mod/quiz/accessrule/heartbeatmonitor/new_form.php');
+// require_once($CFG->dirroot . '/mod/quiz/accessrule/heartbeatmonitor/exec_output.text');
+// require_once($CFG->dirroot . '/mod/quiz/accessrule/heartbeatmonitor/exec_pid.text');
 
 
 $quizid     = required_param('quizid', PARAM_INT);
@@ -38,6 +40,7 @@ $courseid   = required_param('courseid', PARAM_INT);
 $cmid       = required_param('cmid', PARAM_INT);
 // $mode = optional_param('mode', '', PARAM_ALPHA); // One of 'user' or 'group', default is 'group'.
 
+// echo '<br><br><br>';
 list($course, $cm) = get_course_and_cm_from_cmid($cmid, 'quiz');
 $quiz = $DB->get_record('quiz', array('id' => $cm->instance), '*', MUST_EXIST);
 
@@ -190,8 +193,10 @@ $startnode_form = new startnode_form($url, $quiz, $course, $cm);
 // $startnode_form->set_data($nodesv);
 // Start node server from here.
 // echo 'Start node server';
+$startnode_form->display();
 
 $nodesv = 0;
+$execoutput = '';
 if($nodestatus = $startnode_form->get_data()) {
 //     echo '<br><br><br>-- In node status --';
 //     print_object($nodestatus);
@@ -200,18 +205,62 @@ if($nodestatus = $startnode_form->get_data()) {
         $socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
         $phpws_result = @socket_connect($socket, '127.0.0.1', 3000);
         if(!$phpws_result) {
+
             $nodesv = 1;
 
 //             exec("node /var/www/html/moodle/mod/quiz/accessrule/heartbeatmonitor/server.js 2>&1 &", $output);
 //             exec("node /var/www/html/moodle/mod/quiz/accessrule/heartbeatmonitor/server.js > /dev/null 2>/dev/null &", $output); // Works
 
+            // Works!
             $cmd = "node /var/www/html/moodle/mod/quiz/accessrule/heartbeatmonitor/server.js";
-//             $outputfile = '/var/www/html/moodle/mod/quiz/accessrule/heartbeatmonitor/exec_output.text';
+            $outputfile = "/var/www/html/moodle/mod/quiz/accessrule/heartbeatmonitor/exec_output.text";
             $pidfile = '/var/www/html/moodle/mod/quiz/accessrule/heartbeatmonitor/exec_pid.text';
-//             exec(sprintf("%s > %s 2>&1 & echo $! >> %s", $cmd, $outputfile, $pidfile));
+            file_put_contents($outputfile, '');
+            file_put_contents($pidfile, '');
+            exec(sprintf("%s > %s 2>&1 & echo $! >> %s", $cmd, $outputfile, $pidfile));
 
-            $outputfile = '/dev/null';
-            exec(sprintf("%s > %s & echo $! >> %s", $cmd, $outputfile, $pidfile), $execoutput);
+//             // Doesn't work when no err!
+//             $cmd1 = "node /var/www/html/moodle/mod/quiz/accessrule/heartbeatmonitor/server.js 2>&1";
+//             $outputfile1 = '/dev/null';
+//             exec(sprintf("%s > %s & echo $! >> %s", $cmd, $outputfile1, $pidfile), $execoutput);
+
+
+            echo '<br>-- Printing execoutput --';
+            print_object($execoutput);
+
+            // Not working!
+            //$cmd = "node /var/www/html/moodle/mod/quiz/accessrule/heartbeatmonitor/server.js 2> " . $execoutput;
+//             exec(sprintf("%s > %s & echo $! >> %s", $cmd, $outputfile1, $pidfile), $execoutput);
+
+            sleep(5);
+            echo '<br>-- Printing op file --';
+            print_object(file_get_contents($outputfile));
+
+            echo '<br>-- Printing err --';
+            $err = explode("<br>", file_get_contents($outputfile));
+            print_object($err);
+
+            echo '<br>-- Echoing op file --';
+            echo nl2br(file_get_contents("/var/www/html/moodle/mod/quiz/accessrule/heartbeatmonitor/exec_output.text"));
+
+            echo '<br>-- Echoing op file --';
+            $myfile = fopen("exec_output.text", "r") or die("Unable to open file!");
+            echo fread($myfile,filesize("exec_output.text"));
+            fclose($myfile);
+
+//             $myfile = fopen($outputfile, "r");
+//             echo fread($myfile,filesize($outputfile));
+//             fclose($myfile);
+
+            if(!empty($outputfile)) {
+                echo $OUTPUT->notification('Error:<br>' . implode("<br>", $err));
+//                 echo readfile($outputfile);
+            }
+
+//             if($execoutput) {
+//                 echo $OUTPUT->notification('Error:<br>' . implode("<br>", $err));
+//                 //                 echo readfile($outputfile);
+//             }
 
 //             exec("start-stop-daemon -C -b -m -p ./node.pid  -d . --start --exec /home/fossee/.nvm/versions/node/v8.5.0/bin/node server.js",$execoutput);
 //             die('cannot connect '.socket_strerror(socket_last_error()).PHP_EOL);
@@ -220,11 +269,13 @@ if($nodestatus = $startnode_form->get_data()) {
         }
     } else {
         // Kill node.
-        exec("killall node 2>&1", $output1);
+        exec("killall node");
+//         exec("kill " . $pidfile);
+// print_object($pidfile);
+//         file_put_contents($pidfile, '');
 //         print_object($output1);
     }
 }
-$startnode_form->display();
 
 $mform = new new_form($url, $cm, $quiz, $context);
 if($fromform = $mform->get_data()) {
