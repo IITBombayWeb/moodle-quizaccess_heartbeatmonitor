@@ -52,10 +52,19 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
     public function prevent_access() {
         global $CFG, $PAGE, $_SESSION, $DB;
 
+
         $PAGE->requires->jquery();
         $PAGE->requires->js( new moodle_url('http://127.0.0.1:3000/socket.io/socket.io.js'), true );
         $PAGE->requires->js( new moodle_url($CFG->wwwroot . '/mod/quiz/accessrule/heartbeatmonitor/client.js') );
 //         $PAGE->requires->js( new moodle_url($CFG->wwwroot . '/mod/quiz/accessrule/heartbeatmonitor/server.js') );
+
+        //===========================================================
+        // Check node server status, if hbmon is enabled.
+        $socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
+        $phpws_result = @socket_connect($socket, '127.0.0.1', 3000);
+        if(!$phpws_result) {
+            return 'Time server is not on. Please contact your instructor.';
+        } else {
 
         // Use this to delete user-override when the attempt finishes.
 //         $this->current_attempt_finished();
@@ -164,6 +173,7 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
             }
         }
 //         return false;
+        }
     }
 
     public function setup_attempt_page($page) {
