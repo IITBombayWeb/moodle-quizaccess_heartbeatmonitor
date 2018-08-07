@@ -195,7 +195,6 @@ static $node_up = 0;
 
 // Start node server from here.
 // echo 'Start node server';
-$startnode_form->display();
 
 if($nodestatus = $startnode_form->get_data()) {
     $outputfile = "/var/www/html/moodle/mod/quiz/accessrule/heartbeatmonitor/exec_output.text";
@@ -265,25 +264,28 @@ if($fromform = $mform->get_data()) {
 
         $mform1->display();
     }
-} else if(empty($table->data)) {
-//     echo '<br>';
-//     echo 'Live users data';
-//     echo html_writer::label('Live users data', null);
-    echo '<h4>';
-    echo html_writer::nonempty_tag('liveuserstblcaption', 'Live users data');
-    echo '</h4>';
-//     echo '<br>';
-    echo $OUTPUT->notification(get_string('nodatafound', 'quizaccess_heartbeatmonitor'), 'info');
-
 } else {
-    echo '<h4>';
-    echo html_writer::nonempty_tag('liveuserstblcaption', 'Live users data');
-    echo '</h4>';
+    $startnode_form->display();
+    if(empty($table->data)) {
+//         echo '<br>';
+//         echo 'Live users data';
+//         echo html_writer::label('Live users data', null);
+        echo '<h4>';
+        echo html_writer::nonempty_tag('liveuserstblcaption', 'Live users data');
+        echo '</h4>';
+//         echo '<br>';
+        echo $OUTPUT->notification(get_string('nodatafound', 'quizaccess_heartbeatmonitor'), 'info');
 
-    // Display table.
-    echo html_writer::table($table);
-    echo '<br>';
-    $mform->display();
+    } else {
+        echo '<h4>';
+        echo html_writer::nonempty_tag('liveuserstblcaption', 'Live users data');
+        echo '</h4>';
+
+        // Display table.
+        echo html_writer::table($table);
+        echo '<br>';
+        $mform->display();
+    }
 }
 
 function secondsToTime($seconds) {

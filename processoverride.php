@@ -70,6 +70,8 @@ foreach ($keys as $key) {
         $data->{$key} = $quiz->{$key};
     }
 }
+echo '<br>-- in proc ovr --<br>';
+print_object($quiz);
 
 // True if group-based override.
 $groupmode = !empty($data->groupid) || ($action === 'addgroup' && empty($overrideid));
@@ -88,17 +90,23 @@ if($mform->is_cancelled()) {
     redirect($indexurl);
 }
 if ($fromform = $mform->get_data()) {
-    echo '<br>-- fromform obj --';
-    print_object($fromform);
-    echo '<br>-- quiz obj --';
-    print_object($quiz);
-
     $roomids = array();
     $roomids = explode(" ", $fromform->users);
     foreach ($roomids as $roomid) {
         // One common function for duplicate code in rule.php and processoverride.php
+        $temp = array();
+        $temp = explode("_", $roomid);
+        $username = $temp[0];
+        $usersql = "SELECT id
+                        FROM {user}
+                        WHERE username = '" . $username . "'";
+        $uid = $DB->get_field_sql($usersql);
+
+        $quizobj = quiz::create($cm->instance, $uid);
+        $quiz1 = $quizobj->get_quiz();
+
         $myobj = new createoverride();
-        $myobj->my_override($cmid, $roomid, $fromform, $quiz);
+        $myobj->my_override($cmid, $roomid, $fromform, $quiz1);
     }
 
     if (!empty($fromform->submitbutton)) {

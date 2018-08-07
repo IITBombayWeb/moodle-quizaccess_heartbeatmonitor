@@ -118,6 +118,8 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
 //         print_object($this->quizobj);   // Contains quiz timeopen, timeclose etc.
 
         $quiz = $this->quizobj->get_quiz();
+//         echo '<br>-- prev acc qz obj --<br>';
+//         print_object($this->quizobj);
 
 //     	$url = 'http://127.0.0.1:3000/';
 //     	$ch = curl_init($url);
@@ -328,6 +330,8 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
             $myobj = new createoverride();
             $myobj->reset_timelimit_override($cmid, $roomid, $fromform, $quiz);
         } else {
+//             echo '<br>-- in create ovrrde --<br>';
+//             print_object($quiz);
             $myobj = new createoverride();
             $myobj->my_override($cmid, $roomid, $fromform, $quiz);
         }
