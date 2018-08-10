@@ -26,6 +26,7 @@
 
 
 require_once('../../../../config.php');
+require_once($CFG->dirroot . '/mod/quiz/accessrule/heartbeatmonitor/hbmonconfig.php');
 require_once($CFG->dirroot . '/mod/quiz/accessrule/heartbeatmonitor/timelimit_override_form1.php');
 require_once($CFG->dirroot . '/mod/quiz/accessrule/heartbeatmonitor/intermediate_form.php');
 require_once($CFG->dirroot . '/mod/quiz/accessrule/heartbeatmonitor/startnode_form.php');
@@ -197,15 +198,15 @@ static $node_up = 0;
 // echo 'Start node server';
 
 if($nodestatus = $startnode_form->get_data()) {
-    $outputfile = "/var/www/html/moodle/mod/quiz/accessrule/heartbeatmonitor/exec_output.text";
-    $pidfile = '/var/www/html/moodle/mod/quiz/accessrule/heartbeatmonitor/exec_pid.text';
+    $outputfile = $CFG->dirroot . "/mod/quiz/accessrule/heartbeatmonitor/exec_output.text";
+    $pidfile = $CFG->dirroot . '/mod/quiz/accessrule/heartbeatmonitor/exec_pid.text';
 
     if($nodestatus->submitbutton == 'Start') {
         $socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
         $phpws_result = @socket_connect($socket, '127.0.0.1', 3000);
 
         if(!$phpws_result) {
-            $cmd = "node /var/www/html/moodle/mod/quiz/accessrule/heartbeatmonitor/server.js";
+            $cmd = "node " . $CFG->dirroot . "/mod/quiz/accessrule/heartbeatmonitor/server.js";
 
             file_put_contents($outputfile, '');
             file_put_contents($pidfile, '');

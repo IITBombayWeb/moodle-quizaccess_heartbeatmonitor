@@ -27,6 +27,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+require_once($CFG->dirroot . '/mod/quiz/accessrule/heartbeatmonitor/hbmonconfig.php');
 require_once($CFG->dirroot . '/mod/quiz/accessrule/accessrulebase.php');
 require_once($CFG->dirroot . '/mod/quiz/accessrule/heartbeatmonitor/createoverride.php');
 
@@ -50,18 +51,22 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
     }
 
     public function prevent_access() {
-        global $CFG, $PAGE, $_SESSION, $DB, $USER;
+        global $CFG, $PAGE, $_SESSION, $DB, $USER, $hbCFG;
 
-
+        echo '<br><br><br>';
+        echo '<br>-- host --'.$hbCFG->host;
+        echo '<br>-- port --'.$hbCFG->port;
         $PAGE->requires->jquery();
-        $PAGE->requires->js( new moodle_url('http://127.0.0.1:3000/socket.io/socket.io.js'), true );
+        $PAGE->requires->js( new moodle_url($hbCFG->wwwroot . ':' . $hbCFG->port . '/socket.io/socket.io.js'), true );
         $PAGE->requires->js( new moodle_url($CFG->wwwroot . '/mod/quiz/accessrule/heartbeatmonitor/client.js') );
 //         $PAGE->requires->js( new moodle_url($CFG->wwwroot . '/mod/quiz/accessrule/heartbeatmonitor/server.js') );
 
         //===========================================================
         // Check node server status, if hbmon is enabled.
         $socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
-        $phpws_result = @socket_connect($socket, '127.0.0.1', 3000);
+        $phpws_result = @socket_connect($socket, $hbCFG->host, $hbCFG->port);
+        echo '<br><br>-- phpws --<br>';
+        print_object($phpws_result);
         if(!$phpws_result) {
             return 'Time server is not on. Please contact your instructor.';
         } else {
@@ -149,6 +154,10 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
 
         // No need now. Since, qa is used just for checking state, which is now obtained through unfinattpt obj.
         $attemptobj = quiz_attempt::create($attemptid);
+        // Check that this attempt belongs to this user.
+        if ($attemptobj->get_userid() != $USER->id) {
+            throw new moodle_quiz_exception($attemptobj->get_quizobj(), 'notyourattempt');
+        }
 //         $qa = quiz_attempt::create($attemptid);
 
 
@@ -201,7 +210,7 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
 //         if ($hbmonmode) {
 
         $PAGE->requires->jquery();
-        $PAGE->requires->js( new moodle_url('http://127.0.0.1:3000/socket.io/socket.io.js'), true );
+        $PAGE->requires->js( new moodle_url($hbCFG->wwwroot . ':' . $hbCFG->port . '/socket.io/socket.io.js'), true );
         $PAGE->requires->js( new moodle_url($CFG->wwwroot . '/mod/quiz/accessrule/heartbeatmonitor/client.js') );
 
         // Use this to delete user-override when the attempt finishes.

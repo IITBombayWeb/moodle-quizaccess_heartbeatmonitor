@@ -94,13 +94,19 @@ if ($fromform = $mform->get_data()) {
     $roomids = explode(" ", $fromform->users);
     foreach ($roomids as $roomid) {
         // One common function for duplicate code in rule.php and processoverride.php
-        $temp = array();
-        $temp = explode("_", $roomid);
-        $username = $temp[0];
-        $usersql = "SELECT id
-                        FROM {user}
-                        WHERE username = '" . $username . "'";
-        $uid = $DB->get_field_sql($usersql);
+//         $temp = array();
+//         $temp = explode("_", $roomid);
+//         $username = $temp[0];
+        $arr = array();
+        $arr            = explode("_", $roomid);
+        $attemptid      = array_splice($arr, -1)[0];
+        $my_quizid      = array_splice($arr, -1)[0];
+        $username       = implode("_", $arr);
+//         $usersql = "SELECT id
+//                         FROM {user}
+//                         WHERE username = '" . $username . "'";
+//         $uid = $DB->get_field_sql($usersql);
+        $uid = $DB->get_field('user', 'id', array('username' => $username));
 
         $quizobj = quiz::create($cm->instance, $uid);
         $quiz1 = $quizobj->get_quiz();
