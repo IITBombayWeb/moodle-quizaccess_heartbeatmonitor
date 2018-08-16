@@ -32,16 +32,12 @@ require_once($CFG->dirroot . '/mod/quiz/accessrule/heartbeatmonitor/intermediate
 require_once($CFG->dirroot . '/mod/quiz/accessrule/heartbeatmonitor/startnode_form.php');
 require_once($CFG->dirroot . '/mod/quiz/override_form.php');
 require_once($CFG->dirroot . '/mod/quiz/accessrule/heartbeatmonitor/new_form.php');
-// require_once($CFG->dirroot . '/mod/quiz/accessrule/heartbeatmonitor/exec_output.text');
-// require_once($CFG->dirroot . '/mod/quiz/accessrule/heartbeatmonitor/exec_pid.text');
 
 
 $quizid     = required_param('quizid', PARAM_INT);
 $courseid   = required_param('courseid', PARAM_INT);
 $cmid       = required_param('cmid', PARAM_INT);
-// $mode = optional_param('mode', '', PARAM_ALPHA); // One of 'user' or 'group', default is 'group'.
 
-// echo '<br><br><br>';
 list($course, $cm) = get_course_and_cm_from_cmid($cmid, 'quiz');
 $quiz = $DB->get_record('quiz', array('id' => $cm->instance), '*', MUST_EXIST);
 
@@ -64,16 +60,19 @@ require_capability('mod/quiz:manage', $context);
 
 // Display live users.
 // Fetch records from database.
-
 $sql = 'SELECT * FROM {quizaccess_hbmon_livetable1}';  // Select data for a particular quiz and not entire table..insert quizid col in livetable1 for this.
 $arr = array();
 $roomid = null;
 
 $table = new html_table();
-$table->id = 'liveusers';
-// $table->caption = get_string('liveusers', 'quizaccess_heartbeatmonitor');
-$table->caption = 'Users attempting quiz';
-$table->head = array('User', 'Socket room id', 'Current status', 'Status update on', 'Quiz time used up', 'Quiz time lost');
+$table->id = get_string('liveusers', 'quizaccess_heartbeatmonitor');
+$table->caption = get_string('usersattemptingquiz', 'quizaccess_heartbeatmonitor');
+$table->head = array(get_string('user', 'quizaccess_heartbeatmonitor'),
+                        get_string('socketroomid', 'quizaccess_heartbeatmonitor'),
+                        get_string('currentstatus', 'quizaccess_heartbeatmonitor'),
+                        get_string('statusupdate', 'quizaccess_heartbeatmonitor'),
+                        get_string('timeutilized', 'quizaccess_heartbeatmonitor'),
+                        get_string('timelost', 'quizaccess_heartbeatmonitor'));
 // $table->head = array('User', 'Socket room id', 'Current status', 'Status update on', 'Quiz time used up', 'Quiz time lost', 'Total extra time granted');
 
 $result    = $DB->get_records_sql($sql);
@@ -81,58 +80,48 @@ $result    = $DB->get_records_sql($sql);
 if (!empty($result)){
     // Output data of each row.
     foreach ($result as $record) {
-        $roomid         = $record->roomid;
-        $arr            = explode("_", $roomid);
-        $attemptid      = array_splice($arr, -1)[0];
-        $qa             = $DB->get_record('quiz_attempts', array('id'=>$attemptid));
+        $roomid    = $record->roomid;
+        $roomdata  = explode("_", $roomid);
+        $attemptid = array_splice($roomdata, -1)[0];
+        $quiza     = $DB->get_record('quiz_attempts', array('id'=>$attemptid));
 
-        if(!$qa || $qa->state == 'finished') {
-            $sql = 'DELETE FROM {quizaccess_hbmon_livetable1} WHERE roomid = "' . $roomid . '"';
-
-            $table11 = 'quizaccess_hbmon_livetable1';
+        if(!$quiza || $quiza->state == 'finished') {
+//             $sql = 'DELETE FROM {quizaccess_hbmon_livetable1} WHERE roomid = "' . $roomid . '"';
+            $hblivetable = 'quizaccess_hbmon_livetable1';
             $select = 'roomid = ?'; // Is put into the where clause.
             $params = array($roomid);
-
-            $delete = $DB->delete_records_select($table11, $select, $params);
+            $delete = $DB->delete_records_select($hblivetable, $select, $params);
             continue;
         }
 
-        $quizid1        = array_splice($arr, -1)[0];
-        $username       = implode("_", $arr);
-        $user           = $DB->get_record('user', array('username'=>$username));
+        $roomquizid = array_splice($roomdata, -1)[0];
+        $username   = implode("_", $roomdata);
+        $user       = $DB->get_record('user', array('username'=>$username));
 
         if($user) {
             $userid = $user->id;
         }
 
-        if($quizid1 == $quizid) {
+        if($roomquizid == $quizid) {
             $status          = $record->status;
             $timetoconsider  = $record->timetoconsider;
             $livetime        = $record->livetime;
             $deadtime        = $record->deadtime;
 
-            $currentTimestamp = intval(microtime(true));
+            $currenttimestamp = intval(microtime(true));
 
             if ($status == 'Live') {
-//                 echo '<br><br><br>';
-//                 echo '<br> $livetime ts ' . $livetime;
-
-                $livetime = ($currentTimestamp - $timetoconsider) + $livetime;
-
-//                 echo '<br> curr ts ' . $currentTimestamp;
-//                 echo '<br> $timetoconsider ts ' . $timetoconsider;
-//                 echo '<br> $livetime ts ' . $livetime;
-                $statustodisplay = '<font color="green"><i>Online</i></font>';
-
-
+                $livetime = ($currenttimestamp - $timetoconsider) + $livetime;
+                $statustodisplay = get_string('online', 'quizaccess_heartbeatmonitor');
             } else {
-                $deadtime = ($currentTimestamp - $timetoconsider) + $deadtime;
-                $statustodisplay = '<font color="red"><i>Offline</i></font>';
+                $deadtime = ($currenttimestamp - $timetoconsider) + $deadtime;
+                $statustodisplay = get_string('offline', 'quizaccess_heartbeatmonitor');
             }
 
 //             $humanisedlivetime = secondsToTime(intval($livetime));
-            $humanisedlivetime = format_time($livetime);
 //             $humaniseddeadtime = secondsToTime(intval($deadtime));
+
+            $humanisedlivetime = format_time($livetime);
             $humaniseddeadtime = format_time($deadtime);
 
             $table->rowclasses['roomid'] = $roomid;
@@ -179,9 +168,6 @@ if (!empty($result)){
 $processoverrideurl = new moodle_url('/mod/quiz/accessrule/heartbeatmonitor/processoverride.php');
 $indexurl = new moodle_url('/mod/quiz/accessrule/heartbeatmonitor/index.php');
 
-// $mform = new timelimit_override_form($overrideediturl, $cm, $quiz, $context, $userid1, $timelimit);
-// come back to this page..fetch checked records and then redirect to processoverride as in ovrrdedit.php.
-
 // Page setup.
 $PAGE->set_pagelayout('admin');
 $PAGE->set_title($pluginname);
@@ -194,30 +180,27 @@ $startnode_form = new startnode_form($url, $quiz, $course, $cm);
 // $startnode_form->set_data($node_up);
 static $node_up = 0;
 
-// Start node server from here.
-// echo 'Start node server';
-
+// Manage node server.
 if($nodestatus = $startnode_form->get_data()) {
     $outputfile = $CFG->dirroot . "/mod/quiz/accessrule/heartbeatmonitor/exec_output.text";
-    $pidfile = $CFG->dirroot . '/mod/quiz/accessrule/heartbeatmonitor/exec_pid.text';
+    $pidfile = $CFG->dirroot . "/mod/quiz/accessrule/heartbeatmonitor/exec_pid.text";
 
     if($nodestatus->submitbutton == 'Start') {
+        // Start node.
         $socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
-        $phpws_result = @socket_connect($socket, '127.0.0.1', 3000);
+        $phpws_result = @socket_connect($socket, $HBCFG->host, $HBCFG->port);
 
         if(!$phpws_result) {
             $cmd = "node " . $CFG->dirroot . "/mod/quiz/accessrule/heartbeatmonitor/server.js";
-
             file_put_contents($outputfile, '');
             file_put_contents($pidfile, '');
-
             exec(sprintf("%s > %s 2>&1 & echo $! >> %s", $cmd, $outputfile, $pidfile));
 
             while(trim(file_get_contents($outputfile)) == false) {
                 $socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
-                $phpws_result = @socket_connect($socket, '127.0.0.1', 3000);
+                $phpws_result = @socket_connect($socket, $HBCFG->host, $HBCFG->port);
                 if(!$phpws_result) {
-                    sleep(2);
+                    sleep(1);
                 } else {
                     $node_up = 1;
                     break;
@@ -230,9 +213,9 @@ if($nodestatus = $startnode_form->get_data()) {
             }
         }
     } else {
-        // Kill node.
+        // Stop node.
         $socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
-        $phpws_result = @socket_connect($socket, '127.0.0.1', 3000);
+        $phpws_result = @socket_connect($socket, $HBCFG->host, $HBCFG->port);
         if($phpws_result) {
             $cmd = "kill " . file_get_contents($pidfile);
             exec($cmd);
@@ -245,46 +228,39 @@ if($fromform = $mform->get_data()) {
     if($fromform->users) {
         $users = '';
         $i = 1;
-        echo '<br>You have selected : <br><br>';
+        echo get_string('youhaveselected', 'quizaccess_heartbeatmonitor');
 
         foreach ($fromform->users as $user) {
-            $arr            = explode("_", $user);
-            $attemptid      = array_splice($arr, -1)[0];
-            $quizid1        = array_splice($arr, -1)[0];
-            $username       = implode("_", $arr);
+            $arr        = explode("_", $user);
+            $attemptid  = array_splice($arr, -1)[0];
+            $roomquizid = array_splice($arr, -1)[0];
+            $username   = implode("_", $arr);
 
-            $userdata       = $DB->get_record('user', array('username'=>$username));
-            $userid1        = $userdata->id;
+            $userdata   = $DB->get_record('user', array('username'=>$username));
+            $roomuserid = $userdata->id;
 
-            echo $i . ' | ' . $userdata->firstname .  ' ' . $userdata->lastname . '<br>';
+            echo $i . ' | ' . $userdata->firstname .  ' ' . $userdata->lastname . get_string('br', 'quizaccess_heartbeatmonitor');
             $users .= $user . ' ';
             $i++;
-
         }
         $mform1 = new timelimit_override_form1($processoverrideurl, $cm, $quiz, $context, $users, 0);
-
         $mform1->display();
     }
 } else {
     $startnode_form->display();
     if(empty($table->data)) {
-//         echo '<br>';
-//         echo 'Live users data';
-//         echo html_writer::label('Live users data', null);
-        echo '<h4>';
-        echo html_writer::nonempty_tag('liveuserstblcaption', 'Live users data');
-        echo '</h4>';
-//         echo '<br>';
+        echo get_string('h4open', 'quizaccess_heartbeatmonitor');
+        echo html_writer::nonempty_tag('liveuserstblcaption', get_string('liveusers', 'quizaccess_heartbeatmonitor'));
+        echo get_string('h4close', 'quizaccess_heartbeatmonitor');
         echo $OUTPUT->notification(get_string('nodatafound', 'quizaccess_heartbeatmonitor'), 'info');
-
     } else {
-        echo '<h4>';
-        echo html_writer::nonempty_tag('liveuserstblcaption', 'Live users data');
-        echo '</h4>';
+        echo get_string('h4open', 'quizaccess_heartbeatmonitor');
+        echo html_writer::nonempty_tag('liveuserstblcaption', get_string('liveusers', 'quizaccess_heartbeatmonitor'));
+        echo get_string('h4close', 'quizaccess_heartbeatmonitor');
 
         // Display table.
         echo html_writer::table($table);
-        echo '<br>';
+        echo get_string('br', 'quizaccess_heartbeatmonitor');
         $mform->display();
     }
 }

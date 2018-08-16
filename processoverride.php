@@ -70,11 +70,6 @@ foreach ($keys as $key) {
         $data->{$key} = $quiz->{$key};
     }
 }
-echo '<br>-- in proc ovr --<br>';
-print_object($quiz);
-
-// True if group-based override.
-$groupmode = !empty($data->groupid) || ($action === 'addgroup' && empty($overrideid));
 
 $overridelisturl = new moodle_url('/mod/quiz/accessrule/heartbeatmonitor/showoverrides.php', array('cmid'=>$cm->id));
 $overridelisturl->param('mode', 'user');
@@ -93,19 +88,11 @@ if ($fromform = $mform->get_data()) {
     $roomids = array();
     $roomids = explode(" ", $fromform->users);
     foreach ($roomids as $roomid) {
-        // One common function for duplicate code in rule.php and processoverride.php
-//         $temp = array();
-//         $temp = explode("_", $roomid);
-//         $username = $temp[0];
         $arr = array();
-        $arr            = explode("_", $roomid);
-        $attemptid      = array_splice($arr, -1)[0];
-        $my_quizid      = array_splice($arr, -1)[0];
-        $username       = implode("_", $arr);
-//         $usersql = "SELECT id
-//                         FROM {user}
-//                         WHERE username = '" . $username . "'";
-//         $uid = $DB->get_field_sql($usersql);
+        $arr = explode("_", $roomid);
+        $attemptid = array_splice($arr, -1)[0];
+        $room_quizid = array_splice($arr, -1)[0];
+        $username = implode("_", $arr);
         $uid = $DB->get_field('user', 'id', array('username' => $username));
 
         $quizobj = quiz::create($cm->instance, $uid);
@@ -114,7 +101,6 @@ if ($fromform = $mform->get_data()) {
         $myobj = new createoverride();
         $myobj->my_override($cmid, $roomid, $fromform, $quiz1);
     }
-
     if (!empty($fromform->submitbutton)) {
         redirect($overridelisturl);
     }

@@ -53,4 +53,19 @@ $string['hbmonrequired_help'] = 'Heartbeat monitoring system is used to track th
 $string['hbmonrequiredoption'] = 'Yes';
 $string['automatic'] = 'Automatic';
 $string['manual'] = 'Manual';
+$string['servererr'] = '<font color="red">Time server is not on. Please contact your instructor.</font>';
+$string['usersattemptingquiz'] = 'Users attempting quiz';
+$string['user'] = 'User';
+$string['socketroomid'] = 'Socket room id';
+$string['currentstatus'] = 'Current status';
+$string['statusupdate'] = 'Status update on';
+$string['timeutilized'] = 'Quiz time used up';
+$string['timelost'] = 'Quiz time lost';
+$string['online'] = '<font color="green"><i>Online</i></font>';
+$string['offline'] = '<font color="red"><i>Offline</i></font>';
+$string['youhaveselected'] = '<br><h4>Selected users</h4><br><br>';
+$string['h4open'] = '<h4>';
+$string['h4close'] = '</h4>';
+$string['br'] = '<br>';
+
 

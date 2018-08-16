@@ -23,11 +23,13 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-function client(Y, quizid, userid, username, attemptid, sessionkey, cfg)
+function client(Y, quizid, userid, username, attemptid, sessionkey, cfg, hbcfg)
 {
 	var obj = JSON.parse(cfg);
+	var nodecfg = JSON.parse(hbcfg);
 	console.log(obj);
-	var socket = io('http://127.0.0.1:3000', {
+//	var socket = io('http://127.0.0.1:3000', {
+	var socket = io(nodecfg.wwwroot + ':' + nodecfg.port, {
 						'secure':                    false,
 					    'connect timeout':           5000,
 					    'try multiple transports':   true,
