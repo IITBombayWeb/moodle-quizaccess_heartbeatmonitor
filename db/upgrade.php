@@ -33,31 +33,51 @@ function xmldb_quizaccess_heartbeatmonitor_upgrade($oldversion) {
 
     $dbman = $DB->get_manager();
 
-    if ($oldversion < 2017110207) {
+    if ($oldversion < 2017110208) {
 
-        // Define table quiz_sections to be created.
+        // Define table quizaccess_enable_hbmonto be created.
         $table = new xmldb_table('quizaccess_enable_hbmon');
 
-        // Adding fields to table quiz_sections.
+        // Adding fields to table quizaccess_enable_hbmon.
         $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
         $table->add_field('quizid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
         $table->add_field('hbmonrequired', XMLDB_TYPE_INTEGER, '2', null, XMLDB_NOTNULL, null, '0');
         $table->add_field('hbmonmode', XMLDB_TYPE_INTEGER, '2', null, XMLDB_NOTNULL, null, '1');
 
-        // Adding keys to table quiz_sections.
+        // Adding keys to table quizaccess_enable_hbmon.
         $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
         $table->add_key('quizid', XMLDB_KEY_FOREIGN, array('quizid'), 'quiz', array('id'));
 
-        // Adding indexes to table quiz_sections.
+        // Adding indexes to table quizaccess_enable_hbmon.
 //         $table->add_index('quizid-firstslot', XMLDB_INDEX_UNIQUE, array('quizid', 'firstslot'));
 
-        // Conditionally launch create table for quiz_sections.
+        // Conditionally launch create table for quizaccess_enable_hbmon.
         if (!$dbman->table_exists($table)) {
             $dbman->create_table($table);
         }
 
+        //--------------------------------------------------------------------------------------------
+
+        // Define table quizaccess_hbmon_timeserverto be created.
+        $table1 = new xmldb_table('quizaccess_hbmon_timeserver');
+
+        // Adding fields to table quizaccess_hbmon_timeserver.
+        $table1->add_field('timeserverid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table1->add_field('timestarted', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $table1->add_field('lastlivetime', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+
+        // Adding keys to table quizaccess_hbmon_timeserver.
+        $table1->add_key('primary', XMLDB_KEY_PRIMARY, array('timeserverid'));
+
+        // Adding indexes to table quizaccess_hbmon_timeserver.
+        //         $table->add_index('quizid-firstslot', XMLDB_INDEX_UNIQUE, array('quizid', 'firstslot'));
+
+        // Conditionally launch create table for quizaccess_hbmon_timeserver.
+        if (!$dbman->table_exists($table1)) {
+            $dbman->create_table($table1);
+        }
         // Heartbeatmonitor savepoint reached.
-        upgrade_plugin_savepoint(true, 2017110207, 'quizaccess', 'heartbeatmonitor');
+        upgrade_plugin_savepoint(true, 2017110208, 'quizaccess', 'heartbeatmonitor');
     }
 
 }

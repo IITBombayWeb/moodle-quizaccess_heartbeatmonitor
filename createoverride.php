@@ -61,9 +61,9 @@ class createoverride {
 //         }
 
         if($roomid) {
-            // Select data for a particular quiz and not entire table..insert quizid col in livetable1 for this.
+            // Select data for a particular quiz and not entire table..insert quizid col in livetable for this.
             $select_sql = 'SELECT *
-                                FROM {quizaccess_hbmon_livetable1}
+                                FROM {quizaccess_hbmon_livetable}
                                 WHERE roomid = "' . $roomid . '"'.
                             //    AND status = "Live"
                                 'AND deadtime > 60';
@@ -209,7 +209,7 @@ class createoverride {
                         // Reset database record.
                         $livetime = $livetime + $deadtime;
                         $deadtime = 0;
-                        $update_sql = 'UPDATE {quizaccess_hbmon_livetable1}
+                        $update_sql = 'UPDATE {quizaccess_hbmon_livetable}
                                             SET deadtime = 0
                                             WHERE roomid = "' . $roomid . '"';
                         $update_sql_result = $DB->execute($update_sql);

@@ -72,7 +72,7 @@ class new_form extends moodleform {
 
         // Display live users.
         // Fetch records from database.
-        $sql1 = 'SELECT * FROM {quizaccess_hbmon_livetable1} WHERE status = "Live" AND deadtime <> 0';
+        $sql1 = 'SELECT * FROM {quizaccess_hbmon_livetable} WHERE status = "Live" AND deadtime <> 0';
         $result1    = $DB->get_records_sql($sql1);
         $deadtime1  = null;
         $userid1    = null;

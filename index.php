@@ -60,7 +60,7 @@ require_capability('mod/quiz:manage', $context);
 
 // Display live users.
 // Fetch records from database.
-$sql = 'SELECT * FROM {quizaccess_hbmon_livetable1}';  // Select data for a particular quiz and not entire table..insert quizid col in livetable1 for this.
+$sql = 'SELECT * FROM {quizaccess_hbmon_livetable}';  // Select data for a particular quiz and not entire table..insert quizid col in livetable for this.
 $arr = array();
 $roomid = null;
 
@@ -86,8 +86,8 @@ if (!empty($result)){
         $quiza     = $DB->get_record('quiz_attempts', array('id'=>$attemptid));
 
         if(!$quiza || $quiza->state == 'finished') {
-//             $sql = 'DELETE FROM {quizaccess_hbmon_livetable1} WHERE roomid = "' . $roomid . '"';
-            $hblivetable = 'quizaccess_hbmon_livetable1';
+//             $sql = 'DELETE FROM {quizaccess_hbmon_livetable} WHERE roomid = "' . $roomid . '"';
+            $hblivetable = 'quizaccess_hbmon_livetable';
             $select = 'roomid = ?'; // Is put into the where clause.
             $params = array($roomid);
             $delete = $DB->delete_records_select($hblivetable, $select, $params);
@@ -173,6 +173,9 @@ $PAGE->set_pagelayout('admin');
 $PAGE->set_title($pluginname);
 $PAGE->set_heading($course->fullname);
 // $PAGE->requires->jquery();
+$PAGE->requires->jquery();
+// $PAGE->requires->js( new moodle_url($CFG->wwwroot . '/mod/quiz/accessrule/heartbeatmonitor/testnode.js') );
+
 echo $OUTPUT->header();
 echo $OUTPUT->heading(format_string($quiz->name, true, array('context' => $context)));
 
@@ -211,6 +214,28 @@ if($nodestatus = $startnode_form->get_data()) {
                 $node_err = nl2br(file_get_contents($outputfile));
                 echo $OUTPUT->notification('Error:<br>' . $node_err);
             }
+//             $PAGE->requires->js_init_call('testnode');
+//             $result = null;
+//             $result ="<script>
+// 					 function countDownTimer() {
+
+// 					   $(document).ready(function() {
+
+// 						var interval = setInterval(function() {
+
+//            				 	var currentTime = new Date().getTime();
+
+//             				if (countDownTime < 0) {
+//                 				clearInterval(interval);
+//                 				$('#timer').hide();
+//                				    $('#startAttemptButton').show();
+//             				}
+
+// 					}, 1000);
+//     				});
+// 					}
+// 				</script>";
+//             $result.="<script type='text/javascript'>countDownTimer($diffMilliSecs);</script>";
         }
     } else {
         // Stop node.

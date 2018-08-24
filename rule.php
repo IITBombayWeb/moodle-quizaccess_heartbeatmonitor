@@ -53,6 +53,8 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
         $PAGE->requires->jquery();
         $PAGE->requires->js( new moodle_url($HBCFG->wwwroot . ':' . $HBCFG->port . '/socket.io/socket.io.js'), true );
         $PAGE->requires->js( new moodle_url($CFG->wwwroot . '/mod/quiz/accessrule/heartbeatmonitor/client.js') );
+//         $PAGE->requires->js( new moodle_url($CFG->wwwroot . '/mod/quiz/accessrule/heartbeatmonitor/testnode.js') );
+//         $PAGE->requires->js_init_call('testnode');
 
         // Check node server status.
         $socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
@@ -61,7 +63,7 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
         if(!$phpws_result) {
             return get_string('servererr', 'quizaccess_heartbeatmonitor');
         } else {
-            echo '<br><br><br>-- In prevent access --';
+//             echo '<br><br><br>-- In prevent access --';
 
             // Use this to delete user-override when the attempt finishes.
 //             $this->current_attempt_finished();
@@ -90,8 +92,10 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
                         throw new moodle_quiz_exception($attemptobj->get_quizobj(), 'notyourattempt');
                     } else {
                         $roomid = $username . '_' . $quizid . '_' . $attemptid;
-                        $PAGE->requires->js_init_call('client', array($quizid, $userid, $username, $attemptid, $sessionkey, json_encode($CFG), json_encode($HBCFG)));
+                        $PAGE->requires->js_init_call('client', array($quizid, $userid, $username, $attemptid, $sessionkey, json_encode($HBCFG)));
+//                         $variable = $_POST['variable'];
 
+//                         echo '<br><br><br> here -- ' . $a;
                         $hbmonmodesql = "SELECT hbmonmode
                                             FROM {quizaccess_enable_hbmon}
                                             WHERE quizid = $quizid";
@@ -100,7 +104,7 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
 //                             echo '<br>-- In rule crtovrrde -- <br>-- qa state - ' . $quiza->state;
                             // If deadtime is there, then create override.
                             $select_sql = 'SELECT *
-                                                FROM {quizaccess_hbmon_livetable1}
+                                                FROM {quizaccess_hbmon_livetable}
                                                 WHERE roomid = "' . $roomid . '"' .
                                                 /*  AND status = "Live" */
                                                 'AND deadtime > 60';
@@ -178,7 +182,7 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
                  */
                 $roomid = $username . '_' . $quizid . '_' . $attemptid;
                 $select_sql = 'SELECT *
-                                    FROM {quizaccess_hbmon_livetable1}
+                                    FROM {quizaccess_hbmon_livetable}
                                     WHERE roomid = "' . $roomid . '"';
                                     // AND status = "Dead"';
                                     // AND deadtime > 60000';

@@ -23,11 +23,11 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-function client(Y, quizid, userid, username, attemptid, sessionkey, cfg, hbcfg)
+function client(Y, quizid, userid, username, attemptid, sessionkey, hbcfg)
 {
-	var obj = JSON.parse(cfg);
+//	var obj = JSON.parse(cfg);
 	var nodecfg = JSON.parse(hbcfg);
-	console.log(obj);
+//	console.log(obj);
 //	var socket = io('http://127.0.0.1:3000', {
 	var socket = io(nodecfg.wwwroot + ':' + nodecfg.port, {
 						'secure':                    false,
@@ -53,13 +53,21 @@ function client(Y, quizid, userid, username, attemptid, sessionkey, cfg, hbcfg)
 	
 	socket.on('connect', function() {
 		console.log('-- In client \'connect\' event --');
-		console.log(obj);
+//		console.log(obj);
 		console.log('-- After socket connected - ' + socket.id  + '. Curr. TS - ' + Math.floor(new Date().getTime()/1000));
-		socket.emit('attempt', { username:username, quizid:quizid, roomid:roomid, attemptid:attemptid, config:obj });
+		socket.emit('attempt', { username:username, quizid:quizid, roomid:roomid, attemptid:attemptid });
 		
 	});	
 	
+	socket.on('timeserver', function(data) {
+		console.log('-- In timeserver event --');
+		console.log('-- Timeserver id - ' + data.timeserverid);
+//		var variableToSend = 'foo';
+//		$.post('http://localhost/moodle/mod/quiz/attempt.php', {variable: variableToSend});
+	});
+	
 	socket.on('disconnect', function() {
+		console.log('-- In client \'disconnect\' event --');
 		console.log('-- After socket disconnected - ' + socket.id  + '. Curr. TS - ' + Math.floor(new Date().getTime())/1000);
 	});
 }

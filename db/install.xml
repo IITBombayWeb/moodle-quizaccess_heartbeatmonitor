@@ -19,10 +19,11 @@
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
       </KEYS>
     </TABLE>
-    <TABLE NAME="quizaccess_hbmon_livetable1" COMMENT="Default comment for quizaccess_heartbeatmonitor, please edit me">
+    <TABLE NAME="quizaccess_hbmon_livetable" COMMENT="Default comment for quizaccess_heartbeatmonitor, please edit me">
       <FIELDS>
         <FIELD NAME="roomid" TYPE="char" LENGTH="40" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="status" TYPE="char" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="timeserver" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="timetoconsider" TYPE="char" LENGTH="40" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="livetime" TYPE="char" LENGTH="40" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="deadtime" TYPE="char" LENGTH="40" NOTNULL="true" SEQUENCE="false"/>
@@ -41,6 +42,16 @@
             <KEYS>
                 <KEY NAME="primary" TYPE="primary" FIELDS="id" />
                 <KEY NAME="quizid" TYPE="foreign-unique" FIELDS="quizid" REFTABLE="quiz" REFFIELDS="id" />
+            </KEYS>
+        </TABLE>
+        <TABLE NAME="quizaccess_hbmon_timeserver" COMMENT="Stores the additional setting required by this accessrule">
+            <FIELDS>
+                <FIELD NAME="timeserverid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true" />
+                <FIELD NAME="timestarted" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" />
+                <FIELD NAME="lastlivetime" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" />
+            </FIELDS>
+            <KEYS>
+                <KEY NAME="primary" TYPE="primary" FIELDS="timeserverid" />
             </KEYS>
         </TABLE>
   </TABLES>
