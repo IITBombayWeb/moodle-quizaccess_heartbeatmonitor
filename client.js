@@ -61,7 +61,7 @@ function client(Y, quizid, userid, username, attemptid, sessionkey, hbcfg)
 	
 	socket.on('timeserver', function(data) {
 		console.log('-- In timeserver event --');
-		console.log('-- Timeserver id - ' + data.timeserverid);
+		console.log('-- Curr. Timeserver id - ' + data.currenttimeserverid);
 //		var variableToSend = 'foo';
 //		$.post('http://localhost/moodle/mod/quiz/attempt.php', {variable: variableToSend});
 	});
