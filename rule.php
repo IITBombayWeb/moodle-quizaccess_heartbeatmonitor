@@ -53,112 +53,88 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
         $PAGE->requires->jquery();
         $PAGE->requires->js( new moodle_url($HBCFG->wwwroot . ':' . $HBCFG->port . '/socket.io/socket.io.js'), true );
         $PAGE->requires->js( new moodle_url($CFG->wwwroot . '/mod/quiz/accessrule/heartbeatmonitor/client.js') );
-//         $PAGE->requires->js( new moodle_url($CFG->wwwroot . '/mod/quiz/accessrule/heartbeatmonitor/testnode.js') );
-//         $PAGE->requires->js_init_call('testnode');
+//         echo '<br><br><br>-- In prevent access --';
 
-        // Check node server status.
+//         // Use this to delete user-override when the attempt finishes.
+//         $this->current_attempt_finished();
+//         print_object($this->get_superceded_rules());
+
+        // User details.
+        $sessionkey = sesskey();
+        $userid     = $USER->id;
+        $username   = $USER->username;
+
+        // Quiz details.
+        $quiz       = $this->quizobj->get_quiz();
+        $quizid     = $this->quizobj->get_quizid();
+        $cmid       = $this->quizobj->get_cmid();
+//         $context    = $this->quizobj->get_context();
+//         print_object($this->quizobj);   // Contains quiz timeopen, timeclose etc.
+
+        // Try connecting to the node server.
         $socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
         $phpws_result = @socket_connect($socket, $HBCFG->host, $HBCFG->port);
 
-//         if(!$phpws_result) {
-//             return get_string('servererr', 'quizaccess_heartbeatmonitor');
-//         } else {
-//             echo '<br><br><br>-- In prevent access --';
+        // If unfinished attempt.
+        if ($unfinishedattempt = quiz_get_user_attempt_unfinished($quiz->id, $USER->id)) {
+            $unfinishedattemptid = $unfinishedattempt->id;
+            $unfinished = $unfinishedattempt->state == quiz_attempt::IN_PROGRESS;
 
-            // Use this to delete user-override when the attempt finishes.
-//             $this->current_attempt_finished();
-//             print_object($this->get_superceded_rules());
+            if ($unfinished) {
+                $attemptid  = $unfinishedattempt->id;
+                $attemptobj = quiz_attempt::create($attemptid);
 
-            $sessionkey = sesskey();
-            $userid     = $USER->id;
-            $username   = $USER->username;
+                // Check that this attempt belongs to this user.
+                if ($attemptobj->get_userid() != $USER->id) {
+                    throw new moodle_quiz_exception($attemptobj->get_quizobj(), 'notyourattempt');
+                } else {
+                    $roomid = $username . '_' . $quizid . '_' . $attemptid;
 
-            $quiz       = $this->quizobj->get_quiz();
-            $quizid     = $this->quizobj->get_quizid();
-            $cmid       = $this->quizobj->get_cmid();
-//             $context    = $this->quizobj->get_context();
-//             print_object($this->quizobj);   // Contains quiz timeopen, timeclose etc.
+                    // If node server is down.
+                    if(!$phpws_result) {
+                        $fetchtimesql = 'SELECT *
+                                            FROM mdl_quizaccess_hbmon_livetable
+                                            WHERE roomid = "' . $roomid . '"';
+                        $record = $DB->get_record_sql($fetchtimesql);
 
-            if(!$phpws_result) {
-                //if unfinished attempt
-            if ($unfinishedattempt = quiz_get_user_attempt_unfinished($quiz->id, $USER->id)) {
-                $unfinishedattemptid = $unfinishedattempt->id;
-                $unfinished = $unfinishedattempt->state == quiz_attempt::IN_PROGRESS;
-
-                if ($unfinished) {
-                    $attemptid  = $unfinishedattempt->id;
-                    $attemptobj = quiz_attempt::create($attemptid);
-
-                    // Check that this attempt belongs to this user.
-                    if ($attemptobj->get_userid() != $USER->id) {
-                        throw new moodle_quiz_exception($attemptobj->get_quizobj(), 'notyourattempt');
-                    } else {
-                        $roomid = $username . '_' . $quizid . '_' . $attemptid;
-
-
-//                             UPDATE mdl_quizaccess_hbmon_livetable SET status = " 	+ socket.currentstatus
-// 																+ ", deadtime = "  	+ deadtime
-// 																+ ", timetoconsider = " + socket.timestampC
-// 																+ ", timeserver = " + currenttimeserverid
-// 																+ " WHERE roomid = " + socket.roomid;
-
-                            $fetchtimesql = 'SELECT *
-                                                FROM mdl_quizaccess_hbmon_livetable
-                                                WHERE roomid = "' . $roomid . '"';
-                            $records1 = $DB->get_record_sql($fetchtimesql);
-                            if (!empty($records1)){
-                                // Process data of each row.
-//                                 print_object($records1);
-//                                 foreach ($records1 as $record) {
-                                $status          = $records1->status;
-                                $timetoconsider  = $records1->timetoconsider;
-                                $livetime        = $records1->livetime;
-//                                 }
-
-
+                        if (!empty($record)){
+                            $status           = $record->status;
+                            $timetoconsider   = $record->timetoconsider;
+                            $livetime         = $record->livetime;
+                            $timeserver       = $record->timeserver;
                             $currenttimestamp = intval(microtime(true));
-                            echo 'curr. time -- ' . format_time($currenttimestamp);
-                            $currenttimestamp1 = time();
-                            echo 'curr. time -- ' . format_time($currenttimestamp1);
 
                             if ($status == 'Live') {
-                                //ttc = ndwn ==== llt of prev tsvr
-                                $livetime = ($currenttimestamp - $timetoconsider) + $livetime;
-//                             }
+                                // ttc = ndwn ==== llt of prev tsvr
+                                $fetchtimeserversql = 'SELECT *
+                                                            FROM mdl_quizaccess_hbmon_timeserver
+                                                            WHERE timeserverid = ' . $timeserver;
+                                $record1 = $DB->get_record_sql($fetchtimeserversql);
 
-                                echo '<br><br><br>updating--';
-                                $update_sql = ' UPDATE mdl_quizaccess_hbmon_livetable SET status = "Dead",
-                                                timetoconsider = ' . $currenttimestamp . ',
-                                                livetime = ' . $livetime . '
-                                                WHERE roomid = "' . $roomid . '"';
-                            $update_sql_result = $DB->execute($update_sql);
+                                if (!empty($record1)){
+                                    $livetime = ($currenttimestamp - $record1->lastlivetime) + $livetime;
+//                                     $livetime = ($currenttimestamp - $timetoconsider) + $livetime;
+
+    //                                 echo '<br><br><br>-- Updating --';
+                                    $update_sql = 'UPDATE mdl_quizaccess_hbmon_livetable SET status = "Dead",
+                                                        timetoconsider = ' . $currenttimestamp . ',
+                                                        livetime = ' . $livetime . '
+                                                        WHERE roomid = "' . $roomid . '"';
+
+//                                     $update_sql = ' UPDATE mdl_quizaccess_hbmon_livetable SET status = "Dead",
+//                                                     timetoconsider = ' . $record1->lastlivetime . ',
+//                                                     livetime = ' . $livetime . '
+//                                                     WHERE roomid = "' . $roomid . '"';
+
+                                    $update_sql_result = $DB->execute($update_sql);
+                                }
                             }
-                            }
-                            return get_string('servererr', 'quizaccess_heartbeatmonitor');
-                    }
-                }
-            }
-            // if new attempt
-            return get_string('servererr', 'quizaccess_heartbeatmonitor');
-                        } else {
-                            if ($unfinishedattempt = quiz_get_user_attempt_unfinished($quiz->id, $USER->id)) {
-                                $unfinishedattemptid = $unfinishedattempt->id;
-                                $unfinished = $unfinishedattempt->state == quiz_attempt::IN_PROGRESS;
+                        }
 
-                                if ($unfinished) {
-                                    $attemptid  = $unfinishedattempt->id;
-                                    $attemptobj = quiz_attempt::create($attemptid);
-
-                                    // Check that this attempt belongs to this user.
-                                    if ($attemptobj->get_userid() != $USER->id) {
-                                        throw new moodle_quiz_exception($attemptobj->get_quizobj(), 'notyourattempt');
-                                    } else {
-                                        $roomid = $username . '_' . $quizid . '_' . $attemptid;
-
+                        return get_string('servererr', 'quizaccess_heartbeatmonitor');
+                    } else {
                         $PAGE->requires->js_init_call('client', array($quizid, $userid, $username, $attemptid, $sessionkey, json_encode($HBCFG)));
-//                         $variable = $_POST['variable'];
 
-//                         echo '<br><br><br> here -- ' . $a;
                         $hbmonmodesql = "SELECT hbmonmode
                                             FROM {quizaccess_enable_hbmon}
                                             WHERE quizid = $quizid";
@@ -187,6 +163,11 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
                 }
             }
             return false;
+        } else {
+            if(!$phpws_result) {
+                // If new attempt.
+                return get_string('servererr', 'quizaccess_heartbeatmonitor');
+            }
         }
     }
 
@@ -198,7 +179,7 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
         $PAGE->requires->js( new moodle_url($CFG->wwwroot . '/mod/quiz/accessrule/heartbeatmonitor/client.js') );
 
         // Use this to delete user-override when the attempt finishes.
-        $this->current_attempt_finished();
+//         $this->current_attempt_finished();
 //         echo '<br><br><br>-- In setup attempt --';
 
         $sessionkey = sesskey();

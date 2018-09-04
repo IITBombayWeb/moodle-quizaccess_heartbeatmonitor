@@ -1,31 +1,23 @@
--- curr. timeserverid -- 82-- room tsid -- 81
+-- curr. timeserverid -- 109-- room tsid -- 108
 -- before tssql --
 -- in tssql --
 -- tsresult array -- [object Object]
 -- tsresult array -- [object Object]
-1-- timeserver[1].timeserverid -- 82
-0-- timeserver array loop -- 81
-1-- timeserver array loop -- 82
--- serverdowntime -- 248
--- userdowntime -- 405
--- maxdowntime -- 405
--- before deadtime 2 -- 0
--- deadtime 2 -- 405
-===========================================================
+1-- timeserver[1].timeserverid -- 109
+-- serverdowntime -- 517
+-- userdowntime -- 1918
+-- maxdowntime -- 1918
+-- before deadtime 2 -- 3
+-- deadtime 2 -- 1921
 In 'disconnect' event. Connected sockets - 0
-'anisha_1_476' - Current deadtime is - 0 days, 0 hrs, 0 mins, 0 msecs
--- deadtime 1 -- 0
-===========================================================
+'anisha_1_493' - Current deadtime is - 0 days, 0 hrs, 0 mins, 1 msecs
+-- deadtime 1 -- 1
 In 'disconnect' event. Connected sockets - 0
-===========================================================
+'anisha_1_493' - Current deadtime is - 0 days, 0 hrs, 0 mins, 0 msecs
+-- deadtime 1 -- 1
 In 'disconnect' event. Connected sockets - 0
-'anisha_1_476' - Current deadtime is - 0 days, 0 hrs, 0 mins, 4 msecs
--- deadtime 1 -- 4
-===========================================================
+'anisha_1_493' - Current deadtime is - 0 days, 0 hrs, 0 mins, 0 msecs
+-- deadtime 1 -- 1
 In 'disconnect' event. Connected sockets - 0
-'anisha_1_476' - Current deadtime is - 0 days, 0 hrs, 0 mins, 0 msecs
--- deadtime 1 -- 4
-===========================================================
-In 'disconnect' event. Connected sockets - 0
-'anisha_1_476' - Current deadtime is - 0 days, 0 hrs, 0 mins, 1 msecs
--- deadtime 1 -- 5
+'anisha_1_493' - Current deadtime is - 0 days, 0 hrs, 0 mins, 0 msecs
+-- deadtime 1 -- 1
