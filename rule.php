@@ -112,19 +112,20 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
                                 $record1 = $DB->get_record_sql($fetchtimeserversql);
 
                                 if (!empty($record1)){
-                                    $livetime = ($currenttimestamp - $record1->lastlivetime) + $livetime;
+//                                     $livetime = ($currenttimestamp - $record1->lastlivetime) + $livetime;
+                                    $livetime = ($record1->lastlivetime - $timetoconsider) + $livetime;
 //                                     $livetime = ($currenttimestamp - $timetoconsider) + $livetime;
 
     //                                 echo '<br><br><br>-- Updating --';
-                                    $update_sql = 'UPDATE mdl_quizaccess_hbmon_livetable SET status = "Dead",
-                                                        timetoconsider = ' . $currenttimestamp . ',
-                                                        livetime = ' . $livetime . '
-                                                        WHERE roomid = "' . $roomid . '"';
+//                                     $update_sql = 'UPDATE mdl_quizaccess_hbmon_livetable SET status = "Dead",
+//                                                         timetoconsider = ' . $currenttimestamp . ',
+//                                                         livetime = ' . $livetime . '
+//                                                         WHERE roomid = "' . $roomid . '"';
 
-//                                     $update_sql = ' UPDATE mdl_quizaccess_hbmon_livetable SET status = "Dead",
-//                                                     timetoconsider = ' . $record1->lastlivetime . ',
-//                                                     livetime = ' . $livetime . '
-//                                                     WHERE roomid = "' . $roomid . '"';
+                                    $update_sql = ' UPDATE mdl_quizaccess_hbmon_livetable SET status = "Dead",
+                                                    timetoconsider = ' . $record1->lastlivetime . ',
+                                                    livetime = ' . $livetime . '
+                                                    WHERE roomid = "' . $roomid . '"';
 
                                     $update_sql_result = $DB->execute($update_sql);
                                 }

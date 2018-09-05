@@ -75,7 +75,7 @@ class startnode_form extends moodleform {
 //         $indexurl           = new moodle_url('/mod/quiz/accessrule/heartbeatmonitor/index.php');
 
         // Display table.
-        $mform->addElement('header', 'starttimeserver', 'Start time server');
+        $mform->addElement('header', 'starttimeserver', 'Heartbeat time server');
         $mform->setExpanded('starttimeserver', true);
 
         $flag = 0;
@@ -93,7 +93,7 @@ class startnode_form extends moodleform {
             // Start button.
             $mform->addElement('submit', 'submitbutton', 'Start');
         } else {
-            $mform->addElement('static', 'description', '', 'Time server is already running. <br>Stop the \'Time server\' by clicking \'Stop\' button.');
+            $mform->addElement('static', 'description', '', 'Heartbeat time server is running. <br>Stop the time server by clicking on the \'Stop\' button.');
 
             // Stop button.
             $mform->addElement('submit', 'submitbutton', 'Stop');

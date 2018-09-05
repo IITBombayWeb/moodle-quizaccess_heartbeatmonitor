@@ -30,7 +30,7 @@ defined('MOODLE_INTERNAL') || die();
 
 $string['pluginname'] = 'Hearbeat monitor quiz access rule';
 $string['calculatetime'] = 'Calculate time';
-$string['liveusers'] = 'Live users';
+$string['liveusers'] = 'Users status';
 $string['nodatafound'] = 'No data found.';
 $string['heading'] = '{$a} | Heartbeat monitor ';
 $string['honestycheckheader'] = 'Please read the following message';
@@ -53,12 +53,12 @@ $string['hbmonrequired_help'] = 'Heartbeat monitoring system is used to track th
 $string['hbmonrequiredoption'] = 'Yes';
 $string['automatic'] = 'Automatic';
 $string['manual'] = 'Manual';
-$string['servererr'] = '<font color="red">Time server is not on. Please contact your instructor.</font>';
+$string['servererr'] = '<font color="red">Heartbeat time server is not on. Please contact your instructor.</font>';
 $string['usersattemptingquiz'] = 'Users attempting quiz';
 $string['user'] = 'User';
-$string['socketroomid'] = 'Socket room id';
+$string['socketroomid'] = 'IP address';
 $string['currentstatus'] = 'Current status';
-$string['statusupdate'] = 'Status update on';
+$string['statusupdate'] = 'Last live time';
 $string['timeutilized'] = 'Quiz time used up';
 $string['timelost'] = 'Quiz time lost';
 $string['online'] = '<font color="green"><i>Online</i></font>';
