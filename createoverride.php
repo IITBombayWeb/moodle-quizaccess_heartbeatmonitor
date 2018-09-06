@@ -93,6 +93,7 @@ class createoverride {
                         $timetoconsider  = $record->timetoconsider;
                         $livetime        = $record->livetime;
                         $deadtime        = $record->deadtime;
+                        $extratime       = $record->extratime;
 
 //                         $currentTimestamp = intval(microtime(true)*1000);
                         $currentTimestamp = time();
@@ -208,11 +209,16 @@ class createoverride {
                         //======================================================
                         // Reset database record.
                         $livetime = $livetime + $deadtime;
+                        $extratime = $extratime + $deadtime;
                         $deadtime = 0;
+
                         $update_sql = 'UPDATE {quizaccess_hbmon_livetable}
-                                            SET deadtime = 0
+                                            SET extratime = ' . $extratime . ',
+                                                deadtime = 0
                                             WHERE roomid = "' . $roomid . '"';
                         $update_sql_result = $DB->execute($update_sql);
+
+
                     }
                 }
             }

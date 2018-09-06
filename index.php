@@ -72,7 +72,8 @@ $table->head = array(get_string('user', 'quizaccess_heartbeatmonitor'),
                         get_string('currentstatus', 'quizaccess_heartbeatmonitor'),
                         get_string('statusupdate', 'quizaccess_heartbeatmonitor'),
                         get_string('timeutilized', 'quizaccess_heartbeatmonitor'),
-                        get_string('timelost', 'quizaccess_heartbeatmonitor'));
+                        get_string('timelost', 'quizaccess_heartbeatmonitor'),
+                        'Total extra time granted');
 // $table->head = array('User', 'Socket room id', 'Current status', 'Status update on', 'Quiz time used up', 'Quiz time lost', 'Total extra time granted');
 
 $result    = $DB->get_records_sql($sql);
@@ -107,6 +108,7 @@ if (!empty($result)){
             $timetoconsider  = $record->timetoconsider;
             $livetime        = $record->livetime;
             $deadtime        = $record->deadtime;
+            $extratime       = $record->extratime;
 
             $currenttimestamp = intval(microtime(true));
 
@@ -152,12 +154,17 @@ if (!empty($result)){
             $cell5->id = 'deadtime';
             $cell5->attributes['value'] = $deadtime;
 
+            $cell6 = new html_table_cell(format_time($extratime));
+            $cell6->id = 'extratime';
+            $cell6->attributes['value'] = $extratime;
+
             $row->cells[] = $cell0;
             $row->cells[] = $cell1;
             $row->cells[] = $cell2;
             $row->cells[] = $cell3;
             $row->cells[] = $cell4;
             $row->cells[] = $cell5;
+            $row->cells[] = $cell6;
 
             $table->data[] = $row;
         }

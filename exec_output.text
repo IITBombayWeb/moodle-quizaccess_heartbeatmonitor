@@ -1,68 +1,24 @@
--- curr. timeserverid -- 113-- room tsid -- 112
+-- curr. timeserverid -- 115-- room tsid -- 114
 -- before tssql --
 -- in tssql --
 -- tsresult array -- [object Object]
 -- tsresult array -- [object Object]
-1-- timeserver[1].timeserverid -- 113
--- serverdowntime -- 183
--- userdowntime -- 310
--- maxdowntime -- 310
+1-- timeserver[1].timeserverid -- 115
+-- serverdowntime -- 256
+-- userdowntime -- 312
+-- maxdowntime -- 312
 -- before deadtime 2 -- 0
--- deadtime 2 -- 310
+-- deadtime 2 -- 312
 In 'disconnect' event. Connected sockets - 0
-'anisha_1_496' - Current deadtime is - 0 days, 0 hrs, 0 mins, 1 msecs
+'anisha_1_500' - Current deadtime is - 0 days, 0 hrs, 0 mins, 1 msecs
 -- deadtime 1 -- 1
--- curr. timeserverid -- 113-- room tsid -- 112
--- before tssql --
--- in tssql --
--- tsresult array -- [object Object]
--- tsresult array -- [object Object]
-1-- timeserver[1].timeserverid -- 113
--- serverdowntime -- 183
--- userdowntime -- 388
--- maxdowntime -- 388
--- before deadtime 2 -- 0
--- deadtime 2 -- 388
-In 'disconnect' event. Connected sockets - 1
-'reshma_1_497' - Current deadtime is - 0 days, 0 hrs, 0 mins, 0 msecs
--- deadtime 1 -- 0
-In 'disconnect' event. Connected sockets - 1
-'reshma_1_497' - Current deadtime is - 0 days, 0 hrs, 0 mins, 0 msecs
--- deadtime 1 -- 0
-In 'disconnect' event. Connected sockets - 2
-In 'disconnect' event. Connected sockets - 1
-'reshma_1_497' - Current deadtime is - 0 days, 0 hrs, 0 mins, 8 msecs
--- deadtime 1 -- 8
-In 'disconnect' event. Connected sockets - 1
-'reshma_1_497' - Current deadtime is - 0 days, 0 hrs, 0 mins, 0 msecs
--- deadtime 1 -- 8
-In 'disconnect' event. Connected sockets - 1
-'reshma_1_497' - Current deadtime is - 0 days, 0 hrs, 0 mins, 0 msecs
--- deadtime 1 -- 8
-In 'disconnect' event. Connected sockets - 1
-'reshma_1_497' - Current deadtime is - 0 days, 0 hrs, 0 mins, 0 msecs
--- deadtime 1 -- 8
-In 'disconnect' event. Connected sockets - 1
-'reshma_1_497' - Current deadtime is - 0 days, 0 hrs, 0 mins, 0 msecs
--- deadtime 1 -- 8
-In 'disconnect' event. Connected sockets - 1
-'reshma_1_497' - Current deadtime is - 0 days, 0 hrs, 0 mins, 154 msecs
--- deadtime 1 -- 162
-In 'disconnect' event. Connected sockets - 1
-'reshma_1_497' - Current deadtime is - 0 days, 0 hrs, 0 mins, 0 msecs
--- deadtime 1 -- 0
-In 'disconnect' event. Connected sockets - 1
-'reshma_1_497' - Current deadtime is - 0 days, 0 hrs, 0 mins, 0 msecs
--- deadtime 1 -- 0
-In 'disconnect' event. Connected sockets - 1
-'reshma_1_497' - Current deadtime is - 0 days, 0 hrs, 0 mins, 0 msecs
--- deadtime 1 -- 0
-In 'disconnect' event. Connected sockets - 1
-'reshma_1_497' - Current deadtime is - 0 days, 0 hrs, 0 mins, 0 msecs
--- deadtime 1 -- 0
-In 'disconnect' event. Connected sockets - 1
-'reshma_1_497' - Current deadtime is - 0 days, 0 hrs, 0 mins, 0 msecs
--- deadtime 1 -- 0
-In 'disconnect' event. Connected sockets - 1
-'anisha_1_496' - Current deadtime is - 0 days, 0 hrs, 0 mins, 1 msecs
+In 'disconnect' event. Connected sockets - 0
+'anisha_1_500' - Current deadtime is - 0 days, 0 hrs, 0 mins, 0 msecs
+-- deadtime 1 -- 1
+In 'disconnect' event. Connected sockets - 0
+'anisha_1_500' - Current deadtime is - 0 days, 0 hrs, 0 mins, 0 msecs
+-- deadtime 1 -- 1
+In 'disconnect' event. Connected sockets - 0
+'anisha_1_500' - Current deadtime is - 0 days, 0 hrs, 0 mins, 1 msecs
 -- deadtime 1 -- 2
+In 'disconnect' event. Connected sockets - 0
