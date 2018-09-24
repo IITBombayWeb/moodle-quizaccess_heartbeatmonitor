@@ -26,7 +26,7 @@ require_once ($CFG->libdir . '/formslib.php');
  * @copyright  2017 IIT Bombay, India
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class new_form extends moodleform {
+class createoverrides_form extends moodleform {
 
     /** @var object course module object. */
     protected $cm;

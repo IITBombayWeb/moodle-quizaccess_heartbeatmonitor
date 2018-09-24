@@ -29,7 +29,7 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot . '/mod/quiz/accessrule/heartbeatmonitor/hbmonconfig.php');
 require_once($CFG->dirroot . '/mod/quiz/accessrule/accessrulebase.php');
-require_once($CFG->dirroot . '/mod/quiz/accessrule/heartbeatmonitor/createoverride.php');
+require_once($CFG->dirroot . '/mod/quiz/accessrule/heartbeatmonitor/timelimitoverride.php');
 
 
 /**
@@ -153,8 +153,8 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
                             if (!empty($records)){
                                 foreach ($records as $record) {
                                     if($roomid == $record->roomid){
-                                        echo '<br>-- In rule crtovrrd 2 --';
-                                        $this->create_override($roomid, $cmid, $quiz);
+//                                         echo '<br>-- In rule crtovrrd 2 --';
+                                        $this->create_user_override($roomid, $cmid, $quiz);
                                     }
                                     break;
                                 }
@@ -236,7 +236,7 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
                 if (!empty($records)){
                     foreach ($records as $record) {
                         if($roomid == $record->roomid){
-                            $this->create_override($roomid, $cmid, $quiz, $state);
+                            $this->create_user_override($roomid, $cmid, $quiz, $state);
                         }
                     }
                 }
@@ -244,7 +244,7 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
         }
     }
 
-    protected function create_override($roomid, $cmid, $quiz, $state = null) {
+    protected function create_user_override($roomid, $cmid, $quiz, $state = null) {
         global $DB, $CFG;
 
 //         $context = context_module::instance($cmid);
@@ -271,27 +271,28 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
 //         $groupmode = !empty($data->groupid) || ($action === 'addgroup' && empty($overrideid));
 
         // Setup the form data required for processing as in overrideedit.php file.
-        $dataobj = new stdClass();
-        $dataobj->action = 'adduser';
-        $dataobj->cmid = $cmid;
-        $dataobj->quiz = $quiz->id;
-        $dataobj->_qf__quiz_override_form = 1;
-        $dataobj->mform_isexpanded_id_override = 1;
-        $dataobj->userid = '';
-        $dataobj->password = '';
-        $dataobj->timeopen = $quiz->timeopen;
-        $dataobj->timeclose = $quiz->timeclose;
-        $dataobj->timelimit = 0;
-        $dataobj->attempts = $quiz->attempts;
-        $dataobj->submitbutton = 'Save';
+        $override = new stdClass();
+//         $override->action = 'adduser';
+        $override->cmid = $cmid;
+        $override->quiz = $quiz->id;
+//         $override->_qf__quiz_override_form = 1;
+//         $override->mform_isexpanded_id_override = 1;
+        $override->userid = '';
+        $override->password = '';
+        $override->timeopen = $quiz->timeopen;
+        $override->timeclose = $quiz->timeclose;
+        $override->timelimit = 0;
+        $override->attempts = $quiz->attempts;
+//         $override->submitbutton = 'Save';
 
-        $myobj = new createoverride();
+        $dataobj = new timelimitoverride();
+
         if($state === 'finished') {
-            $myobj->reset_timelimit_override($cmid, $roomid, $dataobj, $quiz);
+            $dataobj->reset_timelimit_override($cmid, $roomid, $override, $quiz);
         } else {
 //             echo '<br>-- in create ovrrde --<br>';
 //             print_object($quiz);
-            $myobj->my_override($cmid, $roomid, $dataobj, $quiz);
+            $dataobj->create_timelimit_override($cmid, $roomid, $override, $quiz);
         }
     }
 

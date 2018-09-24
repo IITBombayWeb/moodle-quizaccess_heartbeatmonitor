@@ -27,8 +27,8 @@ require_once('../../../../config.php');
 require_once($CFG->dirroot . '/mod/quiz/lib.php');
 require_once($CFG->dirroot . '/mod/quiz/locallib.php');
 require_once($CFG->dirroot . '/mod/quiz/override_form.php');
-require_once($CFG->dirroot . '/mod/quiz/accessrule/heartbeatmonitor/timelimit_override_form1.php');
-require_once($CFG->dirroot . '/mod/quiz/accessrule/heartbeatmonitor/createoverride.php');
+require_once($CFG->dirroot . '/mod/quiz/accessrule/heartbeatmonitor/timelimitoverride_form.php');
+require_once($CFG->dirroot . '/mod/quiz/accessrule/heartbeatmonitor/timelimitoverride.php');
 
 $cmid       = optional_param('cmid', 0, PARAM_INT);
 $overrideid = optional_param('id', 0, PARAM_INT);
@@ -76,7 +76,7 @@ $overridelisturl->param('mode', 'user');
 
 // Setup the form.
 $users = array();
-$mform = new timelimit_override_form1($url, $cm, $quiz, $context, $users, $override);
+$mform = new timelimitoverride_form($url, $cm, $quiz, $context, $users, $override);
 $mform->set_data($data);
 
 $indexurl = new moodle_url('/mod/quiz/accessrule/heartbeatmonitor/index.php', array('quizid'=>$quiz->id, 'courseid'=>$course->id, 'cmid'=>$cmid));
@@ -98,8 +98,8 @@ if ($fromform = $mform->get_data()) {
         $quizobj = quiz::create($cm->instance, $uid);
         $quiz1 = $quizobj->get_quiz();
 
-        $myobj = new createoverride();
-        $myobj->my_override($cmid, $roomid, $fromform, $quiz1);
+        $dataobj = new timelimitoverride();
+        $dataobj->create_timelimit_override($cmid, $roomid, $fromform, $quiz1);
     }
     if (!empty($fromform->submitbutton)) {
         redirect($overridelisturl);

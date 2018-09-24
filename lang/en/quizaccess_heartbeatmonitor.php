@@ -30,7 +30,7 @@ defined('MOODLE_INTERNAL') || die();
 
 $string['pluginname'] = 'Hearbeat monitor quiz access rule';
 $string['calculatetime'] = 'Calculate time';
-$string['liveusers'] = 'Users status';
+$string['liveusers'] = '<font color="#C7EA46">Users status';
 $string['nodatafound'] = 'No data found.';
 $string['heading'] = '{$a} | Heartbeat monitor ';
 $string['honestycheckheader'] = 'Please read the following message';

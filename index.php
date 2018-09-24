@@ -27,11 +27,11 @@
 
 require_once('../../../../config.php');
 require_once($CFG->dirroot . '/mod/quiz/accessrule/heartbeatmonitor/hbmonconfig.php');
-require_once($CFG->dirroot . '/mod/quiz/accessrule/heartbeatmonitor/timelimit_override_form1.php');
+require_once($CFG->dirroot . '/mod/quiz/accessrule/heartbeatmonitor/timelimitoverride_form.php');
 require_once($CFG->dirroot . '/mod/quiz/accessrule/heartbeatmonitor/intermediate_form.php');
 require_once($CFG->dirroot . '/mod/quiz/accessrule/heartbeatmonitor/startnode_form.php');
 require_once($CFG->dirroot . '/mod/quiz/override_form.php');
-require_once($CFG->dirroot . '/mod/quiz/accessrule/heartbeatmonitor/new_form.php');
+require_once($CFG->dirroot . '/mod/quiz/accessrule/heartbeatmonitor/createoverrides_form.php');
 
 
 $quizid     = required_param('quizid', PARAM_INT);
@@ -136,13 +136,14 @@ if (!empty($result)){
             $cell0 = new html_table_cell($user->firstname .  ' ' . $user->lastname);
             $cell0->id = 'user';
 
-            $cell1 = new html_table_cell($roomid);
+//             $cell1 = new html_table_cell($roomid);
+            $cell1 = new html_table_cell($user->lastip);
             $cell1->id = 'roomid';
 
             $cell2 = new html_table_cell($statustodisplay);
             $cell2->id = 'status';
 
-            $cell3 = new html_table_cell(userdate(intval($timetoconsider)));
+            $cell3 = new html_table_cell(date('g:i a, M j', intval($timetoconsider)));
 //             $cell3 = new html_table_cell(format_time($timetoconsider));
             $cell3->id = 'timetoconsider';
 
@@ -221,28 +222,6 @@ if($nodestatus = $startnode_form->get_data()) {
                 $node_err = nl2br(file_get_contents($outputfile));
                 echo $OUTPUT->notification('Error:<br>' . $node_err);
             }
-//             $PAGE->requires->js_init_call('testnode');
-//             $result = null;
-//             $result ="<script>
-// 					 function countDownTimer() {
-
-// 					   $(document).ready(function() {
-
-// 						var interval = setInterval(function() {
-
-//            				 	var currentTime = new Date().getTime();
-
-//             				if (countDownTime < 0) {
-//                 				clearInterval(interval);
-//                 				$('#timer').hide();
-//                				    $('#startAttemptButton').show();
-//             				}
-
-// 					}, 1000);
-//     				});
-// 					}
-// 				</script>";
-//             $result.="<script type='text/javascript'>countDownTimer($diffMilliSecs);</script>";
         }
     } else {
         // Stop node.
@@ -255,7 +234,7 @@ if($nodestatus = $startnode_form->get_data()) {
     }
 }
 
-$mform = new new_form($url, $cm, $quiz, $context);
+$mform = new createoverrides_form($url, $cm, $quiz, $context);
 if($fromform = $mform->get_data()) {
     if($fromform->users) {
         $users = '';
@@ -275,7 +254,7 @@ if($fromform = $mform->get_data()) {
             $users .= $user . ' ';
             $i++;
         }
-        $mform1 = new timelimit_override_form1($processoverrideurl, $cm, $quiz, $context, $users, 0);
+        $mform1 = new timelimitoverride_form($processoverrideurl, $cm, $quiz, $context, $users, 0);
         $mform1->display();
     }
 } else {

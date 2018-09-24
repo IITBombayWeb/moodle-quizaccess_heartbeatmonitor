@@ -39,9 +39,9 @@ require_once($CFG->dirroot . '/mod/quiz/locallib.php');
  * @copyright  2017 IIT Bombay, India
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class createoverride {
+class timelimitoverride {
 
-    public function my_override($cmid, $roomid, $fromform, $quiz) {
+    public function create_timelimit_override($cmid, $roomid, $fromform, $quiz) {
         global $DB;
         list($course, $cm) = get_course_and_cm_from_cmid($cmid, 'quiz');
 //         $quiz = $DB->get_record('quiz', array('id' => $cm->instance), '*', MUST_EXIST);
@@ -64,7 +64,7 @@ class createoverride {
             // Select data for a particular quiz and not entire table..insert quizid col in livetable for this.
             $select_sql = 'SELECT *
                                 FROM {quizaccess_hbmon_livetable}
-                                WHERE roomid = "' . $roomid . '"'.
+                                WHERE roomid = "' . $roomid . '"' .
                             //    AND status = "Live"
                                 'AND deadtime > 60';
             $records = $DB->get_records_sql($select_sql);
@@ -106,13 +106,6 @@ class createoverride {
 
 //                         $timelimit = $quiz->timelimit + intval($deadtime / 1000);
                         $timelimit = $quiz->timelimit + $deadtime;
-
-                        //--------------------------------------------------------------------------
-
-//                         echo '<br>-- fromfrom obj --';
-//                         print_object($fromform);
-//                         echo '<br>-- fromfrom obj --';
-//                         print_object($quiz);
 
                         // Process the data.
                         $fromform->quiz = $quiz->id;
