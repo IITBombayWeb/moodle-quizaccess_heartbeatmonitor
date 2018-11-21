@@ -402,7 +402,7 @@ function humanise(difference) {
     var hours 	 = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
     var minutes  = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
     var mseconds = Math.floor((difference % (1000 * 60)));
-    //var secs = Math.floor((difference % (1000 * 60)));
+    //var secs = Math.floor((difference % (1000 * 60))); 
 
     var time 	 = days + ' days, ' + hours + ' hrs, ' + minutes + ' mins, ' + mseconds + ' msecs';
     
