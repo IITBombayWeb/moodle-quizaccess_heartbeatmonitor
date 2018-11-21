@@ -1,6 +1,6 @@
 # moodle-quizaccess_heartbeatmonitor
 
-We are developing a plugin to automatically extend the quiz time limit for users who encounter a network failure. Comments, advice and suggestions are gratefully appreciated.
+This is a plugin to automatically extend the quiz time limit for users who encounter a network or a hardware failure. 
 
 ### Background
 In a quiz where some time gets wasted due to issues like network failures or hardware crash, the user needs to be given additional time to compensate fairly for this loss.	 
