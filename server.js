@@ -397,17 +397,40 @@ var record = io.sockets.on('connection', function (socket) {
 	}); 
 });
 
-function humanise(difference) {
-    var days 	 = Math.floor(difference / (1000 * 60 * 60 * 24));
-    var hours 	 = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-    var minutes  = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
-    var mseconds = Math.floor((difference % (1000 * 60)));
-    //var secs = Math.floor((difference % (1000 * 60))); 
+/****
 
-    var time 	 = days + ' days, ' + hours + ' hrs, ' + minutes + ' mins, ' + mseconds + ' msecs';
-    
-    return time;
+    A human redable code of a human redable time in milliseconds
+
+****/
+function humanise(timems) { // time in milli sec
+    var sms = 1000; // millisec in one sec
+    var mms = sms*60; // ms in one min
+    var hms = mms*60; // ms in one hr
+    var dms = hms*24 // ms in one day
+
+    var days = Math.floor( timems        / dms); // whole days
+    var hrs  = Math.floor((timems % dms) / hms); // whole hours
+    var mins = Math.floor((timems % hms) / mms); // whole mins
+    var secs = Math.floor((timems % mms) / sms); // whole mins
+    var msec = Math.floor((timems % sms)      ); // who
+
+    var dstr  = days > 1 ? ' days' : ' day';
+    var hstr  = hrs  > 1 ? ' hrs'  : ' hr';
+    var mstr  = mins > 1 ? ' mins' : ' min';
+    var sstr  = secs > 1 ? ' secs' : ' sec';
+    var msstr = msec > 1 ? ' msecs': ' msec';
+
+
+    var humstr = '';
+    humstr += days == 0 ? '' : days + dstr;
+    humstr += hrs == 0 ? '' : ' ' + hrs + hstr;
+    humstr += mins == 0 ? '' : ' ' + mins + mstr;
+    humstr += secs == 0 ? '' : ' ' + secs + sstr;
+    humstr += msec == 0 ? '' : ' ' + msec + msstr;
+
+    return humstr;
 }
+
 
 app.get('/livestatus', function(req, res) {
     var sql = "SELECT * FROM livetable";
