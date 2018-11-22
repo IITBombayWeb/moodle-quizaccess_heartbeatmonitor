@@ -56,6 +56,11 @@ var con = mysql.createConnection({
     database : obj.dbname
 });
 
+con.connect(function(err) {
+  if (err) throw err;
+  console.log("Connected!");
+});
+
 app.use(bodyParser.urlencoded({ extended: true }));
 
 var port = 3000;
@@ -88,6 +93,11 @@ var interval = setInterval(function() {
 	+ " WHERE timeserverid = " + currenttimeserverid;
     //	console.log(updatetstablesql);
     //console.log('---------- DB conev ts update ----------');
+
+         con.query("LOCK TABLE exm_quizaccess_hbmon_timeserver WRITE", function(err, result) {
+	  if (err) throw err;
+	});
+
     con.query(updatetstablesql, function(err, result) {
 	if (err) throw err;
     });
@@ -95,9 +105,11 @@ var interval = setInterval(function() {
 
 // Socket.IO
 var record = io.sockets.on('connection', function (socket) {	
+
+        setTimeout(function(){},500);
     console.log('\n---------- Connect event. Connected sockets - ' + io.sockets.server.eio.clientsCount);
     allsocketscount = io.sockets.server.eio.clientsCount;
-    console.log('             Socket connected - ' + socket.id + '. TS - ' + (socket.handshake.issued) + '. Curr. TS - ' + (new Date().getTime()));
+    console.log('          Socket connected - ' + socket.id + '. Handshake TS: ' + (socket.handshake.issued) + '; Curr. TS: ' + (new Date().getTime()));
     
     var allclients = io.sockets.server.eio.clients;
     allsocketids = [];
@@ -107,7 +119,8 @@ var record = io.sockets.on('connection', function (socket) {
     }  
     
     socket.on('attempt', function(data) {
-        //setTimeout(wakeupnote(500),500);
+
+
         //setTimeout(wakeupnote(1000),1000);
         //sleep(500);
 	console.log('           Attempt event ----------');
@@ -130,6 +143,9 @@ var record = io.sockets.on('connection', function (socket) {
 	//        console.log('-- Socket time stamp --' + socket.timestampC);
 	//        console.log('-- Current time stamp --' + Math.floor((new Date().getTime())/1000));
 	
+	con.query("LOCK TABLE exm_quizaccess_hbmon_socketinfo WRITE", function(err,result){
+	    if (err) throw err;
+	});
         var sql = "INSERT INTO exm_quizaccess_hbmon_socketinfo (username, quizid, roomid, socketid, socketstatus, ip, timestamp) VALUES" +
             "(" + socket.username + "," 
             + socket.quizid + "," 
@@ -143,6 +159,7 @@ var record = io.sockets.on('connection', function (socket) {
 	});
 	//	    console.log('-- Insert done --');
         console.log('           DB conev insert. ' + socket.roomid + ':' + socket.id + ' inserted to DB ----------');
+
 	
 	// Join the connected socket to the room. 'roomid' is the concatenation of (username + quizid + attemptid).
 	// Here, 'roomid' corresponds to a particular user.
@@ -164,8 +181,13 @@ var record = io.sockets.on('connection', function (socket) {
             
 	    // 'livetable' reflects current status of a user. There is one entry per user in this table. 
 	    // If exists, fetch previous entry for this user from 'livetable'.
-	    
+		console.log('before con select ' + (new Date().getTime()));	    
 	    var liverecordexistsql = "SELECT * FROM exm_quizaccess_hbmon_livetable WHERE roomid = " + socket.roomid;
+
+         con.query("LOCK TABLE exm_quizaccess_hbmon_livetable WRITE", function(err, result) {
+	  if (err) throw err;
+	});
+
 	    	con.query(liverecordexistsql, function(err, result) {
                     if (err) throw err;                
                     if (result.length > 0) {
@@ -177,7 +199,7 @@ var record = io.sockets.on('connection', function (socket) {
                             var deadtime 		= result[i].deadtime;
                             var livetime 		= result[i].livetime;
                             //console.log(socket.roomid + ' - Previous deadtime - ' + humanise(deadtime) + ' - Status - ' + status);
-                            console.log('            ' + socket.roomid + ' - Previous deadtime - ' + deadtime + ' - Status - ' + status);
+                            console.log('         Current status: ttc = ' + timetoconsider + '; '  + socket.roomid + ' - Previous deadtime - ' + deadtime + ' - Status - ' + status);
 			}
 			//                    if (status == 'Dead') {
                     	// Time server check.
@@ -242,16 +264,26 @@ var record = io.sockets.on('connection', function (socket) {
 	    	                    }
 
 
-                                   console.log('node down: status to' + socket.currentstatus);
+                                   console.log('node down: status to' + socket.currentstatus + ' ttc to: ' + socket.timestampC);
 	                	    
+
 		                    var updatelivetablesql = "UPDATE exm_quizaccess_hbmon_livetable SET status = " 	+ socket.currentstatus 
 					+ ", deadtime = "  	+ deadtime 
 					+ ", timetoconsider = " + socket.timestampC
 					+ ", timeserver = " + currenttimeserverid
 					+ " WHERE roomid = " + socket.roomid;
+
+         con.query("LOCK TABLE exm_quizaccess_hbmon_livetable WRITE", function(err, result) {
+	  if (err) throw err;
+	});
+
 				    con.query(updatelivetablesql, function(err, result) {
 					if (err) throw err;
 				    });
+
+				con.query("UNLOCK TABLES", function(err, result) {
+				    if (err) throw err;
+				});
 	                        }
 	                        return timeserver;
 	                        
@@ -264,7 +296,8 @@ var record = io.sockets.on('connection', function (socket) {
 			    //	            	    	}
 			    //	            	    	
                     	}
-	            	if (status == 'Dead' && currenttimeserverid == room_timeserver) {
+	            	//if (status == 'Dead' && currenttimeserverid == room_timeserver) {
+	            	if (currenttimeserverid == room_timeserver) {
 	            	//if ( currenttimeserverid == room_timeserver) {
 			    //                    	} else {
                    	    
@@ -277,26 +310,37 @@ var record = io.sockets.on('connection', function (socket) {
 	                    
 	                    // Compute cumulative deadtime.
                             var delta = socket.timestampC - timetoconsider;
-			    console.log('======= delta deadtime: '+ delta);
+			    console.log('======= delta deadtime: '+ delta + ' with ttc = ' + timetoconsider);
 			    //if((delta) > 20){
 	                        deadtime = parseInt(deadtime) + parseInt(delta);
 	                        //console.log('-- deadtime 1 -- ' + deadtime);
 	                        
-                                   console.log('conn1: status to' + socket.currentstatus  + ' ' + socket.id);
+                                console.log('conn1: status to' + socket.currentstatus  + ' ' + socket.id + '; ttc to ' + socket.timestampC );
+
 	                        var updatelivetablesql = "UPDATE exm_quizaccess_hbmon_livetable SET status = " 	+ socket.currentstatus 
 				    + ", deadtime = " + deadtime 
 				    + ", timetoconsider = " + socket.timestampC
 				    + ", timeserver = " + currenttimeserverid
 				    + " WHERE roomid = " + socket.roomid;
+
+
+         con.query("LOCK TABLE exm_quizaccess_hbmon_livetable WRITE", function(err, result) {
+	  if (err) throw err;
+	});
 				con.query(updatelivetablesql, function(err, result) {
 				    if (err) throw err;
 				});
+				con.query("UNLOCK TABLES", function(err, result) {
+				    if (err) throw err;
+				});
+
+
             	    	    //}  
 			}
 			//                    }
                     } else {
                 	// Insert current status entry for this user in 'livetable'.                	
-                        console.log('conn2: status to' + socket.currentstatus  + ' ' + socket.id);
+                        console.log('conn2: status to' + socket.currentstatus  + ' ' + socket.id + ' ttc to ' + timetoconsider);
 			var livetablesql = "INSERT INTO exm_quizaccess_hbmon_livetable (roomid, status, timeserver, timetoconsider, livetime, deadtime) VALUES" +
                             "(" + socket.roomid + "," 
                             + socket.currentstatus + "," 
@@ -317,8 +361,13 @@ var record = io.sockets.on('connection', function (socket) {
     
     
     socket.on('disconnect', function() {
-	console.log('    ***** In \'disconnect\' event. Connected sockets - ' + io.sockets.server.eio.clientsCount);
-	console.log('---------- ' + socket.id + ' disconnected. Curr. TS - ' + (new Date().getTime()));
+	console.log('      *** In \'disconnect\' event. Connected sockets - ' + io.sockets.server.eio.clientsCount);
+
+		con.query("LOCK TABLE exm_quizaccess_hbmon_livetable WRITE", function(err, result) {
+		  if (err) throw err;
+		});
+        console.log('          Socket disconnec - ' + socket.id + '; Curr. TS: ' + (new Date().getTime()));
+
 	
 	allsocketscount = io.sockets.server.eio.clientsCount;
 	var allclients = io.sockets.server.eio.clients;
@@ -345,11 +394,20 @@ var record = io.sockets.on('connection', function (socket) {
 		+ socket.statusDisconnected + "," 
 		+ socket.ip + "," 
 		+ socket.timestampD + ")";
+
+         con.query("LOCK TABLE exm_quizaccess_hbmon_socketinfo WRITE", function(err, result) {
+	  if (err) throw err;
+	});
 	    
 	    con.query(sql, function(err, result) {
 		if (err) throw err;	  
 	    });
 	    console.log('           DB disconev insert ----------');	    
+
+
+
+
+
 	    // Find the total connected sockets in the room.
 	    var rooms = io.sockets.adapter.rooms[socket.roomid]; 
 	    
@@ -377,6 +435,10 @@ var record = io.sockets.on('connection', function (socket) {
 		var fetchtimesql = "SELECT * FROM exm_quizaccess_hbmon_livetable WHERE roomid = " + socket.roomid;
 		//			    console.log("fetchsql: " + fetchtimesql);
 		
+         con.query("LOCK TABLE exm_quizaccess_hbmon_livetable WRITE", function(err, result) {
+	  if (err) throw err;
+	});
+
 		con.query(fetchtimesql, function(err,ftresult) {
 		    if (err) throw err;
 		    //				console.log("result: ");
@@ -402,15 +464,19 @@ var record = io.sockets.on('connection', function (socket) {
 		    //			    	console.log(socket.roomid + ' - After cumulation, livetime  is - ' + humanise(livetime));
 		    
 		    // Update 'status' entry for this user in 'livetable'.
-                        console.log('discon: status to' + socket.currentstatus + ' ' + socket.id);
 		    var updatelivetablesql = "UPDATE exm_quizaccess_hbmon_livetable SET status = " + socket.currentstatus 
 			+ ", timetoconsider = " + socket.timestampD 
 			+ ", livetime = " + livetime 
 			+ " where roomid = " + socket.roomid;
 		    //				console.log('Err query: ' + updatelivetablesql);
-		    con.query(updatelivetablesql, function(err, result) {
+
+		con.query(updatelivetablesql, function(err, result) {
 			if (err) throw err;
-		    });
+		});
+		con.query("UNLOCK TABLES", function(err, result) {
+		  if (err) throw err;
+		});
+                    console.log('discon: ' + (new Date().getTime()) + ' status to ' + socket.currentstatus + ' ' + socket.id + '; ttc to ' + socket.timestampD);
 		});
 	    }
 	}
@@ -468,7 +534,8 @@ http.listen(port, function() {
     
 });
 
-
+/*
 function wakeupnote(t) {
   console.log('Woke up from sleep after ' + t)
 }
+*/

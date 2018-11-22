@@ -1,0 +1,51 @@
+Connected!
+
+---------- Connect event. Connected sockets - 1
+          Socket connected - YtoxB-zlL56gPT-zAAAA. Handshake TS: 1542919600384; Curr. TS: 1542919600388
+           Attempt event ----------
+           DB conev insert. 'jm.yogesh.kumar_47_41187':YtoxB-zlL56gPT-zAAAA inserted to DB ----------
+before con select 1542919600393
+conn2: status to'Live' YtoxB-zlL56gPT-zAAAA ttc to undefined
+      *** In 'disconnect' event. Connected sockets - 0
+          Socket disconnec - YtoxB-zlL56gPT-zAAAA; Curr. TS: 1542919616829
+           DB disconev insert ----------
+
+---------- Connect event. Connected sockets - 1
+          Socket connected - 20RcRgOrFWM61TqPAAAB. Handshake TS: 1542919616837; Curr. TS: 1542919616837
+           Attempt event ----------
+           DB conev insert. 'jm.yogesh.kumar_47_41187':20RcRgOrFWM61TqPAAAB inserted to DB ----------
+before con select 1542919616839
+discon: 1542919616845 status to 'Dead' YtoxB-zlL56gPT-zAAAA; ttc to 1542919616
+         Current status: ttc = 1542919600; 'jm.yogesh.kumar_47_41187' - Previous deadtime - 0 - Status - Live
+======= delta deadtime: 16 with ttc = 1542919600
+conn1: status to'Live' 20RcRgOrFWM61TqPAAAB; ttc to 1542919616
+      *** In 'disconnect' event. Connected sockets - 0
+          Socket disconnec - 20RcRgOrFWM61TqPAAAB; Curr. TS: 1542919630493
+           DB disconev insert ----------
+
+---------- Connect event. Connected sockets - 1
+          Socket connected - 9esZHxEJEBxAQ1HlAAAC. Handshake TS: 1542919630496; Curr. TS: 1542919630497
+           Attempt event ----------
+           DB conev insert. 'jm.yogesh.kumar_47_41187':9esZHxEJEBxAQ1HlAAAC inserted to DB ----------
+before con select 1542919630497
+discon: 1542919630502 status to 'Dead' 20RcRgOrFWM61TqPAAAB; ttc to 1542919630
+         Current status: ttc = 1542919616; 'jm.yogesh.kumar_47_41187' - Previous deadtime - 16 - Status - Live
+======= delta deadtime: 14 with ttc = 1542919616
+conn1: status to'Live' 9esZHxEJEBxAQ1HlAAAC; ttc to 1542919630
+      *** In 'disconnect' event. Connected sockets - 0
+          Socket disconnec - 9esZHxEJEBxAQ1HlAAAC; Curr. TS: 1542919644939
+           DB disconev insert ----------
+
+---------- Connect event. Connected sockets - 1
+          Socket connected - c6Tilf_m4SMJxAI1AAAD. Handshake TS: 1542919644945; Curr. TS: 1542919644945
+           Attempt event ----------
+           DB conev insert. 'jm.yogesh.kumar_47_41187':c6Tilf_m4SMJxAI1AAAD inserted to DB ----------
+before con select 1542919644947
+discon: 1542919644948 status to 'Dead' 9esZHxEJEBxAQ1HlAAAC; ttc to 1542919644
+         Current status: ttc = 1542919630; 'jm.yogesh.kumar_47_41187' - Previous deadtime - 30 - Status - Live
+======= delta deadtime: 14 with ttc = 1542919630
+conn1: status to'Live' c6Tilf_m4SMJxAI1AAAD; ttc to 1542919644
+      *** In 'disconnect' event. Connected sockets - 0
+          Socket disconnec - c6Tilf_m4SMJxAI1AAAD; Curr. TS: 1542919652138
+           DB disconev insert ----------
+discon: 1542919652145 status to 'Dead' c6Tilf_m4SMJxAI1AAAD; ttc to 1542919652
