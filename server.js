@@ -28,6 +28,8 @@
 //var server    = app.listen(3033);
 //var io        = require('socket.io').listen(server);
 
+//import sleep from 'await-sleep';
+
 var app 		= require('express')();
 var http 		= require('http').createServer(app);
 var io			= require('socket.io').listen(http);
@@ -35,6 +37,7 @@ var bodyParser 	= require('body-parser');
 var mysql 		= require('mysql');
 //var fs 			= require('fs');
 var obj;
+//var sleep = require('system-sleep');
 
 
 // EXEC SYNC - WORKS
@@ -104,7 +107,12 @@ var record = io.sockets.on('connection', function (socket) {
     }  
     
     socket.on('attempt', function(data) {
+        //setTimeout(wakeupnote(500),500);
+        //setTimeout(wakeupnote(1000),1000);
+        //sleep(500);
 	console.log('           Attempt event ----------');
+	//process.stdout.write();
+
 	
 	// Append some extra data to the socket object.
 	socket.username 		= "'" + data.username + "'";
@@ -256,8 +264,8 @@ var record = io.sockets.on('connection', function (socket) {
 			    //	            	    	}
 			    //	            	    	
                     	}
-	            	//if (status == 'Dead' && currenttimeserverid == room_timeserver) {
-	            	if ( currenttimeserverid == room_timeserver) {
+	            	if (status == 'Dead' && currenttimeserverid == room_timeserver) {
+	            	//if ( currenttimeserverid == room_timeserver) {
 			    //                    	} else {
                    	    
 	                    //--------------------------------------------------------------------------------------
@@ -460,3 +468,7 @@ http.listen(port, function() {
     
 });
 
+
+function wakeupnote(t) {
+  console.log('Woke up from sleep after ' + t)
+}
