@@ -39,6 +39,11 @@ var mysql 		= require('mysql');
 var obj;
 //var sleep = require('system-sleep');
 
+function debuglog(message) {
+  var curtime = new Date().getTime();
+  console.log(curtime + ': ' + message);
+}
+
 
 // EXEC SYNC - WORKS
 //var child = require('child_process').execSync('php -r \'define("CLI_SCRIPT", true); include("../../../../config.php"); print json_encode($CFG);\'');
@@ -58,7 +63,7 @@ var con = mysql.createConnection({
 
 con.connect(function(err) {
   if (err) throw err;
-  console.log("Connected!");
+  debuglog("Mysql Connected!");
 });
 
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -80,19 +85,14 @@ var timeserversql = "INSERT INTO exm_quizaccess_hbmon_timeserver (timestarted, l
 con.query(timeserversql, function(err, result) {
     if (err) throw err;
     currenttimeserverid = result.insertId;
-    //	console.log('-- here result insert id -- ' + result.insertId);
 });
-//console.log('-- here timeserverid - ' + timeserverid);
     	
 // Update record for node server.
 var interval = setInterval(function() {
-    //	console.log('-- Time server 5 sec update --');                	
     var updatetstablesql = "UPDATE exm_quizaccess_hbmon_timeserver SET lastlivetime = "
 	+ Math.floor((new Date().getTime())/1000) 
     //    								+ " WHERE timeserverid = (SELECT * FROM (SELECT MAX(timeserverid) FROM exm_quizaccess_hbmon_timeserver) AS tstable)";
 	+ " WHERE timeserverid = " + currenttimeserverid;
-    //	console.log(updatetstablesql);
-    //console.log('---------- DB conev ts update ----------');
 
          con.query("LOCK TABLE exm_quizaccess_hbmon_timeserver WRITE", function(err, result) {
 	  if (err) throw err;
@@ -107,9 +107,9 @@ var interval = setInterval(function() {
 var record = io.sockets.on('connection', function (socket) {	
 
         setTimeout(function(){},500);
-    console.log('\n---------- Connect event. Connected sockets - ' + io.sockets.server.eio.clientsCount);
+    debuglog('------ Connect event. Connected sockets - ' + io.sockets.server.eio.clientsCount);
     allsocketscount = io.sockets.server.eio.clientsCount;
-    console.log('          Socket connected - ' + socket.id + '. Handshake TS: ' + (socket.handshake.issued) + '; Curr. TS: ' + (new Date().getTime()));
+    debuglog('       Socket connected - ' + socket.id + '. Handshake TS: ' + (socket.handshake.issued) + '; Curr. TS: ' + (new Date().getTime()));
     
     var allclients = io.sockets.server.eio.clients;
     allsocketids = [];
@@ -123,7 +123,7 @@ var record = io.sockets.on('connection', function (socket) {
 
         //setTimeout(wakeupnote(1000),1000);
         //sleep(500);
-	console.log('           Attempt event ----------');
+	debuglog('       Attempt event ----------');
 	//process.stdout.write();
 
 	
@@ -137,11 +137,7 @@ var record = io.sockets.on('connection', function (socket) {
         socket.timestampC1 		= socket.handshake.issued;
         socket.timestampC 		= Math.floor((socket.timestampC1)/1000);
         socket.ip 				= "'" + socket.request.connection.remoteAddress + "'";
-	//        cfg = data.config;
         
-	//        console.log('-- Time stamps --');
-	//        console.log('-- Socket time stamp --' + socket.timestampC);
-	//        console.log('-- Current time stamp --' + Math.floor((new Date().getTime())/1000));
 	
 	con.query("LOCK TABLE exm_quizaccess_hbmon_socketinfo WRITE", function(err,result){
 	    if (err) throw err;
@@ -157,8 +153,7 @@ var record = io.sockets.on('connection', function (socket) {
 	con.query(sql, function(err, result) {
 	    if (err) throw err;
 	});
-	//	    console.log('-- Insert done --');
-        console.log('           DB conev insert. ' + socket.roomid + ':' + socket.id + ' inserted to DB ----------');
+        debug.log('      DB conev insert. ' + socket.roomid + ':' + socket.id + ' inserted to DB ----------');
 
 	
 	// Join the connected socket to the room. 'roomid' is the concatenation of (username + quizid + attemptid).
@@ -181,7 +176,7 @@ var record = io.sockets.on('connection', function (socket) {
             
 	    // 'livetable' reflects current status of a user. There is one entry per user in this table. 
 	    // If exists, fetch previous entry for this user from 'livetable'.
-		console.log('before con select ' + (new Date().getTime()));	    
+		console.log('       before con select ');
 	    var liverecordexistsql = "SELECT * FROM exm_quizaccess_hbmon_livetable WHERE roomid = " + socket.roomid;
 
          con.query("LOCK TABLE exm_quizaccess_hbmon_livetable WRITE", function(err, result) {
