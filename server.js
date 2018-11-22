@@ -109,7 +109,7 @@ var record = io.sockets.on('connection', function (socket) {
     //setTimeout(function(){},500);
     debuglog('------ Connect event. Connected sockets - ' + io.sockets.server.eio.clientsCount);
     allsocketscount = io.sockets.server.eio.clientsCount;
-    debuglog('       Socket connected - ' + socket.id + '. Handshake TS: ' + (socket.handshake.issued) + '; Curr. TS: ' + (new Date().getTime()));
+    debuglog('      Socket connected - ' + socket.id + '. Handshake TS: ' + (socket.handshake.issued) );
     
     var allclients = io.sockets.server.eio.clients;
     allsocketids = [];
@@ -189,7 +189,7 @@ var record = io.sockets.on('connection', function (socket) {
                         var timetoconsider 	= result[i].timetoconsider;
                         var deadtime 		= result[i].deadtime;
                         var livetime 		= result[i].livetime;
-                        debuglog('      Current status: ttc = '
+                        debuglog('       Current status: ttc = '
 				 + timetoconsider + '; '  + socket.roomid
 				 + ' - Previous deadtime - ' + deadtime
 				 + ' - Status - ' + status);
@@ -227,7 +227,6 @@ var record = io.sockets.on('connection', function (socket) {
 	    	            	var sdowntimestart = timeserver[0].lastlivetime;
 	    	            	var sdowntimeend = timeserver[1].timestarted;
 	    	            	serverdowntime = sdowntimeend - sdowntimestart;
-				//	    	            	    	serverdowntime = Math.floor((new Date().getTime())/1000) - timeserver[0].lastlivetime;
 	    	            	
 	    	            	var userdowntime;
 	    	            	var udowntimestart = timetoconsider;
@@ -288,7 +287,7 @@ var record = io.sockets.on('connection', function (socket) {
 			    //if((delta) > 20){
 	                        deadtime = parseInt(deadtime) + parseInt(delta);
 	                        
-                                debuglog('conn1: status to' + socket.currentstatus  + ' ' + socket.id + '; ttc to ' + socket.timestampC );
+                                debuglog('       conn1: status to' + socket.currentstatus  + ' ' + socket.id + '; ttc to ' + socket.timestampC );
 
 	                        var updatelivetablesql = "UPDATE exm_quizaccess_hbmon_livetable SET status = " 	+ socket.currentstatus 
 				    + ", deadtime = " + deadtime 
@@ -313,7 +312,7 @@ var record = io.sockets.on('connection', function (socket) {
 			//                    }
                     } else {
                 	// Insert current status entry for this user in 'livetable'.                	
-                        debuglog('conn2: status to' + socket.currentstatus  + ' ' + socket.id + ' ttc to ' + timetoconsider);
+                        debuglog('       conn2: status to' + socket.currentstatus  + ' ' + socket.id + ' ttc to ' + timetoconsider);
 			var livetablesql = "INSERT INTO exm_quizaccess_hbmon_livetable (roomid, status, timeserver, timetoconsider, livetime, deadtime) VALUES" +
                             "(" + socket.roomid + "," 
                             + socket.currentstatus + "," 
@@ -334,12 +333,12 @@ var record = io.sockets.on('connection', function (socket) {
     
     
     socket.on('disconnect', function() {
-	debuglog('      *** In \'disconnect\' event. Connected sockets - ' + io.sockets.server.eio.clientsCount);
+	debuglog('     *** In disconnect event. Connected sockets - ' + io.sockets.server.eio.clientsCount);
 
 		con.query("LOCK TABLE exm_quizaccess_hbmon_livetable WRITE", function(err, result) {
 		  if (err) throw err;
 		});
-        debuglog('          Socket disconnec - ' + socket.id + '; Curr. TS: ' + (new Date().getTime()));
+        debuglog('          Socket disconnec - ' + socket.id );
 
 	
 	allsocketscount = io.sockets.server.eio.clientsCount;
@@ -375,7 +374,7 @@ var record = io.sockets.on('connection', function (socket) {
 	    con.query(sql, function(err, result) {
 		if (err) throw err;	  
 	    });
-	    debuglog('           DB disconev insert ----------');	    
+	    debuglog('          DB disconev insert ----------');	    
 
 
 
@@ -442,7 +441,7 @@ var record = io.sockets.on('connection', function (socket) {
 		con.query("UNLOCK TABLES", function(err, result) {
 		  if (err) throw err;
 		});
-                    debuglog('discon: ' + (new Date().getTime()) + ' status to ' + socket.currentstatus + ' ' + socket.id + '; ttc to ' + socket.timestampD);
+                    debuglog('     *** discon: status to ' + socket.currentstatus + ' ' + socket.id + '; ttc to ' + socket.timestampD);
 		});
 	    }
 	}
