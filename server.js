@@ -92,9 +92,9 @@ var interval = setInterval(function() {
 
 // Socket.IO
 var record = io.sockets.on('connection', function (socket) {	
-    console.log('---------- Connect event. Connected sockets - ' + io.sockets.server.eio.clientsCount);
+    console.log('\n---------- Connect event. Connected sockets - ' + io.sockets.server.eio.clientsCount);
     allsocketscount = io.sockets.server.eio.clientsCount;
-    console.log('Socket connected - ' + socket.id + '. TS - ' + (socket.handshake.issued) + '. Curr. TS - ' + (new Date().getTime()));
+    console.log('             Socket connected - ' + socket.id + '. TS - ' + (socket.handshake.issued) + '. Curr. TS - ' + (new Date().getTime()));
     
     var allclients = io.sockets.server.eio.clients;
     allsocketids = [];
@@ -104,7 +104,7 @@ var record = io.sockets.on('connection', function (socket) {
     }  
     
     socket.on('attempt', function(data) {
-	console.log('---------- Attempt event ----------');
+	console.log('           Attempt event ----------');
 	
 	// Append some extra data to the socket object.
 	socket.username 		= "'" + data.username + "'";
@@ -112,6 +112,7 @@ var record = io.sockets.on('connection', function (socket) {
         socket.roomid 			= "'" + data.roomid + "'";
         socket.socketid 		= "'" + socket.id + "'";
         socket.statusConnected 	= "'Connected'";
+        //socket.timestampC 		= socket.handshake.issued;
         socket.timestampC1 		= socket.handshake.issued;
         socket.timestampC 		= Math.floor((socket.timestampC1)/1000);
         socket.ip 				= "'" + socket.request.connection.remoteAddress + "'";
@@ -133,7 +134,7 @@ var record = io.sockets.on('connection', function (socket) {
 	    if (err) throw err;
 	});
 	//	    console.log('-- Insert done --');
-        console.log('---------- DB conev insert. ' + socket.roomid + ':' + socket.id + ' inserted to DB ----------');
+        console.log('           DB conev insert. ' + socket.roomid + ':' + socket.id + ' inserted to DB ----------');
 	
 	// Join the connected socket to the room. 'roomid' is the concatenation of (username + quizid + attemptid).
 	// Here, 'roomid' corresponds to a particular user.
@@ -167,7 +168,8 @@ var record = io.sockets.on('connection', function (socket) {
                             var timetoconsider 	= result[i].timetoconsider;
                             var deadtime 		= result[i].deadtime;
                             var livetime 		= result[i].livetime;
-                            console.log(socket.roomid + ' - Previous deadtime - ' + humanise(deadtime) + ' - Status - ' + status);
+                            //console.log(socket.roomid + ' - Previous deadtime - ' + humanise(deadtime) + ' - Status - ' + status);
+                            console.log('            ' + socket.roomid + ' - Previous deadtime - ' + deadtime + ' - Status - ' + status);
 			}
 			//                    if (status == 'Dead') {
                     	// Time server check.
@@ -230,6 +232,9 @@ var record = io.sockets.on('connection', function (socket) {
 	    	                        deadtime = parseInt(deadtime) + parseInt(maxdowntime);
 	    		                console.log('-- deadtime 2 -- ' + deadtime);
 	    	                    }
+
+
+                                   console.log('node down: status to' + socket.currentstatus);
 	                	    
 		                    var updatelivetablesql = "UPDATE exm_quizaccess_hbmon_livetable SET status = " 	+ socket.currentstatus 
 					+ ", deadtime = "  	+ deadtime 
@@ -251,7 +256,8 @@ var record = io.sockets.on('connection', function (socket) {
 			    //	            	    	}
 			    //	            	    	
                     	}
-	            	if (status == 'Dead' && currenttimeserverid == room_timeserver) {
+	            	//if (status == 'Dead' && currenttimeserverid == room_timeserver) {
+	            	if ( currenttimeserverid == room_timeserver) {
 			    //                    	} else {
                    	    
 	                    //--------------------------------------------------------------------------------------
@@ -264,10 +270,11 @@ var record = io.sockets.on('connection', function (socket) {
 	                    // Compute cumulative deadtime.
                             var delta = socket.timestampC - timetoconsider;
 			    console.log('======= delta deadtime: '+ delta);
-			    if((delta) > 20){
+			    //if((delta) > 20){
 	                        deadtime = parseInt(deadtime) + parseInt(delta);
 	                        //console.log('-- deadtime 1 -- ' + deadtime);
 	                        
+                                   console.log('conn1: status to' + socket.currentstatus  + ' ' + socket.id);
 	                        var updatelivetablesql = "UPDATE exm_quizaccess_hbmon_livetable SET status = " 	+ socket.currentstatus 
 				    + ", deadtime = " + deadtime 
 				    + ", timetoconsider = " + socket.timestampC
@@ -276,11 +283,12 @@ var record = io.sockets.on('connection', function (socket) {
 				con.query(updatelivetablesql, function(err, result) {
 				    if (err) throw err;
 				});
-            	    	    }  
+            	    	    //}  
 			}
 			//                    }
                     } else {
                 	// Insert current status entry for this user in 'livetable'.                	
+                        console.log('conn2: status to' + socket.currentstatus  + ' ' + socket.id);
 			var livetablesql = "INSERT INTO exm_quizaccess_hbmon_livetable (roomid, status, timeserver, timetoconsider, livetime, deadtime) VALUES" +
                             "(" + socket.roomid + "," 
                             + socket.currentstatus + "," 
@@ -301,8 +309,8 @@ var record = io.sockets.on('connection', function (socket) {
     
     
     socket.on('disconnect', function() {
+	console.log('    ***** In \'disconnect\' event. Connected sockets - ' + io.sockets.server.eio.clientsCount);
 	console.log('---------- ' + socket.id + ' disconnected. Curr. TS - ' + (new Date().getTime()));
-	console.log('In \'disconnect\' event. Connected sockets - ' + io.sockets.server.eio.clientsCount);
 	
 	allsocketscount = io.sockets.server.eio.clientsCount;
 	var allclients = io.sockets.server.eio.clients;
@@ -333,7 +341,7 @@ var record = io.sockets.on('connection', function (socket) {
 	    con.query(sql, function(err, result) {
 		if (err) throw err;	  
 	    });
-	    console.log('---------- DB disconev insert ----------');	    
+	    console.log('           DB disconev insert ----------');	    
 	    // Find the total connected sockets in the room.
 	    var rooms = io.sockets.adapter.rooms[socket.roomid]; 
 	    
@@ -354,6 +362,8 @@ var record = io.sockets.on('connection', function (socket) {
        	    
 	    if(totalconnectedsockets == 0) {          
 		socket.currentstatus = "'Dead'";
+
+               
 		
 		// Fetch previous entry for this user from 'livetable'.
 		var fetchtimesql = "SELECT * FROM exm_quizaccess_hbmon_livetable WHERE roomid = " + socket.roomid;
@@ -363,8 +373,8 @@ var record = io.sockets.on('connection', function (socket) {
 		    if (err) throw err;
 		    //				console.log("result: ");
 		    //				console.log(ftresult);
-		    var timetoconsider=0;
-                    var livetime=0;
+		    var timetoconsider;
+                    var livetime;
 		    
 		    for (i in ftresult) {
 			timetoconsider = ftresult[i].timetoconsider;
@@ -384,6 +394,7 @@ var record = io.sockets.on('connection', function (socket) {
 		    //			    	console.log(socket.roomid + ' - After cumulation, livetime  is - ' + humanise(livetime));
 		    
 		    // Update 'status' entry for this user in 'livetable'.
+                        console.log('discon: status to' + socket.currentstatus + ' ' + socket.id);
 		    var updatelivetablesql = "UPDATE exm_quizaccess_hbmon_livetable SET status = " + socket.currentstatus 
 			+ ", timetoconsider = " + socket.timestampD 
 			+ ", livetime = " + livetime 
@@ -432,21 +443,6 @@ function humanise(timems) { // time in milli sec
     return humstr;
 }
 
-
-app.get('/livestatus', function(req, res) {
-    var sql = "SELECT * FROM livetable";
-    con.query(sql, function(err, result, fields) {
-        if (err) throw err;
-        for(i in result){
-            result[i].totalconnectedsockets = totalconnectedsockets;       	
-            var roomid = "'" + result[i].roomid + "'";
-            result[i].roomwisesockets = roomwisesocketids[roomid];
-            result[i].allsockets = allsocketids;
-            result[i].allsocketscount = allsocketscount;
-        }
-        res.send(result);
-    });
-});
 
 //console.log(http);
 http.on('listening',function(){
