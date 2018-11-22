@@ -288,7 +288,7 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
         $dataobj = new timelimitoverride();
 
         if($state === 'finished') {
-            $dataobj->reset_timelimit_override($cmid, $roomid, $override, $quiz);
+            // $dataobj->reset_timelimit_override($cmid, $roomid, $override, $quiz);
         } else {
 //             echo '<br>-- in create ovrrde --<br>';
 //             print_object($quiz);

@@ -363,8 +363,8 @@ var record = io.sockets.on('connection', function (socket) {
 		    if (err) throw err;
 		    //				console.log("result: ");
 		    //				console.log(ftresult);
-		    var timetoconsider;
-                    var livetime;
+		    var timetoconsider=0;
+                    var livetime=0;
 		    
 		    for (i in ftresult) {
 			timetoconsider = ftresult[i].timetoconsider;
