@@ -109,7 +109,7 @@ var record = io.sockets.on('connection', function (socket) {
     //setTimeout(function(){},500);
     debuglog('------ Connect event. Connected sockets - ' + io.sockets.server.eio.clientsCount);
     allsocketscount = io.sockets.server.eio.clientsCount;
-    debuglog('      Socket connected - ' + socket.id + '. Handshake TS: ' + (socket.handshake.issued) );
+    debuglog('       Socket connected - ' + socket.id + '. Handshake TS: ' + (socket.handshake.issued) );
     
     var allclients = io.sockets.server.eio.clients;
     allsocketids = [];
@@ -150,7 +150,7 @@ var record = io.sockets.on('connection', function (socket) {
 	con.query(sql, function(err, result) {
 	    if (err) throw err;
 	});
-        debuglog('      DB conev insert. ' + socket.roomid + ':' + socket.id + ' inserted to DB ----------');
+        debuglog('       DB conev insert. ' + socket.roomid + ':' + socket.id + ' inserted to DB ----------');
 
 	
 	// Join the connected socket to the room. 'roomid' is the concatenation of (username + quizid + attemptid).
@@ -202,9 +202,15 @@ var record = io.sockets.on('connection', function (socket) {
                     var lastlivetime;
                     
                     if(currenttimeserverid != room_timeserver) {
+
+         con.query("LOCK TABLE exm_quizaccess_hbmon_timeserver WRITE", function(err, result) {
+	  if (err) throw err;
+	});
+
+
 	                var tssql = "SELECT * FROM exm_quizaccess_hbmon_timeserver WHERE timeserverid IN (" + room_timeserver + ", " + currenttimeserverid + ")";
 			
-	                debuglog('     >> before tssql --');
+	                debuglog('     ^^^ before tssql --');
 	            	var value = con.query(tssql, function(err, tsresult) {
 	                    if (err) throw err;  
 	                    var timeserver = [];
@@ -406,14 +412,17 @@ var record = io.sockets.on('connection', function (socket) {
 		// Fetch previous entry for this user from 'livetable'.
 		var fetchtimesql = "SELECT * FROM exm_quizaccess_hbmon_livetable WHERE roomid = " + socket.roomid;
 		
-         con.query("LOCK TABLE exm_quizaccess_hbmon_livetable WRITE", function(err, result) {
-	  if (err) throw err;
-	});
+                con.query("LOCK TABLE exm_quizaccess_hbmon_livetable WRITE", function(err, result) {
+	          if (err) throw err;
+	        });
+                debuglog('     <<< lt lock acquired');
 
 		con.query(fetchtimesql, function(err,ftresult) {
 		    if (err) throw err;
 		    var timetoconsider;
                     var livetime;
+                    debuglog('     <<<<< select query');
+
 		    
 		    for (i in ftresult) {
 			timetoconsider = ftresult[i].timetoconsider;
@@ -438,11 +447,13 @@ var record = io.sockets.on('connection', function (socket) {
 		con.query(updatelivetablesql, function(err, result) {
 			if (err) throw err;
 		});
+                debuglog('     *** discon: status to ' + socket.currentstatus + ' ' + socket.id + '; ttc to ' + socket.timestampD);
+
 		con.query("UNLOCK TABLES", function(err, result) {
 		  if (err) throw err;
 		});
-                    debuglog('     *** discon: status to ' + socket.currentstatus + ' ' + socket.id + '; ttc to ' + socket.timestampD);
-		});
+                debuglog('     >>> lt lock released');
+	      });
 	    }
 	}
     }); 
