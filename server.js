@@ -93,10 +93,12 @@ var interval = setInterval( function() {
 	+ Math.floor((new Date().getTime())/1000) 
 	+ " WHERE timeserverid = " + currenttimeserverid;
     
-    con.query("LOCK TABLE exm_quizaccess_hbmon_timeserver WRITE",
+
+    /*con.query("LOCK TABLE exm_quizaccess_hbmon_timeserver WRITE",
 	      function(err, result) {
 		  if (err) throw err;
-	      });
+	      });*/
+
 
     con.query(updatetstablesql, function(err, result) {
 	if (err) throw err;
@@ -136,9 +138,9 @@ var record = io.sockets.on('connection', function (socket) {
         socket.ip 				= "'" + socket.request.connection.remoteAddress + "'";
         
 	
-	con.query("LOCK TABLE exm_quizaccess_hbmon_socketinfo WRITE", function(err,result){
+	/*con.query("LOCK TABLE exm_quizaccess_hbmon_socketinfo WRITE", function(err,result){
 	    if (err) throw err;
-	});
+	});*/
         var sql = "INSERT INTO exm_quizaccess_hbmon_socketinfo (username, quizid, roomid, socketid, socketstatus, ip, timestamp) VALUES" +
             "(" + socket.username + "," 
             + socket.quizid + "," 
@@ -176,9 +178,9 @@ var record = io.sockets.on('connection', function (socket) {
 	    debuglog('       before con select ');
 	    var liverecordexistsql = "SELECT * FROM exm_quizaccess_hbmon_livetable WHERE roomid = " + socket.roomid;
 	    
-            con.query("LOCK TABLE exm_quizaccess_hbmon_livetable WRITE", function(err, result) {
+            /*con.query("LOCK TABLE exm_quizaccess_hbmon_livetable WRITE", function(err, result) {
 		if (err) throw err;
-	    });
+	    });*/
 	    
 	    con.query(liverecordexistsql, function(err, result) {
                 if (err) throw err; if (result.length > 0) {
@@ -203,9 +205,9 @@ var record = io.sockets.on('connection', function (socket) {
                     
                     if(currenttimeserverid != room_timeserver) {
 
-         con.query("LOCK TABLE exm_quizaccess_hbmon_timeserver WRITE", function(err, result) {
+         /*con.query("LOCK TABLE exm_quizaccess_hbmon_timeserver WRITE", function(err, result) {
 	  if (err) throw err;
-	});
+	});*/
 
 
 	                var tssql = "SELECT * FROM exm_quizaccess_hbmon_timeserver WHERE timeserverid IN (" + room_timeserver + ", " + currenttimeserverid + ")";
@@ -267,25 +269,25 @@ var record = io.sockets.on('connection', function (socket) {
 					+ ", timeserver = " + currenttimeserverid
 					+ " WHERE roomid = " + socket.roomid;
 
-         con.query("LOCK TABLE exm_quizaccess_hbmon_livetable WRITE", function(err, result) {
+         /*con.query("LOCK TABLE exm_quizaccess_hbmon_livetable WRITE", function(err, result) {
 	  if (err) throw err;
-	});
+	});*/
 
 				    con.query(updatelivetablesql, function(err, result) {
 					if (err) throw err;
 				    });
 
-				con.query("UNLOCK TABLES", function(err, result) {
+				/*con.query("UNLOCK TABLES", function(err, result) {
 				    if (err) throw err;
-				});
+				});*/
 	                        }
 	                        return timeserver;
 	                        
 	            	    });
 	            	    
                     	}
-	            	if (status == 'Dead' && currenttimeserverid == room_timeserver) {
-	            	//if (currenttimeserverid == room_timeserver) {
+	            	//if (status == 'Dead' && currenttimeserverid == room_timeserver) {
+	            	if (currenttimeserverid == room_timeserver) {
 	                    
 	                    // Compute cumulative deadtime.
                             var delta = socket.timestampC - timetoconsider;
@@ -302,15 +304,15 @@ var record = io.sockets.on('connection', function (socket) {
 				    + " WHERE roomid = " + socket.roomid;
 
 
-         con.query("LOCK TABLE exm_quizaccess_hbmon_livetable WRITE", function(err, result) {
+         /*con.query("LOCK TABLE exm_quizaccess_hbmon_livetable WRITE", function(err, result) {
 	  if (err) throw err;
-	});
+	});*/
 				con.query(updatelivetablesql, function(err, result) {
 				    if (err) throw err;
 				});
-				con.query("UNLOCK TABLES", function(err, result) {
+				/*con.query("UNLOCK TABLES", function(err, result) {
 				    if (err) throw err;
-				});
+				});*/
 
 
             	    	    //}  
@@ -318,9 +320,9 @@ var record = io.sockets.on('connection', function (socket) {
 			//                    }
                     } else {
 
-		con.query("LOCK TABLE exm_quizaccess_hbmon_livetable WRITE", function(err, result) {
+		/*con.query("LOCK TABLE exm_quizaccess_hbmon_livetable WRITE", function(err, result) {
 		  if (err) throw err;
-		});
+		}); */
                 	// Insert current status entry for this user in 'livetable'.                	
                         debuglog('       conn2: status to' + socket.currentstatus  + ' ' + socket.id + ' ttc to ' + timetoconsider);
 			var livetablesql = "INSERT INTO exm_quizaccess_hbmon_livetable (roomid, status, timeserver, timetoconsider, livetime, deadtime) VALUES" +
@@ -345,9 +347,9 @@ var record = io.sockets.on('connection', function (socket) {
     socket.on('disconnect', function() {
 	debuglog('     *** In disconnect event. Connected sockets - ' + io.sockets.server.eio.clientsCount);
 
-		con.query("LOCK TABLE exm_quizaccess_hbmon_livetable WRITE", function(err, result) {
+		/*con.query("LOCK TABLE exm_quizaccess_hbmon_livetable WRITE", function(err, result) {
 		  if (err) throw err;
-		});
+		}); */
         debuglog('          Socket disconnec - ' + socket.id );
 
 	
@@ -377,9 +379,9 @@ var record = io.sockets.on('connection', function (socket) {
 		+ socket.ip + "," 
 		+ socket.timestampD + ")";
 
-         con.query("LOCK TABLE exm_quizaccess_hbmon_socketinfo WRITE", function(err, result) {
+         /* con.query("LOCK TABLE exm_quizaccess_hbmon_socketinfo WRITE", function(err, result) {
 	  if (err) throw err;
-	});
+	}); */
 	    
 	    con.query(sql, function(err, result) {
 		if (err) throw err;	  
@@ -416,10 +418,11 @@ var record = io.sockets.on('connection', function (socket) {
 		// Fetch previous entry for this user from 'livetable'.
 		var fetchtimesql = "SELECT * FROM exm_quizaccess_hbmon_livetable WHERE roomid = " + socket.roomid;
 		
-                con.query("LOCK TABLE exm_quizaccess_hbmon_livetable WRITE", function(err, result) {
+                /*con.query("LOCK TABLE exm_quizaccess_hbmon_livetable WRITE", function(err, result) {
 	          if (err) throw err;
-	        });
-                debuglog('     <<< lt lock acquired');
+	        }); 
+                debuglog('     <<< lt lock acquired'); */
+
 
 		con.query(fetchtimesql, function(err,ftresult) {
 		    if (err) throw err;
@@ -448,10 +451,10 @@ var record = io.sockets.on('connection', function (socket) {
 			+ ", livetime = " + livetime 
 			+ " where roomid = " + socket.roomid;
 
-		con.query("LOCK TABLE exm_quizaccess_hbmon_livetable WRITE", function(err, result) {
+		/*con.query("LOCK TABLE exm_quizaccess_hbmon_livetable WRITE", function(err, result) {
                   if (err) throw err;
                 });
-                debuglog('     <<< lt lock acquired');
+                debuglog('     <<< lt lock acquired'); */
 
 
 		con.query(updatelivetablesql, function(err, result) {
@@ -459,10 +462,10 @@ var record = io.sockets.on('connection', function (socket) {
 		});
                 debuglog('     *** discon: status to ' + socket.currentstatus + ' ' + socket.id + '; ttc to ' + socket.timestampD);
 
-		con.query("UNLOCK TABLES", function(err, result) {
+		/*con.query("UNLOCK TABLES", function(err, result) {
 		  if (err) throw err;
 		});
-                debuglog('     >>> lt lock released');
+                debuglog('     >>> lt lock released'); */
 	      });
 	    }
 	}
