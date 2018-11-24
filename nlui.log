@@ -1,0 +1,129 @@
+1543047167232: Mysql Connected!
+1543047189884: ------ Connect event. Connected sockets - 1
+1543047189885:        Socket connected - _L87Sjx4gH_DV9AoAAAA. Handshake TS: 1543047189881
+1543047190084:        Attempt event ----------
+1543047190085:        DB conev insert. 'kashmira.n_47_48271':_L87Sjx4gH_DV9AoAAAA inserted to DB ----------
+1543047190086:        before con select 
+1543047190095:        conn2: status to'Live' _L87Sjx4gH_DV9AoAAAA ttc to undefined
+1543047199848:      *** In disconnect event. Connected sockets - 0
+1543047199848:           Socket disconnec - _L87Sjx4gH_DV9AoAAAA
+1543047199849:           DB disconev insert ----------
+1543047199855:      <<<<< select query
+1543047199856:      *** discon: status to 'Dead' _L87Sjx4gH_DV9AoAAAA; ttc to 1543047199
+1543047201138: ------ Connect event. Connected sockets - 1
+1543047201138:        Socket connected - VU_IL-qzyRlmAw7dAAAB. Handshake TS: 1543047201137
+1543047201361:        Attempt event ----------
+1543047201361:        DB conev insert. 'kashmira.n_47_48271':VU_IL-qzyRlmAw7dAAAB inserted to DB ----------
+1543047201362:        before con select 
+1543047201366:        Current status: ttc = 1543047199; 'kashmira.n_47_48271' - Previous deadtime - 0 - Status - Dead
+1543047201366:      === delta deadtime: 2 with ttc = 1543047199
+1543047201367:        conn1: status to'Live' VU_IL-qzyRlmAw7dAAAB; ttc to 1543047201
+1543047264061:      *** In disconnect event. Connected sockets - 0
+1543047264061:           Socket disconnec - VU_IL-qzyRlmAw7dAAAB
+1543047264062:           DB disconev insert ----------
+1543047264065:      <<<<< select query
+1543047264066:      *** discon: status to 'Dead' VU_IL-qzyRlmAw7dAAAB; ttc to 1543047264
+1543047264919: ------ Connect event. Connected sockets - 1
+1543047264919:        Socket connected - gaHLDL1Jd3Bjdq09AAAC. Handshake TS: 1543047264919
+1543047265205:        Attempt event ----------
+1543047265205:        DB conev insert. 'kashmira.n_47_48271':gaHLDL1Jd3Bjdq09AAAC inserted to DB ----------
+1543047265206:        before con select 
+1543047265208:        Current status: ttc = 1543047264; 'kashmira.n_47_48271' - Previous deadtime - 2 - Status - Dead
+1543047265209:      === delta deadtime: 0 with ttc = 1543047264
+1543047265209:        conn1: status to'Live' gaHLDL1Jd3Bjdq09AAAC; ttc to 1543047264
+1543047275976:      *** In disconnect event. Connected sockets - 0
+1543047275976:           Socket disconnec - gaHLDL1Jd3Bjdq09AAAC
+1543047275976:           DB disconev insert ----------
+1543047275981:      <<<<< select query
+1543047275981:      *** discon: status to 'Dead' gaHLDL1Jd3Bjdq09AAAC; ttc to 1543047275
+1543047276394: ------ Connect event. Connected sockets - 1
+1543047276394:        Socket connected - gihXzWv7X0gWCFLyAAAD. Handshake TS: 1543047276394
+1543047277100:        Attempt event ----------
+1543047277101:        DB conev insert. 'kashmira.n_47_48271':gihXzWv7X0gWCFLyAAAD inserted to DB ----------
+1543047277102:        before con select 
+1543047277105:        Current status: ttc = 1543047275; 'kashmira.n_47_48271' - Previous deadtime - 2 - Status - Dead
+1543047277105:      === delta deadtime: 1 with ttc = 1543047275
+1543047277105:        conn1: status to'Live' gihXzWv7X0gWCFLyAAAD; ttc to 1543047276
+1543047280013:      *** In disconnect event. Connected sockets - 0
+1543047280013:           Socket disconnec - gihXzWv7X0gWCFLyAAAD
+1543047280014:           DB disconev insert ----------
+1543047280018:      <<<<< select query
+1543047280018:      *** discon: status to 'Dead' gihXzWv7X0gWCFLyAAAD; ttc to 1543047280
+1543047280804: ------ Connect event. Connected sockets - 1
+1543047280804:        Socket connected - MOSUV1bQGTpXd2DeAAAE. Handshake TS: 1543047280796
+1543047281435:        Attempt event ----------
+1543047281435:        DB conev insert. 'kashmira.n_47_48271':MOSUV1bQGTpXd2DeAAAE inserted to DB ----------
+1543047281435:        before con select 
+1543047281440:        Current status: ttc = 1543047280; 'kashmira.n_47_48271' - Previous deadtime - 3 - Status - Dead
+1543047281440:      === delta deadtime: 0 with ttc = 1543047280
+1543047281440:        conn1: status to'Live' MOSUV1bQGTpXd2DeAAAE; ttc to 1543047280
+1543047358713:      *** In disconnect event. Connected sockets - 0
+1543047358713:           Socket disconnec - MOSUV1bQGTpXd2DeAAAE
+1543047358713:           DB disconev insert ----------
+1543047358717:      <<<<< select query
+1543047358717:      *** discon: status to 'Dead' MOSUV1bQGTpXd2DeAAAE; ttc to 1543047358
+1543047359939: ------ Connect event. Connected sockets - 1
+1543047359939:        Socket connected - SXsopScRDvLaq7LYAAAF. Handshake TS: 1543047359938
+1543047360150:        Attempt event ----------
+1543047360151:        DB conev insert. 'kashmira.n_47_48271':SXsopScRDvLaq7LYAAAF inserted to DB ----------
+1543047360151:        before con select 
+1543047360154:        Current status: ttc = 1543047358; 'kashmira.n_47_48271' - Previous deadtime - 3 - Status - Dead
+1543047360154:      === delta deadtime: 1 with ttc = 1543047358
+1543047360154:        conn1: status to'Live' SXsopScRDvLaq7LYAAAF; ttc to 1543047359
+1543047398475:      *** In disconnect event. Connected sockets - 0
+1543047398475:           Socket disconnec - SXsopScRDvLaq7LYAAAF
+1543047398479:           DB disconev insert ----------
+1543047398482:      <<<<< select query
+1543047398483:      *** discon: status to 'Dead' SXsopScRDvLaq7LYAAAF; ttc to 1543047398
+1543047399032: ------ Connect event. Connected sockets - 1
+1543047399032:        Socket connected - MsOjUNAtscw_c2JAAAAG. Handshake TS: 1543047399032
+1543047399622:        Attempt event ----------
+1543047399623:        DB conev insert. 'kashmira.n_47_48271':MsOjUNAtscw_c2JAAAAG inserted to DB ----------
+1543047399623:        before con select 
+1543047399631:        Current status: ttc = 1543047398; 'kashmira.n_47_48271' - Previous deadtime - 4 - Status - Dead
+1543047399631:      === delta deadtime: 1 with ttc = 1543047398
+1543047399632:        conn1: status to'Live' MsOjUNAtscw_c2JAAAAG; ttc to 1543047399
+1543047456866:      *** In disconnect event. Connected sockets - 0
+1543047456866:           Socket disconnec - MsOjUNAtscw_c2JAAAAG
+1543047456866:           DB disconev insert ----------
+1543047456870:      <<<<< select query
+1543047456870:      *** discon: status to 'Dead' MsOjUNAtscw_c2JAAAAG; ttc to 1543047456
+1543047457671: ------ Connect event. Connected sockets - 1
+1543047457671:        Socket connected - H4rpJb9h3FBoLVzVAAAH. Handshake TS: 1543047457670
+1543047458007:        Attempt event ----------
+1543047458008:        DB conev insert. 'kashmira.n_47_48271':H4rpJb9h3FBoLVzVAAAH inserted to DB ----------
+1543047458009:        before con select 
+1543047458016:        Current status: ttc = 1543047456; 'kashmira.n_47_48271' - Previous deadtime - 5 - Status - Dead
+1543047458016:      === delta deadtime: 1 with ttc = 1543047456
+1543047458016:        conn1: status to'Live' H4rpJb9h3FBoLVzVAAAH; ttc to 1543047457
+1543047487988:      *** In disconnect event. Connected sockets - 0
+1543047487988:           Socket disconnec - H4rpJb9h3FBoLVzVAAAH
+1543047487990:           DB disconev insert ----------
+1543047487993:      <<<<< select query
+1543047487993:      *** discon: status to 'Dead' H4rpJb9h3FBoLVzVAAAH; ttc to 1543047487
+1543047489024: ------ Connect event. Connected sockets - 1
+1543047489024:        Socket connected - CnDiDRCEjLW68nIZAAAI. Handshake TS: 1543047489024
+1543047489654:        Attempt event ----------
+1543047489655:        DB conev insert. 'kashmira.n_47_48271':CnDiDRCEjLW68nIZAAAI inserted to DB ----------
+1543047489655:        before con select 
+1543047489657:        Current status: ttc = 1543047487; 'kashmira.n_47_48271' - Previous deadtime - 6 - Status - Dead
+1543047489657:      === delta deadtime: 2 with ttc = 1543047487
+1543047489658:        conn1: status to'Live' CnDiDRCEjLW68nIZAAAI; ttc to 1543047489
+1543047687297:      *** In disconnect event. Connected sockets - 0
+1543047687297:           Socket disconnec - CnDiDRCEjLW68nIZAAAI
+1543047687298:           DB disconev insert ----------
+1543047687301:      <<<<< select query
+1543047687301:      *** discon: status to 'Dead' CnDiDRCEjLW68nIZAAAI; ttc to 1543047687
+1543047689522: ------ Connect event. Connected sockets - 1
+1543047689522:        Socket connected - MKnvOHTxPMPB71LKAAAJ. Handshake TS: 1543047689522
+1543047689841:        Attempt event ----------
+1543047689842:        DB conev insert. 'kashmira.n_47_48271':MKnvOHTxPMPB71LKAAAJ inserted to DB ----------
+1543047689842:        before con select 
+1543047689846:        Current status: ttc = 1543047687; 'kashmira.n_47_48271' - Previous deadtime - 8 - Status - Dead
+1543047689847:      === delta deadtime: 2 with ttc = 1543047687
+1543047689847:        conn1: status to'Live' MKnvOHTxPMPB71LKAAAJ; ttc to 1543047689
+1543047699936:      *** In disconnect event. Connected sockets - 0
+1543047699937:           Socket disconnec - MKnvOHTxPMPB71LKAAAJ
+1543047699937:           DB disconev insert ----------
+1543047699940:      <<<<< select query
+1543047699941:      *** discon: status to 'Dead' MKnvOHTxPMPB71LKAAAJ; ttc to 1543047699

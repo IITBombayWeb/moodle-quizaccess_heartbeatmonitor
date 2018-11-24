@@ -1,0 +1,546 @@
+1543047778829: Mysql Connected!
+1543048514395: ------ Connect event. Connected sockets - 1
+1543048514396:        Socket connected - vokuUADj3eGk9HjAAAAA. Handshake TS: 1543048514392
+1543048514602:        Attempt event ----------
+1543048514603:        DB conev insert. 'kashmira.n_47_48272':vokuUADj3eGk9HjAAAAA inserted to DB ----------
+1543048514604:        before con select 
+1543048514610:        conn2: status to'Live' vokuUADj3eGk9HjAAAAA ttc to undefined
+1543048522910:      *** In disconnect event. Connected sockets - 0
+1543048522910:           Socket disconnec - vokuUADj3eGk9HjAAAAA
+1543048522911:           DB disconev insert ----------
+1543048522915:      <<<<< select query
+1543048522916:      *** discon: status to 'Dead' vokuUADj3eGk9HjAAAAA; ttc to 1543048522
+1543048523353: ------ Connect event. Connected sockets - 1
+1543048523354:        Socket connected - bhVg0gt-X1EkWapZAAAB. Handshake TS: 1543048523353
+1543048523951:        Attempt event ----------
+1543048523951:        DB conev insert. 'kashmira.n_47_48272':bhVg0gt-X1EkWapZAAAB inserted to DB ----------
+1543048523951:        before con select 
+1543048523960:        Current status: ttc = 1543048522; 'kashmira.n_47_48272' - Previous deadtime - 0 - Status - Dead
+1543048523960:      === delta deadtime: 1 with ttc = 1543048522
+1543048523961:        conn1: status to'Live' bhVg0gt-X1EkWapZAAAB; ttc to 1543048523
+1543048536079:      *** In disconnect event. Connected sockets - 0
+1543048536079:           Socket disconnec - bhVg0gt-X1EkWapZAAAB
+1543048536080:           DB disconev insert ----------
+1543048536083:      <<<<< select query
+1543048536083:      *** discon: status to 'Dead' bhVg0gt-X1EkWapZAAAB; ttc to 1543048536
+1543048536584: ------ Connect event. Connected sockets - 1
+1543048536584:        Socket connected - viSHMeZiaculxm6cAAAC. Handshake TS: 1543048536584
+1543048536908:        Attempt event ----------
+1543048536908:        DB conev insert. 'kashmira.n_47_48272':viSHMeZiaculxm6cAAAC inserted to DB ----------
+1543048536908:        before con select 
+1543048536911:        Current status: ttc = 1543048536; 'kashmira.n_47_48272' - Previous deadtime - 1 - Status - Dead
+1543048536911:      === delta deadtime: 0 with ttc = 1543048536
+1543048536911:        conn1: status to'Live' viSHMeZiaculxm6cAAAC; ttc to 1543048536
+1543048548481:      *** In disconnect event. Connected sockets - 0
+1543048548481:           Socket disconnec - viSHMeZiaculxm6cAAAC
+1543048548482:           DB disconev insert ----------
+1543048548485:      <<<<< select query
+1543048548485:      *** discon: status to 'Dead' viSHMeZiaculxm6cAAAC; ttc to 1543048548
+1543048797795: ------ Connect event. Connected sockets - 1
+1543048797796:        Socket connected - MGk-ZQ-fkXRDzQaeAAAD. Handshake TS: 1543048797795
+1543048798035:        Attempt event ----------
+1543048798035:        DB conev insert. 'jm.yogesh.kumar_47_${ATTEMPT_ID}':MGk-ZQ-fkXRDzQaeAAAD inserted to DB ----------
+1543048798035:        before con select 
+1543048798039:        conn2: status to'Live' MGk-ZQ-fkXRDzQaeAAAD ttc to undefined
+1543048810156:      *** In disconnect event. Connected sockets - 0
+1543048810156:           Socket disconnec - MGk-ZQ-fkXRDzQaeAAAD
+1543048810156:           DB disconev insert ----------
+1543048810158:      <<<<< select query
+1543048810158:      *** discon: status to 'Dead' MGk-ZQ-fkXRDzQaeAAAD; ttc to 1543048810
+1543048810797: ------ Connect event. Connected sockets - 1
+1543048810797:        Socket connected - U8kkv2pBGEj6j1yZAAAE. Handshake TS: 1543048810796
+1543048811012:        Attempt event ----------
+1543048811012:        DB conev insert. 'jm.yogesh.kumar_47_48273':U8kkv2pBGEj6j1yZAAAE inserted to DB ----------
+1543048811012:        before con select 
+1543048811015:        conn2: status to'Live' U8kkv2pBGEj6j1yZAAAE ttc to undefined
+1543048827708:      *** In disconnect event. Connected sockets - 0
+1543048827708:           Socket disconnec - U8kkv2pBGEj6j1yZAAAE
+1543048827709:           DB disconev insert ----------
+1543048827718:      <<<<< select query
+1543048827718:      *** discon: status to 'Dead' U8kkv2pBGEj6j1yZAAAE; ttc to 1543048827
+1543048831368: ------ Connect event. Connected sockets - 1
+1543048831368:        Socket connected - _DATo7tKE4wvoPRjAAAF. Handshake TS: 1543048831362
+1543048833456:        Attempt event ----------
+1543048833456:        DB conev insert. 'jm.yogesh.kumar_47_48273':_DATo7tKE4wvoPRjAAAF inserted to DB ----------
+1543048833456:        before con select 
+1543048833459:        Current status: ttc = 1543048827; 'jm.yogesh.kumar_47_48273' - Previous deadtime - 0 - Status - Dead
+1543048833459:      === delta deadtime: 4 with ttc = 1543048827
+1543048833459:        conn1: status to'Live' _DATo7tKE4wvoPRjAAAF; ttc to 1543048831
+1543048857807:      *** In disconnect event. Connected sockets - 0
+1543048857807:           Socket disconnec - _DATo7tKE4wvoPRjAAAF
+1543048857808:           DB disconev insert ----------
+1543048857811:      <<<<< select query
+1543048857812:      *** discon: status to 'Dead' _DATo7tKE4wvoPRjAAAF; ttc to 1543048857
+1543048858727: ------ Connect event. Connected sockets - 1
+1543048858727:        Socket connected - jhP97uHT1EQyv-yiAAAG. Handshake TS: 1543048858726
+1543048860421:        Attempt event ----------
+1543048860422:        DB conev insert. 'jm.yogesh.kumar_47_48273':jhP97uHT1EQyv-yiAAAG inserted to DB ----------
+1543048860422:        before con select 
+1543048860425:        Current status: ttc = 1543048857; 'jm.yogesh.kumar_47_48273' - Previous deadtime - 4 - Status - Dead
+1543048860425:      === delta deadtime: 1 with ttc = 1543048857
+1543048860425:        conn1: status to'Live' jhP97uHT1EQyv-yiAAAG; ttc to 1543048858
+1543048879106:      *** In disconnect event. Connected sockets - 0
+1543048879107:           Socket disconnec - jhP97uHT1EQyv-yiAAAG
+1543048879107:           DB disconev insert ----------
+1543048879110:      <<<<< select query
+1543048879111:      *** discon: status to 'Dead' jhP97uHT1EQyv-yiAAAG; ttc to 1543048879
+1543048880435: ------ Connect event. Connected sockets - 1
+1543048880435:        Socket connected - FKYwt42J7Z3SxgdYAAAH. Handshake TS: 1543048880434
+1543048881939:        Attempt event ----------
+1543048881939:        DB conev insert. 'jm.yogesh.kumar_47_48273':FKYwt42J7Z3SxgdYAAAH inserted to DB ----------
+1543048881939:        before con select 
+1543048881942:        Current status: ttc = 1543048879; 'jm.yogesh.kumar_47_48273' - Previous deadtime - 5 - Status - Dead
+1543048881942:      === delta deadtime: 1 with ttc = 1543048879
+1543048881943:        conn1: status to'Live' FKYwt42J7Z3SxgdYAAAH; ttc to 1543048880
+1543048904286:      *** In disconnect event. Connected sockets - 0
+1543048904286:           Socket disconnec - FKYwt42J7Z3SxgdYAAAH
+1543048904287:           DB disconev insert ----------
+1543048904289:      <<<<< select query
+1543048904289:      *** discon: status to 'Dead' FKYwt42J7Z3SxgdYAAAH; ttc to 1543048904
+1543048904666: ------ Connect event. Connected sockets - 1
+1543048904666:        Socket connected - MUGDKSjHhIxrKwEQAAAI. Handshake TS: 1543048904665
+1543048904754: ------ Connect event. Connected sockets - 2
+1543048904754:        Socket connected - aOF9wd7PtNgH1giSAAAJ. Handshake TS: 1543048904753
+1543048904925:        Attempt event ----------
+1543048904926:        DB conev insert. 'kashmira.n_47_48274':MUGDKSjHhIxrKwEQAAAI inserted to DB ----------
+1543048904926:        before con select 
+1543048904929:        conn2: status to'Live' MUGDKSjHhIxrKwEQAAAI ttc to undefined
+1543048905015:        Attempt event ----------
+1543048905016:        DB conev insert. 'jm.yogesh.kumar_47_48273':aOF9wd7PtNgH1giSAAAJ inserted to DB ----------
+1543048905016:        before con select 
+1543048905018:        Current status: ttc = 1543048904; 'jm.yogesh.kumar_47_48273' - Previous deadtime - 6 - Status - Dead
+1543048905018:      === delta deadtime: 0 with ttc = 1543048904
+1543048905018:        conn1: status to'Live' aOF9wd7PtNgH1giSAAAJ; ttc to 1543048904
+1543048920287:      *** In disconnect event. Connected sockets - 1
+1543048920287:           Socket disconnec - MUGDKSjHhIxrKwEQAAAI
+1543048920288:           DB disconev insert ----------
+1543048920292:      <<<<< select query
+1543048920293:      *** discon: status to 'Dead' MUGDKSjHhIxrKwEQAAAI; ttc to 1543048920
+1543048921125: ------ Connect event. Connected sockets - 2
+1543048921125:        Socket connected - Lc0Xk6KYcG7V4IkqAAAK. Handshake TS: 1543048921124
+1543048921662:        Attempt event ----------
+1543048921662:        DB conev insert. 'kashmira.n_47_48274':Lc0Xk6KYcG7V4IkqAAAK inserted to DB ----------
+1543048921663:        before con select 
+1543048921665:        Current status: ttc = 1543048920; 'kashmira.n_47_48274' - Previous deadtime - 0 - Status - Dead
+1543048921666:      === delta deadtime: 1 with ttc = 1543048920
+1543048921666:        conn1: status to'Live' Lc0Xk6KYcG7V4IkqAAAK; ttc to 1543048921
+1543048923255:      *** In disconnect event. Connected sockets - 1
+1543048923255:           Socket disconnec - aOF9wd7PtNgH1giSAAAJ
+1543048923255:           DB disconev insert ----------
+1543048923258:      <<<<< select query
+1543048923258:      *** discon: status to 'Dead' aOF9wd7PtNgH1giSAAAJ; ttc to 1543048923
+1543048923505: ------ Connect event. Connected sockets - 2
+1543048923508:        Socket connected - Rkrnza0KBmaZaMO4AAAL. Handshake TS: 1543048923504
+1543048924390:        Attempt event ----------
+1543048924390:        DB conev insert. 'jm.yogesh.kumar_47_48273':Rkrnza0KBmaZaMO4AAAL inserted to DB ----------
+1543048924390:        before con select 
+1543048924393:        Current status: ttc = 1543048923; 'jm.yogesh.kumar_47_48273' - Previous deadtime - 6 - Status - Dead
+1543048924393:      === delta deadtime: 0 with ttc = 1543048923
+1543048924393:        conn1: status to'Live' Rkrnza0KBmaZaMO4AAAL; ttc to 1543048923
+1543048947416:      *** In disconnect event. Connected sockets - 1
+1543048947416:           Socket disconnec - Rkrnza0KBmaZaMO4AAAL
+1543048947417:           DB disconev insert ----------
+1543048947427:      <<<<< select query
+1543048947428:      *** discon: status to 'Dead' Rkrnza0KBmaZaMO4AAAL; ttc to 1543048947
+1543048947783: ------ Connect event. Connected sockets - 2
+1543048947783:        Socket connected - 0ErEZOZYmmmn9EzZAAAM. Handshake TS: 1543048947782
+1543048949868:        Attempt event ----------
+1543048949869:        DB conev insert. 'jm.yogesh.kumar_47_48273':0ErEZOZYmmmn9EzZAAAM inserted to DB ----------
+1543048949869:        before con select 
+1543048949878:        Current status: ttc = 1543048947; 'jm.yogesh.kumar_47_48273' - Previous deadtime - 6 - Status - Dead
+1543048949878:      === delta deadtime: 0 with ttc = 1543048947
+1543048949878:        conn1: status to'Live' 0ErEZOZYmmmn9EzZAAAM; ttc to 1543048947
+1543048950213:      *** In disconnect event. Connected sockets - 1
+1543048950214:           Socket disconnec - Lc0Xk6KYcG7V4IkqAAAK
+1543048950214:           DB disconev insert ----------
+1543048950217:      <<<<< select query
+1543048950217:      *** discon: status to 'Dead' Lc0Xk6KYcG7V4IkqAAAK; ttc to 1543048950
+1543048952064: ------ Connect event. Connected sockets - 2
+1543048952064:        Socket connected - TVypp5Ukb-z7geA0AAAN. Handshake TS: 1543048952064
+1543048952291:        Attempt event ----------
+1543048952291:        DB conev insert. 'kashmira.n_47_48274':TVypp5Ukb-z7geA0AAAN inserted to DB ----------
+1543048952292:        before con select 
+1543048952296:        Current status: ttc = 1543048950; 'kashmira.n_47_48274' - Previous deadtime - 1 - Status - Dead
+1543048952296:      === delta deadtime: 2 with ttc = 1543048950
+1543048952296:        conn1: status to'Live' TVypp5Ukb-z7geA0AAAN; ttc to 1543048952
+1543048970715:      *** In disconnect event. Connected sockets - 1
+1543048970716:           Socket disconnec - 0ErEZOZYmmmn9EzZAAAM
+1543048970718:           DB disconev insert ----------
+1543048970730:      <<<<< select query
+1543048970730:      *** discon: status to 'Dead' 0ErEZOZYmmmn9EzZAAAM; ttc to 1543048970
+1543048972072: ------ Connect event. Connected sockets - 2
+1543048972072:        Socket connected - 1ssD10nzYFQh66DsAAAO. Handshake TS: 1543048972071
+1543048975234:        Attempt event ----------
+1543048975234:        DB conev insert. 'jm.yogesh.kumar_47_48273':1ssD10nzYFQh66DsAAAO inserted to DB ----------
+1543048975235:        before con select 
+1543048975238:        Current status: ttc = 1543048970; 'jm.yogesh.kumar_47_48273' - Previous deadtime - 6 - Status - Dead
+1543048975238:      === delta deadtime: 2 with ttc = 1543048970
+1543048975238:        conn1: status to'Live' 1ssD10nzYFQh66DsAAAO; ttc to 1543048972
+1543048990162:      *** In disconnect event. Connected sockets - 1
+1543048990162:           Socket disconnec - TVypp5Ukb-z7geA0AAAN
+1543048990163:           DB disconev insert ----------
+1543048990166:      <<<<< select query
+1543048990166:      *** discon: status to 'Dead' TVypp5Ukb-z7geA0AAAN; ttc to 1543048990
+1543049002307:      *** In disconnect event. Connected sockets - 0
+1543049002308:           Socket disconnec - 1ssD10nzYFQh66DsAAAO
+1543049002309:           DB disconev insert ----------
+1543049002317:      <<<<< select query
+1543049002318:      *** discon: status to 'Dead' 1ssD10nzYFQh66DsAAAO; ttc to 1543049002
+1543049003422: ------ Connect event. Connected sockets - 1
+1543049003422:        Socket connected - Ha47wT92zvp1JWKwAAAP. Handshake TS: 1543049003422
+1543049004513:        Attempt event ----------
+1543049004513:        DB conev insert. 'jm.yogesh.kumar_47_48273':Ha47wT92zvp1JWKwAAAP inserted to DB ----------
+1543049004513:        before con select 
+1543049004516:        Current status: ttc = 1543049002; 'jm.yogesh.kumar_47_48273' - Previous deadtime - 8 - Status - Dead
+1543049004516:      === delta deadtime: 1 with ttc = 1543049002
+1543049004516:        conn1: status to'Live' Ha47wT92zvp1JWKwAAAP; ttc to 1543049003
+1543049026094: ------ Connect event. Connected sockets - 2
+1543049026094:        Socket connected - ROjwXd9kOsxQ35Q_AAAQ. Handshake TS: 1543049026094
+1543049026345:        Attempt event ----------
+1543049026346:        DB conev insert. 'kashmira.n_47_48274':ROjwXd9kOsxQ35Q_AAAQ inserted to DB ----------
+1543049026346:        before con select 
+1543049026348:        Current status: ttc = 1543048990; 'kashmira.n_47_48274' - Previous deadtime - 3 - Status - Dead
+1543049026348:      === delta deadtime: 36 with ttc = 1543048990
+1543049026348:        conn1: status to'Live' ROjwXd9kOsxQ35Q_AAAQ; ttc to 1543049026
+1543049030598:      *** In disconnect event. Connected sockets - 1
+1543049030598:           Socket disconnec - ROjwXd9kOsxQ35Q_AAAQ
+1543049030599:           DB disconev insert ----------
+1543049030602:      <<<<< select query
+1543049030602:      *** discon: status to 'Dead' ROjwXd9kOsxQ35Q_AAAQ; ttc to 1543049030
+1543049034403: ------ Connect event. Connected sockets - 2
+1543049034403:        Socket connected - tyerOsmcOjz9OA61AAAR. Handshake TS: 1543049034402
+1543049034513:      *** In disconnect event. Connected sockets - 1
+1543049034513:           Socket disconnec - Ha47wT92zvp1JWKwAAAP
+1543049034513:           DB disconev insert ----------
+1543049034517:      <<<<< select query
+1543049034517:      *** discon: status to 'Dead' Ha47wT92zvp1JWKwAAAP; ttc to 1543049034
+1543049038321: ------ Connect event. Connected sockets - 2
+1543049038321:        Socket connected - 5bP6CHuodC_vNeWOAAAS. Handshake TS: 1543049038321
+1543049038323:        Attempt event ----------
+1543049038324:        DB conev insert. 'kashmira.n_47_48274':tyerOsmcOjz9OA61AAAR inserted to DB ----------
+1543049038324:        before con select 
+1543049038328:        Current status: ttc = 1543049030; 'kashmira.n_47_48274' - Previous deadtime - 39 - Status - Dead
+1543049038328:      === delta deadtime: 4 with ttc = 1543049030
+1543049038328:        conn1: status to'Live' tyerOsmcOjz9OA61AAAR; ttc to 1543049034
+1543049039422:        Attempt event ----------
+1543049039423:        DB conev insert. 'jm.yogesh.kumar_47_48273':5bP6CHuodC_vNeWOAAAS inserted to DB ----------
+1543049039423:        before con select 
+1543049039425:        Current status: ttc = 1543049034; 'jm.yogesh.kumar_47_48273' - Previous deadtime - 9 - Status - Dead
+1543049039425:      === delta deadtime: 4 with ttc = 1543049034
+1543049039425:        conn1: status to'Live' 5bP6CHuodC_vNeWOAAAS; ttc to 1543049038
+1543049047686:      *** In disconnect event. Connected sockets - 1
+1543049047686:           Socket disconnec - tyerOsmcOjz9OA61AAAR
+1543049047686:           DB disconev insert ----------
+1543049047689:      <<<<< select query
+1543049047689:      *** discon: status to 'Dead' tyerOsmcOjz9OA61AAAR; ttc to 1543049047
+1543049058804:      *** In disconnect event. Connected sockets - 0
+1543049058804:           Socket disconnec - 5bP6CHuodC_vNeWOAAAS
+1543049058805:           DB disconev insert ----------
+1543049058808:      <<<<< select query
+1543049058808:      *** discon: status to 'Dead' 5bP6CHuodC_vNeWOAAAS; ttc to 1543049058
+1543049083680: ------ Connect event. Connected sockets - 1
+1543049083681:        Socket connected - WDjtgp172tLA5OkPAAAT. Handshake TS: 1543049083680
+1543049084240:        Attempt event ----------
+1543049084240:        DB conev insert. 'kashmira.n_47_48274':WDjtgp172tLA5OkPAAAT inserted to DB ----------
+1543049084240:        before con select 
+1543049084243:        Current status: ttc = 1543049047; 'kashmira.n_47_48274' - Previous deadtime - 43 - Status - Dead
+1543049084243:      === delta deadtime: 36 with ttc = 1543049047
+1543049084243:        conn1: status to'Live' WDjtgp172tLA5OkPAAAT; ttc to 1543049083
+1543049089722:      *** In disconnect event. Connected sockets - 0
+1543049089722:           Socket disconnec - WDjtgp172tLA5OkPAAAT
+1543049089723:           DB disconev insert ----------
+1543049089727:      <<<<< select query
+1543049089728:      *** discon: status to 'Dead' WDjtgp172tLA5OkPAAAT; ttc to 1543049089
+1543049091410: ------ Connect event. Connected sockets - 1
+1543049091410:        Socket connected - rZi0D5p5NJVL9jZkAAAU. Handshake TS: 1543049091410
+1543049092385:        Attempt event ----------
+1543049092386:        DB conev insert. 'kashmira.n_47_48274':rZi0D5p5NJVL9jZkAAAU inserted to DB ----------
+1543049092386:        before con select 
+1543049092389:        Current status: ttc = 1543049089; 'kashmira.n_47_48274' - Previous deadtime - 0 - Status - Dead
+1543049092389:      === delta deadtime: 2 with ttc = 1543049089
+1543049092389:        conn1: status to'Live' rZi0D5p5NJVL9jZkAAAU; ttc to 1543049091
+1543049095414:      *** In disconnect event. Connected sockets - 0
+1543049095415:           Socket disconnec - rZi0D5p5NJVL9jZkAAAU
+1543049095415:           DB disconev insert ----------
+1543049095418:      <<<<< select query
+1543049095418:      *** discon: status to 'Dead' rZi0D5p5NJVL9jZkAAAU; ttc to 1543049095
+1543049096384: ------ Connect event. Connected sockets - 1
+1543049096385:        Socket connected - VGEMVdeES0tMSe7yAAAV. Handshake TS: 1543049096384
+1543049097021:        Attempt event ----------
+1543049097022:        DB conev insert. 'kashmira.n_47_48274':VGEMVdeES0tMSe7yAAAV inserted to DB ----------
+1543049097022:        before con select 
+1543049097025:        Current status: ttc = 1543049095; 'kashmira.n_47_48274' - Previous deadtime - 2 - Status - Dead
+1543049097025:      === delta deadtime: 1 with ttc = 1543049095
+1543049097026:        conn1: status to'Live' VGEMVdeES0tMSe7yAAAV; ttc to 1543049096
+1543049103379:      *** In disconnect event. Connected sockets - 0
+1543049103379:           Socket disconnec - VGEMVdeES0tMSe7yAAAV
+1543049103379:           DB disconev insert ----------
+1543049103388:      <<<<< select query
+1543049103388:      *** discon: status to 'Dead' VGEMVdeES0tMSe7yAAAV; ttc to 1543049103
+1543049620948: ------ Connect event. Connected sockets - 1
+1543049620948:        Socket connected - NGwemtJgd0XFerbtAAAW. Handshake TS: 1543049620947
+1543049626967:        Attempt event ----------
+1543049626968:        DB conev insert. 'jm.yogesh.kumar_47_${ATTEMPT_ID}':NGwemtJgd0XFerbtAAAW inserted to DB ----------
+1543049626968:        before con select 
+1543049626975:        Current status: ttc = 1543048810; 'jm.yogesh.kumar_47_${ATTEMPT_ID}' - Previous deadtime - 0 - Status - Dead
+1543049626976:      === delta deadtime: 810 with ttc = 1543048810
+1543049626976:        conn1: status to'Live' NGwemtJgd0XFerbtAAAW; ttc to 1543049620
+1543049656969:      *** In disconnect event. Connected sockets - 0
+1543049656972:           Socket disconnec - NGwemtJgd0XFerbtAAAW
+1543049656972:           DB disconev insert ----------
+1543049656976:      <<<<< select query
+1543049656976:      *** discon: status to 'Dead' NGwemtJgd0XFerbtAAAW; ttc to 1543049656
+1543049662958: ------ Connect event. Connected sockets - 1
+1543049662958:        Socket connected - ___TH3u-60MjYcfoAAAX. Handshake TS: 1543049662958
+1543049665815:        Attempt event ----------
+1543049665815:        DB conev insert. 'jm.yogesh.kumar_47_48275':___TH3u-60MjYcfoAAAX inserted to DB ----------
+1543049665816:        before con select 
+1543049665818:        conn2: status to'Live' ___TH3u-60MjYcfoAAAX ttc to undefined
+1543049692272:      *** In disconnect event. Connected sockets - 0
+1543049692272:           Socket disconnec - ___TH3u-60MjYcfoAAAX
+1543049692272:           DB disconev insert ----------
+1543049692275:      <<<<< select query
+1543049692275:      *** discon: status to 'Dead' ___TH3u-60MjYcfoAAAX; ttc to 1543049692
+1543049692507: ------ Connect event. Connected sockets - 1
+1543049692507:        Socket connected - 9amkrFYaydzN71GoAAAY. Handshake TS: 1543049692506
+1543049693654:        Attempt event ----------
+1543049693654:        DB conev insert. 'jm.yogesh.kumar_47_48275':9amkrFYaydzN71GoAAAY inserted to DB ----------
+1543049693655:        before con select 
+1543049693661:        Current status: ttc = 1543049692; 'jm.yogesh.kumar_47_48275' - Previous deadtime - 0 - Status - Dead
+1543049693661:      === delta deadtime: 0 with ttc = 1543049692
+1543049693661:        conn1: status to'Live' 9amkrFYaydzN71GoAAAY; ttc to 1543049692
+1543049706957:      *** In disconnect event. Connected sockets - 0
+1543049706957:           Socket disconnec - 9amkrFYaydzN71GoAAAY
+1543049706958:           DB disconev insert ----------
+1543049706978:      <<<<< select query
+1543049706978:      *** discon: status to 'Dead' 9amkrFYaydzN71GoAAAY; ttc to 1543049706
+1543049708841: ------ Connect event. Connected sockets - 1
+1543049708841:        Socket connected - sFiVcI0pJ0xDoCMkAAAZ. Handshake TS: 1543049708840
+1543049710968:        Attempt event ----------
+1543049710969:        DB conev insert. 'jm.yogesh.kumar_47_48275':sFiVcI0pJ0xDoCMkAAAZ inserted to DB ----------
+1543049710969:        before con select 
+1543049710972:        Current status: ttc = 1543049706; 'jm.yogesh.kumar_47_48275' - Previous deadtime - 0 - Status - Dead
+1543049710972:      === delta deadtime: 2 with ttc = 1543049706
+1543049710973:        conn1: status to'Live' sFiVcI0pJ0xDoCMkAAAZ; ttc to 1543049708
+1543049732445:      *** In disconnect event. Connected sockets - 0
+1543049732445:           Socket disconnec - sFiVcI0pJ0xDoCMkAAAZ
+1543049732450:           DB disconev insert ----------
+1543049732453:      <<<<< select query
+1543049732453:      *** discon: status to 'Dead' sFiVcI0pJ0xDoCMkAAAZ; ttc to 1543049732
+1543049733523: ------ Connect event. Connected sockets - 1
+1543049733523:        Socket connected - NFvgNp27wqRP6EN2AAAa. Handshake TS: 1543049733522
+1543049733990:        Attempt event ----------
+1543049733990:        DB conev insert. 'jm.yogesh.kumar_47_48275':NFvgNp27wqRP6EN2AAAa inserted to DB ----------
+1543049733991:        before con select 
+1543049733993:        Current status: ttc = 1543049732; 'jm.yogesh.kumar_47_48275' - Previous deadtime - 2 - Status - Dead
+1543049733994:      === delta deadtime: 1 with ttc = 1543049732
+1543049733994:        conn1: status to'Live' NFvgNp27wqRP6EN2AAAa; ttc to 1543049733
+1543049756861:      *** In disconnect event. Connected sockets - 0
+1543049756862:           Socket disconnec - NFvgNp27wqRP6EN2AAAa
+1543049756863:           DB disconev insert ----------
+1543049756866:      <<<<< select query
+1543049756866:      *** discon: status to 'Dead' NFvgNp27wqRP6EN2AAAa; ttc to 1543049756
+1543049758858: ------ Connect event. Connected sockets - 1
+1543049758858:        Socket connected - KE5dcFtONNLUjR4KAAAb. Handshake TS: 1543049758858
+1543049759750:        Attempt event ----------
+1543049759750:        DB conev insert. 'jm.yogesh.kumar_47_48275':KE5dcFtONNLUjR4KAAAb inserted to DB ----------
+1543049759750:        before con select 
+1543049759753:        Current status: ttc = 1543049756; 'jm.yogesh.kumar_47_48275' - Previous deadtime - 3 - Status - Dead
+1543049759754:      === delta deadtime: 2 with ttc = 1543049756
+1543049759754:        conn1: status to'Live' KE5dcFtONNLUjR4KAAAb; ttc to 1543049758
+1543049781956:      *** In disconnect event. Connected sockets - 0
+1543049781957:           Socket disconnec - KE5dcFtONNLUjR4KAAAb
+1543049781957:           DB disconev insert ----------
+1543049781960:      <<<<< select query
+1543049781960:      *** discon: status to 'Dead' KE5dcFtONNLUjR4KAAAb; ttc to 1543049781
+1543049783607: ------ Connect event. Connected sockets - 1
+1543049783607:        Socket connected - ntfqtVsbLpE-F1B7AAAc. Handshake TS: 1543049783607
+1543049789824:        Attempt event ----------
+1543049789825:        DB conev insert. 'jm.yogesh.kumar_47_48275':ntfqtVsbLpE-F1B7AAAc inserted to DB ----------
+1543049789825:        before con select 
+1543049789831:        Current status: ttc = 1543049781; 'jm.yogesh.kumar_47_48275' - Previous deadtime - 5 - Status - Dead
+1543049789831:      === delta deadtime: 2 with ttc = 1543049781
+1543049789831:        conn1: status to'Live' ntfqtVsbLpE-F1B7AAAc; ttc to 1543049783
+1543049819826:      *** In disconnect event. Connected sockets - 0
+1543049819827:           Socket disconnec - ntfqtVsbLpE-F1B7AAAc
+1543049819827:           DB disconev insert ----------
+1543049819831:      <<<<< select query
+1543049819831:      *** discon: status to 'Dead' ntfqtVsbLpE-F1B7AAAc; ttc to 1543049819
+1543049834815: ------ Connect event. Connected sockets - 1
+1543049834815:        Socket connected - p106GZnZqsLjdNvZAAAd. Handshake TS: 1543049834815
+1543049839950:        Attempt event ----------
+1543049839951:        DB conev insert. 'jm.yogesh.kumar_47_48275':p106GZnZqsLjdNvZAAAd inserted to DB ----------
+1543049839951:        before con select 
+1543049839954:        Current status: ttc = 1543049819; 'jm.yogesh.kumar_47_48275' - Previous deadtime - 7 - Status - Dead
+1543049839954:      === delta deadtime: 15 with ttc = 1543049819
+1543049839954:        conn1: status to'Live' p106GZnZqsLjdNvZAAAd; ttc to 1543049834
+1543049869953:      *** In disconnect event. Connected sockets - 0
+1543049869953:           Socket disconnec - p106GZnZqsLjdNvZAAAd
+1543049869953:           DB disconev insert ----------
+1543049869957:      <<<<< select query
+1543049869957:      *** discon: status to 'Dead' p106GZnZqsLjdNvZAAAd; ttc to 1543049869
+1543049873853: ------ Connect event. Connected sockets - 1
+1543049873853:        Socket connected - IP8JT2a-gQEInA06AAAe. Handshake TS: 1543049873852
+1543049878873:        Attempt event ----------
+1543049878873:        DB conev insert. 'jm.yogesh.kumar_47_48275':IP8JT2a-gQEInA06AAAe inserted to DB ----------
+1543049878874:        before con select 
+1543049878876:        Current status: ttc = 1543049869; 'jm.yogesh.kumar_47_48275' - Previous deadtime - 22 - Status - Dead
+1543049878876:      === delta deadtime: 4 with ttc = 1543049869
+1543049878876:        conn1: status to'Live' IP8JT2a-gQEInA06AAAe; ttc to 1543049873
+1543049908877:      *** In disconnect event. Connected sockets - 0
+1543049908877:           Socket disconnec - IP8JT2a-gQEInA06AAAe
+1543049908878:           DB disconev insert ----------
+1543049908882:      <<<<< select query
+1543049908882:      *** discon: status to 'Dead' IP8JT2a-gQEInA06AAAe; ttc to 1543049908
+1543049912869: ------ Connect event. Connected sockets - 1
+1543049912869:        Socket connected - t4kyl7tXGUB5pEi4AAAf. Handshake TS: 1543049912869
+1543049918820:        Attempt event ----------
+1543049918821:        DB conev insert. 'jm.yogesh.kumar_47_48275':t4kyl7tXGUB5pEi4AAAf inserted to DB ----------
+1543049918822:        before con select 
+1543049918825:        Current status: ttc = 1543049908; 'jm.yogesh.kumar_47_48275' - Previous deadtime - 26 - Status - Dead
+1543049918825:      === delta deadtime: 4 with ttc = 1543049908
+1543049918825:        conn1: status to'Live' t4kyl7tXGUB5pEi4AAAf; ttc to 1543049912
+1543049948821:      *** In disconnect event. Connected sockets - 0
+1543049948821:           Socket disconnec - t4kyl7tXGUB5pEi4AAAf
+1543049948822:           DB disconev insert ----------
+1543049948827:      <<<<< select query
+1543049948827:      *** discon: status to 'Dead' t4kyl7tXGUB5pEi4AAAf; ttc to 1543049948
+1543049951836: ------ Connect event. Connected sockets - 1
+1543049951836:        Socket connected - LcQUaPyDHaqFyEYaAAAg. Handshake TS: 1543049951835
+1543049956828:        Attempt event ----------
+1543049956829:        DB conev insert. 'jm.yogesh.kumar_47_48275':LcQUaPyDHaqFyEYaAAAg inserted to DB ----------
+1543049956829:        before con select 
+1543049956831:        Current status: ttc = 1543049948; 'jm.yogesh.kumar_47_48275' - Previous deadtime - 30 - Status - Dead
+1543049956832:      === delta deadtime: 3 with ttc = 1543049948
+1543049956832:        conn1: status to'Live' LcQUaPyDHaqFyEYaAAAg; ttc to 1543049951
+1543049976469:      *** In disconnect event. Connected sockets - 0
+1543049976469:           Socket disconnec - LcQUaPyDHaqFyEYaAAAg
+1543049976469:           DB disconev insert ----------
+1543049976475:      <<<<< select query
+1543049976475:      *** discon: status to 'Dead' LcQUaPyDHaqFyEYaAAAg; ttc to 1543049976
+1543050975478: ------ Connect event. Connected sockets - 1
+1543050975479:        Socket connected - 1NoddpdTc0_sh3-YAAAh. Handshake TS: 1543050975477
+1543050978480:        Attempt event ----------
+1543050978481:        DB conev insert. 'jm.yogesh.kumar_47_${ATTEMPT_ID}':1NoddpdTc0_sh3-YAAAh inserted to DB ----------
+1543050978481:        before con select 
+1543050978489:        conn2: status to'Live' 1NoddpdTc0_sh3-YAAAh ttc to undefined
+1543050996231:      *** In disconnect event. Connected sockets - 0
+1543050996231:           Socket disconnec - 1NoddpdTc0_sh3-YAAAh
+1543050996232:           DB disconev insert ----------
+1543050996236:      <<<<< select query
+1543050996237:      *** discon: status to 'Dead' 1NoddpdTc0_sh3-YAAAh; ttc to 1543050996
+1543051000279: ------ Connect event. Connected sockets - 1
+1543051000279:        Socket connected - 6bF1aDldI7VN0nvIAAAi. Handshake TS: 1543051000279
+1543051008614:        Attempt event ----------
+1543051008614:        DB conev insert. 'jm.yogesh.kumar_47_48276':6bF1aDldI7VN0nvIAAAi inserted to DB ----------
+1543051008615:        before con select 
+1543051008619:        conn2: status to'Live' 6bF1aDldI7VN0nvIAAAi ttc to undefined
+1543051038613:      *** In disconnect event. Connected sockets - 0
+1543051038613:           Socket disconnec - 6bF1aDldI7VN0nvIAAAi
+1543051038614:           DB disconev insert ----------
+1543051038617:      <<<<< select query
+1543051038617:      *** discon: status to 'Dead' 6bF1aDldI7VN0nvIAAAi; ttc to 1543051038
+1543051039137: ------ Connect event. Connected sockets - 1
+1543051039137:        Socket connected - fmkzwDiVfO3vEEvVAAAj. Handshake TS: 1543051039136
+1543051041699:        Attempt event ----------
+1543051041699:        DB conev insert. 'jm.yogesh.kumar_47_48276':fmkzwDiVfO3vEEvVAAAj inserted to DB ----------
+1543051041700:        before con select 
+1543051041703:        Current status: ttc = 1543051038; 'jm.yogesh.kumar_47_48276' - Previous deadtime - 0 - Status - Dead
+1543051041703:      === delta deadtime: 1 with ttc = 1543051038
+1543051041703:        conn1: status to'Live' fmkzwDiVfO3vEEvVAAAj; ttc to 1543051039
+1543051060878:      *** In disconnect event. Connected sockets - 0
+1543051060878:           Socket disconnec - fmkzwDiVfO3vEEvVAAAj
+1543051060878:           DB disconev insert ----------
+1543051060883:      <<<<< select query
+1543051060884:      *** discon: status to 'Dead' fmkzwDiVfO3vEEvVAAAj; ttc to 1543051060
+1543051063394: ------ Connect event. Connected sockets - 1
+1543051063394:        Socket connected - weB_qMP3dKGOwolAAAAk. Handshake TS: 1543051063393
+1543051071466:        Attempt event ----------
+1543051071467:        DB conev insert. 'jm.yogesh.kumar_47_48276':weB_qMP3dKGOwolAAAAk inserted to DB ----------
+1543051071468:        before con select 
+1543051071471:        Current status: ttc = 1543051060; 'jm.yogesh.kumar_47_48276' - Previous deadtime - 1 - Status - Dead
+1543051071471:      === delta deadtime: 3 with ttc = 1543051060
+1543051071471:        conn1: status to'Live' weB_qMP3dKGOwolAAAAk; ttc to 1543051063
+1543051092451:      *** In disconnect event. Connected sockets - 0
+1543051092451:           Socket disconnec - weB_qMP3dKGOwolAAAAk
+1543051092451:           DB disconev insert ----------
+1543051092454:      <<<<< select query
+1543051092455:      *** discon: status to 'Dead' weB_qMP3dKGOwolAAAAk; ttc to 1543051092
+1543051093398: ------ Connect event. Connected sockets - 1
+1543051093398:        Socket connected - 9063gNJxvSYzIaDPAAAl. Handshake TS: 1543051093397
+1543051094320:        Attempt event ----------
+1543051094321:        DB conev insert. 'jm.yogesh.kumar_47_48276':9063gNJxvSYzIaDPAAAl inserted to DB ----------
+1543051094321:        before con select 
+1543051094324:        Current status: ttc = 1543051092; 'jm.yogesh.kumar_47_48276' - Previous deadtime - 4 - Status - Dead
+1543051094324:      === delta deadtime: 1 with ttc = 1543051092
+1543051094324:        conn1: status to'Live' 9063gNJxvSYzIaDPAAAl; ttc to 1543051093
+1543051124322:      *** In disconnect event. Connected sockets - 0
+1543051124322:           Socket disconnec - 9063gNJxvSYzIaDPAAAl
+1543051124323:           DB disconev insert ----------
+1543051124327:      <<<<< select query
+1543051124327:      *** discon: status to 'Dead' 9063gNJxvSYzIaDPAAAl; ttc to 1543051124
+1543051201334: ------ Connect event. Connected sockets - 1
+1543051201334:        Socket connected - uNdJk0wjqItV2E-VAAAm. Handshake TS: 1543051201333
+1543051201957:        Attempt event ----------
+1543051201957:        DB conev insert. 'jm.yogesh.kumar_47_48276':uNdJk0wjqItV2E-VAAAm inserted to DB ----------
+1543051201957:        before con select 
+1543051201960:        Current status: ttc = 1543051124; 'jm.yogesh.kumar_47_48276' - Previous deadtime - 5 - Status - Dead
+1543051201960:      === delta deadtime: 77 with ttc = 1543051124
+1543051201960:        conn1: status to'Live' uNdJk0wjqItV2E-VAAAm; ttc to 1543051201
+1543051210924:      *** In disconnect event. Connected sockets - 0
+1543051210924:           Socket disconnec - uNdJk0wjqItV2E-VAAAm
+1543051210924:           DB disconev insert ----------
+1543051210930:      <<<<< select query
+1543051210930:      *** discon: status to 'Dead' uNdJk0wjqItV2E-VAAAm; ttc to 1543051210
+1543051212664: ------ Connect event. Connected sockets - 1
+1543051212665:        Socket connected - Z7lxipR9TbbTLmdSAAAn. Handshake TS: 1543051212663
+1543051212966:        Attempt event ----------
+1543051212967:        DB conev insert. 'jm.yogesh.kumar_47_48276':Z7lxipR9TbbTLmdSAAAn inserted to DB ----------
+1543051212967:        before con select 
+1543051212969:        Current status: ttc = 1543051210; 'jm.yogesh.kumar_47_48276' - Previous deadtime - 0 - Status - Dead
+1543051212969:      === delta deadtime: 2 with ttc = 1543051210
+1543051212970:        conn1: status to'Live' Z7lxipR9TbbTLmdSAAAn; ttc to 1543051212
+1543051235265:      *** In disconnect event. Connected sockets - 0
+1543051235265:           Socket disconnec - Z7lxipR9TbbTLmdSAAAn
+1543051235265:           DB disconev insert ----------
+1543051235270:      <<<<< select query
+1543051235272:      *** discon: status to 'Dead' Z7lxipR9TbbTLmdSAAAn; ttc to 1543051235
+1543051243431: ------ Connect event. Connected sockets - 1
+1543051243432:        Socket connected - 1CacjEfsS4r0v70VAAAo. Handshake TS: 1543051243431
+1543051244263:        Attempt event ----------
+1543051244263:        DB conev insert. 'jm.yogesh.kumar_47_48276':1CacjEfsS4r0v70VAAAo inserted to DB ----------
+1543051244264:        before con select 
+1543051244266:        Current status: ttc = 1543051235; 'jm.yogesh.kumar_47_48276' - Previous deadtime - 2 - Status - Dead
+1543051244266:      === delta deadtime: 8 with ttc = 1543051235
+1543051244266:        conn1: status to'Live' 1CacjEfsS4r0v70VAAAo; ttc to 1543051243
+1543051261835:      *** In disconnect event. Connected sockets - 0
+1543051261835:           Socket disconnec - 1CacjEfsS4r0v70VAAAo
+1543051261838:           DB disconev insert ----------
+1543051261846:      <<<<< select query
+1543051261847:      *** discon: status to 'Dead' 1CacjEfsS4r0v70VAAAo; ttc to 1543051261
+1543051263735: ------ Connect event. Connected sockets - 1
+1543051263735:        Socket connected - vzVHorlWorXW63tVAAAp. Handshake TS: 1543051263732
+1543051264673:        Attempt event ----------
+1543051264674:        DB conev insert. 'jm.yogesh.kumar_47_48276':vzVHorlWorXW63tVAAAp inserted to DB ----------
+1543051264674:        before con select 
+1543051264677:        Current status: ttc = 1543051261; 'jm.yogesh.kumar_47_48276' - Previous deadtime - 10 - Status - Dead
+1543051264677:      === delta deadtime: 2 with ttc = 1543051261
+1543051264677:        conn1: status to'Live' vzVHorlWorXW63tVAAAp; ttc to 1543051263
+1543051279817:      *** In disconnect event. Connected sockets - 0
+1543051279817:           Socket disconnec - vzVHorlWorXW63tVAAAp
+1543051279819:           DB disconev insert ----------
+1543051279823:      <<<<< select query
+1543051279823:      *** discon: status to 'Dead' vzVHorlWorXW63tVAAAp; ttc to 1543051279
+1543051282234: ------ Connect event. Connected sockets - 1
+1543051282234:        Socket connected - HAgoRf8Ma6w7LVeDAAAq. Handshake TS: 1543051282233
+1543051285220:        Attempt event ----------
+1543051285220:        DB conev insert. 'jm.yogesh.kumar_47_48276':HAgoRf8Ma6w7LVeDAAAq inserted to DB ----------
+1543051285220:        before con select 
+1543051285223:        Current status: ttc = 1543051279; 'jm.yogesh.kumar_47_48276' - Previous deadtime - 12 - Status - Dead
+1543051285223:      === delta deadtime: 3 with ttc = 1543051279
+1543051285223:        conn1: status to'Live' HAgoRf8Ma6w7LVeDAAAq; ttc to 1543051282
+1543051315223:      *** In disconnect event. Connected sockets - 0
+1543051315223:           Socket disconnec - HAgoRf8Ma6w7LVeDAAAq
+1543051315224:           DB disconev insert ----------
+1543051315229:      <<<<< select query
+1543051315229:      *** discon: status to 'Dead' HAgoRf8Ma6w7LVeDAAAq; ttc to 1543051315
