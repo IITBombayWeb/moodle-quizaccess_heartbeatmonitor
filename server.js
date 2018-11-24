@@ -284,8 +284,8 @@ var record = io.sockets.on('connection', function (socket) {
 	            	    });
 	            	    
                     	}
-	            	//if (status == 'Dead' && currenttimeserverid == room_timeserver) {
-	            	if (currenttimeserverid == room_timeserver) {
+	            	if (status == 'Dead' && currenttimeserverid == room_timeserver) {
+	            	//if (currenttimeserverid == room_timeserver) {
 	                    
 	                    // Compute cumulative deadtime.
                             var delta = socket.timestampC - timetoconsider;
@@ -317,6 +317,10 @@ var record = io.sockets.on('connection', function (socket) {
 			}
 			//                    }
                     } else {
+
+		con.query("LOCK TABLE exm_quizaccess_hbmon_livetable WRITE", function(err, result) {
+		  if (err) throw err;
+		});
                 	// Insert current status entry for this user in 'livetable'.                	
                         debuglog('       conn2: status to' + socket.currentstatus  + ' ' + socket.id + ' ttc to ' + timetoconsider);
 			var livetablesql = "INSERT INTO exm_quizaccess_hbmon_livetable (roomid, status, timeserver, timetoconsider, livetime, deadtime) VALUES" +
@@ -443,6 +447,12 @@ var record = io.sockets.on('connection', function (socket) {
 			+ ", timetoconsider = " + socket.timestampD 
 			+ ", livetime = " + livetime 
 			+ " where roomid = " + socket.roomid;
+
+		con.query("LOCK TABLE exm_quizaccess_hbmon_livetable WRITE", function(err, result) {
+                  if (err) throw err;
+                });
+                debuglog('     <<< lt lock acquired');
+
 
 		con.query(updatelivetablesql, function(err, result) {
 			if (err) throw err;
