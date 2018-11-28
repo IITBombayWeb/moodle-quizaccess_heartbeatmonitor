@@ -30,6 +30,10 @@ defined('MOODLE_INTERNAL') || die();
 require_once($CFG->dirroot . '/mod/quiz/accessrule/heartbeatmonitor/hbmonconfig.php');
 require_once($CFG->dirroot . '/mod/quiz/accessrule/accessrulebase.php');
 require_once($CFG->dirroot . '/mod/quiz/accessrule/heartbeatmonitor/timelimitoverride.php');
+require_once($CFG->dirroot . '/mod/quiz/accessrule/heartbeatmonitor/mylib.php');
+
+//require_once($CFG->dirroot . '/mod/quiz/accessrule/heartbeatmonitor/rulelogs.txt');
+
 
 
 /**
@@ -46,6 +50,23 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
         }
         return new self($quizobj, $timenow);
     }
+/*
+    public function debuglog($file, $text) {
+        echo '<br><br><br>in debuglog<br>';
+        $micro_date = microtime();
+        $date_array = explode(" ", $micro_date);
+        $date = date("Y-m-d H:i:s", $date_array[1]);
+
+        $tmp = explode(".", $date_array[0]);
+
+        $contents = $date . "." . $tmp[1] . ": " . $text;
+
+        echo "<br><br><br><br>I am here <br>";
+
+        file_put_contents($file, $contents);
+
+    }
+*/
 
     public function prevent_access() {
         global $CFG, $PAGE, $_SESSION, $DB, $USER, $HBCFG;
@@ -75,11 +96,19 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
         $socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
         $phpws_result = @socket_connect($socket, $HBCFG->host, $HBCFG->port);
 
+	//$myfile = fopen("rulelogs.txt", "a");
+	$myfile = $CFG->dirroot . "/mod/quiz/accessrule/heartbeatmonitor/padebug.log";
+	//echo "<br><br><br> myfile: " . $myfile;
+/*
         // If unfinished attempt.
         if ($unfinishedattempt = quiz_get_user_attempt_unfinished($quiz->id, $USER->id)) {
             $unfinishedattemptid = $unfinishedattempt->id;
             $unfinished = $unfinishedattempt->state == quiz_attempt::IN_PROGRESS;
+	    
+	    $txt = "Prev atmpt: unfinished ". $USER->username;		
+	    debuglog($myfile, $txt);
 
+	    //echo $a;
             if ($unfinished) {
                 $attemptid  = $unfinishedattempt->id;
                 $attemptobj = quiz_attempt::create($attemptid);
@@ -89,6 +118,8 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
                     throw new moodle_quiz_exception($attemptobj->get_quizobj(), 'notyourattempt');
                 } else {
                     $roomid = $username . '_' . $quizid . '_' . $attemptid;
+           	    
+		    debuglog($myfile, "P:a " . $roomid );
 
                     // If node server is down.
                     if(!$phpws_result) {
@@ -134,9 +165,13 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
 
                         return get_string('servererr', 'quizaccess_heartbeatmonitor');
                     } else {
+			if($attemptid) {
                         $PAGE->requires->js_init_call('client', array($quizid, $userid, $username, $attemptid, $sessionkey, json_encode($HBCFG)));
 
-                        $hbmonmodesql = "SELECT hbmonmode
+			$txt1 = "P:a " . $username . " " . $attemptid .  " after init call ----- ";
+			debuglog($myfile, $txt1);
+                        
+			$hbmonmodesql = "SELECT hbmonmode
                                             FROM {quizaccess_enable_hbmon}
                                             WHERE quizid = $quizid";
                         $hbmonmode = $DB->get_field_sql($hbmonmodesql);
@@ -147,7 +182,7 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
                                                 FROM {quizaccess_hbmon_livetable}
                                                 WHERE roomid = "' . $roomid . '"' .
                                                 /*  AND status = "Live" */
-                                                'AND deadtime > 60';
+  /*                                              'AND deadtime > 60';
                             $records = $DB->get_records_sql($select_sql);
 
                             if (!empty($records)){
@@ -160,6 +195,7 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
                                 }
                             }
                         }
+			}
                     }
                 }
             }
@@ -170,6 +206,7 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
                 return get_string('servererr', 'quizaccess_heartbeatmonitor');
             }
         }
+//	fclose($myfile); */
     }
 
     public function setup_attempt_page($page) {
@@ -191,7 +228,15 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
         $quizid     = $this->quizobj->get_quizid();
         $cmid       = $this->quizobj->get_cmid();
 //         $context    = $this->quizobj->get_context();
+	
+	//$myfile = fopen("rulelogs.txt", "w") or die("Unable to open file!");
+	//fwrite($myfile, "Setup atmpt: " . $username . " " . round(microtime(true) * 1000) . " bf sql");
 
+	//echo 'sub atmpt';
+        $myfile = $CFG->dirroot . "/mod/quiz/accessrule/heartbeatmonitor/sadebug.log";
+	$txt = "Setup atmpt: " . $username .  " bf sql ----- ";
+	debuglog($myfile, $txt);
+/*
         // To do - Get attempt id from url here.
         $sql = 'SELECT *
                     FROM {quiz_attempts}
@@ -202,7 +247,10 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
         $params['quizid'] = $quizid;
         $params['userid'] = $userid;
         $attempt = $DB->get_record_sql($sql, $params);
-        if($attempt) {
+	
+	debuglog($myfile, "Setup atmpt: " . $username . " " . $attempt->id . " af sql ----- ");
+        
+	if($attempt) {
             $attemptid  = $attempt->id;
             $quiza      = $DB->get_record('quiz_attempts', array('id' => $attemptid));
             $state      = $quiza->state;
@@ -224,9 +272,11 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
                  if ($override) {
                      quiz_delete_override($quiz, $override->id);
                  }
-                 */
-                $roomid = $username . '_' . $quizid . '_' . $attemptid;
-                $select_sql = 'SELECT *
+                */
+               /* $roomid = $username . '_' . $quizid . '_' . $attemptid;
+        	debuglog($myfile, "Setup atmpt: " . $roomid .  " bf sql2 ----- ");
+	        
+		$select_sql = 'SELECT *
                                     FROM {quizaccess_hbmon_livetable}
                                     WHERE roomid = "' . $roomid . '"';
                                     // AND status = "Dead"';
@@ -241,7 +291,8 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
                     }
                 }
             }
-        }
+        }*/
+//	fclose($myfile);
     }
 
     protected function create_user_override($roomid, $cmid, $quiz, $state = null) {
@@ -319,6 +370,7 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
 //         $mform->addGroup($radioarray, 'radioar', '', array(' '), false);
 //         $hbmonsettingsarray[] = $radioarray;
         $mform->disabledIf('hbmonmode', 'hbmonrequired', 'neq', 1);
+	$mform->setDefault('hbmonmode', 1);
 
         $mform->addGroup($hbmonsettingsarray, 'enablehbmon', get_string('hbmonrequired', 'quizaccess_heartbeatmonitor'), array(' '), false);
         $mform->addHelpButton('enablehbmon', 'hbmonrequired', 'quizaccess_heartbeatmonitor');
@@ -373,3 +425,7 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
          return array();
      }
 }
+
+
+
+

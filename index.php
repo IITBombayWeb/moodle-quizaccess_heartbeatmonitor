@@ -86,7 +86,8 @@ if (!empty($result)){
         $attemptid = array_splice($roomdata, -1)[0];
         $quiza     = $DB->get_record('quiz_attempts', array('id'=>$attemptid));
 
-        if(!$quiza || $quiza->state == 'finished') {
+//        if(!$quiza || $quiza->state == 'finished') {
+      if( $quiza->state == 'finished') {
 //             $sql = 'DELETE FROM {quizaccess_hbmon_livetable} WHERE roomid = "' . $roomid . '"';
             $hblivetable = 'quizaccess_hbmon_livetable';
             $select = 'roomid = ?'; // Is put into the where clause.
@@ -290,6 +291,7 @@ function secondsToTime($seconds) {
     $dtT = new DateTime("@$seconds");
     return $dtF->diff($dtT)->format('%a d, %h h : %i m : %s s');
 }
+
 
 // Finish the page.
 echo $OUTPUT->footer();

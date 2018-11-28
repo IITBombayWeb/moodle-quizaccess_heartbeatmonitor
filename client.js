@@ -48,7 +48,7 @@ function client(Y, quizid, userid, username, attemptid, sessionkey, hbcfg)
 					      , 'xhr-polling'
 					      , 'jsonp-polling']
 					});	
-	
+	if(!attemptid)	{	
 	var roomid = username + '_' + quizid + '_' + attemptid;	
 	
 	socket.on('connect', function() {
@@ -62,10 +62,11 @@ function client(Y, quizid, userid, username, attemptid, sessionkey, hbcfg)
 		console.log('-- In timeserver event --');
 		console.log('-- Curr. Timeserver id - ' + data.currenttimeserverid);
 	});
-	
+}	
 	socket.on('disconnect', function() {
 		console.log('-- In client \'disconnect\' event --');
 		console.log('-- After socket disconnected - ' + socket.id  + '. Curr. TS - ' + Math.floor(new Date().getTime())/1000);
 	});
+
 }
 
