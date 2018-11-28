@@ -1,0 +1,194 @@
+1542943294995: Mysql Connected!
+1542943300394: ------ Connect event. Connected sockets - 1
+1542943300395:        Socket connected - Sim5Vvi-8px_-1ZxAAAA. Handshake TS: 1542943300391
+1542943300406:        Attempt event ----------
+1542943300406:        DB conev insert. 'p.sunthar_47_41197':Sim5Vvi-8px_-1ZxAAAA inserted to DB ----------
+1542943300406:        before con select 
+1542943300414:        conn2: status to'Live' Sim5Vvi-8px_-1ZxAAAA ttc to undefined
+1542943347520:      *** In disconnect event. Connected sockets - 0
+1542943347521:           Socket disconnec - Sim5Vvi-8px_-1ZxAAAA
+1542943347521:           DB disconev insert ----------
+1542943347521:      <<< lt lock acquired
+1542943347527:      <<<<< select query
+1542943347527:      *** discon: status to 'Dead' Sim5Vvi-8px_-1ZxAAAA; ttc to 1542943347
+1542943347528:      >>> lt lock released
+1542943347681: ------ Connect event. Connected sockets - 1
+1542943347681:        Socket connected - 0ZJCLPL8oaR-giyWAAAB. Handshake TS: 1542943347681
+1542943347706:        Attempt event ----------
+1542943347707:        DB conev insert. 'p.sunthar_47_41197':0ZJCLPL8oaR-giyWAAAB inserted to DB ----------
+1542943347707:        before con select 
+1542943347713:        Current status: ttc = 1542943347; 'p.sunthar_47_41197' - Previous deadtime - 0 - Status - Dead
+1542943347713:      === delta deadtime: 0 with ttc = 1542943347
+1542943347713:        conn1: status to'Live' 0ZJCLPL8oaR-giyWAAAB; ttc to 1542943347
+1542943405409:      *** In disconnect event. Connected sockets - 0
+1542943405410:           Socket disconnec - 0ZJCLPL8oaR-giyWAAAB
+1542943405410:           DB disconev insert ----------
+1542943405410:      <<< lt lock acquired
+1542943405414:      <<<<< select query
+1542943405415:      *** discon: status to 'Dead' 0ZJCLPL8oaR-giyWAAAB; ttc to 1542943405
+1542943405415:      >>> lt lock released
+1542943405564: ------ Connect event. Connected sockets - 1
+1542943405564:        Socket connected - aUHTf5AvYJ91G4hrAAAC. Handshake TS: 1542943405564
+1542943405594:        Attempt event ----------
+1542943405595:        DB conev insert. 'p.sunthar_47_41197':aUHTf5AvYJ91G4hrAAAC inserted to DB ----------
+1542943405595:        before con select 
+1542943405599:        Current status: ttc = 1542943405; 'p.sunthar_47_41197' - Previous deadtime - 0 - Status - Dead
+1542943405599:      === delta deadtime: 0 with ttc = 1542943405
+1542943405599:        conn1: status to'Live' aUHTf5AvYJ91G4hrAAAC; ttc to 1542943405
+1542943463793:      *** In disconnect event. Connected sockets - 0
+1542943463794:           Socket disconnec - aUHTf5AvYJ91G4hrAAAC
+1542943463795:           DB disconev insert ----------
+1542943463795:      <<< lt lock acquired
+1542943463799:      <<<<< select query
+1542943463799:      *** discon: status to 'Dead' aUHTf5AvYJ91G4hrAAAC; ttc to 1542943463
+1542943463799:      >>> lt lock released
+1542943463955: ------ Connect event. Connected sockets - 1
+1542943463956:        Socket connected - bA2a2WUic1mNmWDMAAAD. Handshake TS: 1542943463955
+1542943463964:        Attempt event ----------
+1542943463964:        DB conev insert. 'p.sunthar_47_41197':bA2a2WUic1mNmWDMAAAD inserted to DB ----------
+1542943463964:        before con select 
+1542943463969:        Current status: ttc = 1542943463; 'p.sunthar_47_41197' - Previous deadtime - 0 - Status - Dead
+1542943463969:      === delta deadtime: 0 with ttc = 1542943463
+1542943463969:        conn1: status to'Live' bA2a2WUic1mNmWDMAAAD; ttc to 1542943463
+1542943479283:      *** In disconnect event. Connected sockets - 0
+1542943479284:           Socket disconnec - bA2a2WUic1mNmWDMAAAD
+1542943479285:           DB disconev insert ----------
+1542943479285:      <<< lt lock acquired
+1542943479289:      <<<<< select query
+1542943479289:      *** discon: status to 'Dead' bA2a2WUic1mNmWDMAAAD; ttc to 1542943479
+1542943479290:      >>> lt lock released
+1542943479448: ------ Connect event. Connected sockets - 1
+1542943479448:        Socket connected - nBQlH47GrrqDghQ9AAAE. Handshake TS: 1542943479447
+1542943479476:        Attempt event ----------
+1542943479476:        DB conev insert. 'p.sunthar_47_41197':nBQlH47GrrqDghQ9AAAE inserted to DB ----------
+1542943479477:        before con select 
+1542943479492:        Current status: ttc = 1542943479; 'p.sunthar_47_41197' - Previous deadtime - 0 - Status - Dead
+1542943479492:      === delta deadtime: 0 with ttc = 1542943479
+1542943479493:        conn1: status to'Live' nBQlH47GrrqDghQ9AAAE; ttc to 1542943479
+1542943485429:      *** In disconnect event. Connected sockets - 0
+1542943485429:           Socket disconnec - nBQlH47GrrqDghQ9AAAE
+1542943485430:           DB disconev insert ----------
+1542943485430:      <<< lt lock acquired
+1542943485433:      <<<<< select query
+1542943485434:      *** discon: status to 'Dead' nBQlH47GrrqDghQ9AAAE; ttc to 1542943485
+1542943485434:      >>> lt lock released
+1542943485558: ------ Connect event. Connected sockets - 1
+1542943485559:        Socket connected - tTxxcrccfmIXLlxyAAAF. Handshake TS: 1542943485558
+1542943485568:        Attempt event ----------
+1542943485569:        DB conev insert. 'p.sunthar_47_41197':tTxxcrccfmIXLlxyAAAF inserted to DB ----------
+1542943485569:        before con select 
+1542943485574:        Current status: ttc = 1542943485; 'p.sunthar_47_41197' - Previous deadtime - 0 - Status - Dead
+1542943485574:      === delta deadtime: 0 with ttc = 1542943485
+1542943485574:        conn1: status to'Live' tTxxcrccfmIXLlxyAAAF; ttc to 1542943485
+1542943493794:      *** In disconnect event. Connected sockets - 0
+1542943493794:           Socket disconnec - tTxxcrccfmIXLlxyAAAF
+1542943493794:           DB disconev insert ----------
+1542943493794:      <<< lt lock acquired
+1542943493798:      <<<<< select query
+1542943493798:      *** discon: status to 'Dead' tTxxcrccfmIXLlxyAAAF; ttc to 1542943493
+1542943493798:      >>> lt lock released
+1542943493931: ------ Connect event. Connected sockets - 1
+1542943493931:        Socket connected - 7gaRa2UAJ6VoAJyJAAAG. Handshake TS: 1542943493931
+1542943493943:        Attempt event ----------
+1542943493943:        DB conev insert. 'p.sunthar_47_41197':7gaRa2UAJ6VoAJyJAAAG inserted to DB ----------
+1542943493944:        before con select 
+1542943493949:        Current status: ttc = 1542943493; 'p.sunthar_47_41197' - Previous deadtime - 0 - Status - Dead
+1542943493949:      === delta deadtime: 0 with ttc = 1542943493
+1542943493949:        conn1: status to'Live' 7gaRa2UAJ6VoAJyJAAAG; ttc to 1542943493
+1542943500528:      *** In disconnect event. Connected sockets - 0
+1542943500529:           Socket disconnec - 7gaRa2UAJ6VoAJyJAAAG
+1542943500529:           DB disconev insert ----------
+1542943500529:      <<< lt lock acquired
+1542943500534:      <<<<< select query
+1542943500534:      *** discon: status to 'Dead' 7gaRa2UAJ6VoAJyJAAAG; ttc to 1542943500
+1542943500534:      >>> lt lock released
+1542943500669: ------ Connect event. Connected sockets - 1
+1542943500669:        Socket connected - 703GuLcwVyKOyqDMAAAH. Handshake TS: 1542943500668
+1542943500684:        Attempt event ----------
+1542943500685:        DB conev insert. 'p.sunthar_47_41197':703GuLcwVyKOyqDMAAAH inserted to DB ----------
+1542943500685:        before con select 
+1542943500688:        Current status: ttc = 1542943500; 'p.sunthar_47_41197' - Previous deadtime - 0 - Status - Dead
+1542943500688:      === delta deadtime: 0 with ttc = 1542943500
+1542943500688:        conn1: status to'Live' 703GuLcwVyKOyqDMAAAH; ttc to 1542943500
+1542943507378:      *** In disconnect event. Connected sockets - 0
+1542943507378:           Socket disconnec - 703GuLcwVyKOyqDMAAAH
+1542943507379:           DB disconev insert ----------
+1542943507379:      <<< lt lock acquired
+1542943507386:      <<<<< select query
+1542943507386:      *** discon: status to 'Dead' 703GuLcwVyKOyqDMAAAH; ttc to 1542943507
+1542943507386:      >>> lt lock released
+1542943507520: ------ Connect event. Connected sockets - 1
+1542943507521:        Socket connected - -LL8IDzxJLowuI7JAAAI. Handshake TS: 1542943507520
+1542943507535:        Attempt event ----------
+1542943507535:        DB conev insert. 'p.sunthar_47_41197':-LL8IDzxJLowuI7JAAAI inserted to DB ----------
+1542943507535:        before con select 
+1542943507542:        Current status: ttc = 1542943507; 'p.sunthar_47_41197' - Previous deadtime - 0 - Status - Dead
+1542943507543:      === delta deadtime: 0 with ttc = 1542943507
+1542943507543:        conn1: status to'Live' -LL8IDzxJLowuI7JAAAI; ttc to 1542943507
+1542943512617:      *** In disconnect event. Connected sockets - 0
+1542943512617:           Socket disconnec - -LL8IDzxJLowuI7JAAAI
+1542943512617:           DB disconev insert ----------
+1542943512617:      <<< lt lock acquired
+1542943512622:      <<<<< select query
+1542943512624:      *** discon: status to 'Dead' -LL8IDzxJLowuI7JAAAI; ttc to 1542943512
+1542943512624:      >>> lt lock released
+1542943512769: ------ Connect event. Connected sockets - 1
+1542943512769:        Socket connected - y2Y-AcHrKSDMGKLtAAAJ. Handshake TS: 1542943512769
+1542943512780:        Attempt event ----------
+1542943512781:        DB conev insert. 'p.sunthar_47_41197':y2Y-AcHrKSDMGKLtAAAJ inserted to DB ----------
+1542943512781:        before con select 
+1542943512787:        Current status: ttc = 1542943512; 'p.sunthar_47_41197' - Previous deadtime - 0 - Status - Dead
+1542943512789:      === delta deadtime: 0 with ttc = 1542943512
+1542943512789:        conn1: status to'Live' y2Y-AcHrKSDMGKLtAAAJ; ttc to 1542943512
+1542943523426:      *** In disconnect event. Connected sockets - 0
+1542943523426:           Socket disconnec - y2Y-AcHrKSDMGKLtAAAJ
+1542943523426:           DB disconev insert ----------
+1542943523427:      <<< lt lock acquired
+1542943523430:      <<<<< select query
+1542943523430:      *** discon: status to 'Dead' y2Y-AcHrKSDMGKLtAAAJ; ttc to 1542943523
+1542943523431:      >>> lt lock released
+1542943523596: ------ Connect event. Connected sockets - 1
+1542943523596:        Socket connected - Mf04szYkzO3yurSuAAAK. Handshake TS: 1542943523596
+1542943523626:        Attempt event ----------
+1542943523627:        DB conev insert. 'p.sunthar_47_41197':Mf04szYkzO3yurSuAAAK inserted to DB ----------
+1542943523627:        before con select 
+1542943523630:        Current status: ttc = 1542943523; 'p.sunthar_47_41197' - Previous deadtime - 0 - Status - Dead
+1542943523631:      === delta deadtime: 0 with ttc = 1542943523
+1542943523631:        conn1: status to'Live' Mf04szYkzO3yurSuAAAK; ttc to 1542943523
+1542943559739:      *** In disconnect event. Connected sockets - 0
+1542943559740:           Socket disconnec - Mf04szYkzO3yurSuAAAK
+1542943559740:           DB disconev insert ----------
+1542943559740:      <<< lt lock acquired
+1542943559744:      <<<<< select query
+1542943559744:      *** discon: status to 'Dead' Mf04szYkzO3yurSuAAAK; ttc to 1542943559
+1542943559744:      >>> lt lock released
+1542943559904: ------ Connect event. Connected sockets - 1
+1542943559904:        Socket connected - AkBuh8WbrHncbbhsAAAL. Handshake TS: 1542943559903
+1542943559935:        Attempt event ----------
+1542943559936:        DB conev insert. 'p.sunthar_47_41197':AkBuh8WbrHncbbhsAAAL inserted to DB ----------
+1542943559936:        before con select 
+1542943559943:        Current status: ttc = 1542943559; 'p.sunthar_47_41197' - Previous deadtime - 0 - Status - Dead
+1542943559943:      === delta deadtime: 0 with ttc = 1542943559
+1542943559943:        conn1: status to'Live' AkBuh8WbrHncbbhsAAAL; ttc to 1542943559
+1542943644567:      *** In disconnect event. Connected sockets - 0
+1542943644567:           Socket disconnec - AkBuh8WbrHncbbhsAAAL
+1542943644568:           DB disconev insert ----------
+1542943644568:      <<< lt lock acquired
+1542943644571:      <<<<< select query
+1542943644572:      *** discon: status to 'Dead' AkBuh8WbrHncbbhsAAAL; ttc to 1542943644
+1542943644572:      >>> lt lock released
+1542943644738: ------ Connect event. Connected sockets - 1
+1542943644738:        Socket connected - 3lxyt3IfikVzI7gMAAAM. Handshake TS: 1542943644737
+1542943644746:        Attempt event ----------
+1542943644746:        DB conev insert. 'p.sunthar_47_41197':3lxyt3IfikVzI7gMAAAM inserted to DB ----------
+1542943644746:        before con select 
+1542943644751:        Current status: ttc = 1542943644; 'p.sunthar_47_41197' - Previous deadtime - 0 - Status - Dead
+1542943644751:      === delta deadtime: 0 with ttc = 1542943644
+1542943644751:        conn1: status to'Live' 3lxyt3IfikVzI7gMAAAM; ttc to 1542943644
+1542943659583:      *** In disconnect event. Connected sockets - 0
+1542943659583:           Socket disconnec - 3lxyt3IfikVzI7gMAAAM
+1542943659584:           DB disconev insert ----------
+1542943659584:      <<< lt lock acquired
+1542943659587:      <<<<< select query
+1542943659587:      *** discon: status to 'Dead' 3lxyt3IfikVzI7gMAAAM; ttc to 1542943659
+1542943659587:      >>> lt lock released

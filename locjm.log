@@ -1,0 +1,29 @@
+1543051511104: Mysql Connected!
+1543051737658: ------ Connect event. Connected sockets - 1
+1543051737660:        Socket connected - 0ZMvaKk5SvmJysdTAAAA. Handshake TS: 1543051737655
+1543051739764:        Attempt event ----------
+1543051739765:        DB conev insert. 'jm.yogesh.kumar_47_${ATTEMPT_ID}':0ZMvaKk5SvmJysdTAAAA inserted to DB ----------
+1543051739765:        before con select 
+1543051739776:        conn2: status to'Live' 0ZMvaKk5SvmJysdTAAAA ttc to undefined
+1543051769769:      *** In disconnect event. Connected sockets - 0
+1543051769771:           Socket disconnec - 0ZMvaKk5SvmJysdTAAAA
+1543051769772:           DB disconev insert ----------
+1543051769772:      <<< lt lock acquired
+1543051769779:      <<<<< select query
+1543051769779:      <<< lt lock acquired
+1543051769780:      *** discon: status to 'Dead' 0ZMvaKk5SvmJysdTAAAA; ttc to 1543051769
+1543051769780:      >>> lt lock released
+1543051980748: ------ Connect event. Connected sockets - 1
+1543051980749:        Socket connected - 9Ru_lny_9q8TgihoAAAB. Handshake TS: 1543051980747
+1543051982493:        Attempt event ----------
+1543051982498:        DB conev insert. 'jm.yogesh.kumar_47_':9Ru_lny_9q8TgihoAAAB inserted to DB ----------
+1543051982498:        before con select 
+1543051982504:        conn2: status to'Live' 9Ru_lny_9q8TgihoAAAB ttc to undefined
+1543052012495:      *** In disconnect event. Connected sockets - 0
+1543052012495:           Socket disconnec - 9Ru_lny_9q8TgihoAAAB
+1543052012496:           DB disconev insert ----------
+1543052012496:      <<< lt lock acquired
+1543052012500:      <<<<< select query
+1543052012500:      <<< lt lock acquired
+1543052012501:      *** discon: status to 'Dead' 9Ru_lny_9q8TgihoAAAB; ttc to 1543052012
+1543052012501:      >>> lt lock released
