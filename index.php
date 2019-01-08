@@ -77,6 +77,8 @@ $table->head = array('', get_string('user', 'quizaccess_heartbeatmonitor'), 'ID 
 // $table->head = array('User', 'Socket room id', 'Current status', 'Status update on', 'Quiz time used up', 'Quiz time lost', 'Total extra time granted');
 
 $result    = $DB->get_records_sql($sql);
+//print_object($result);
+
 $count = 0;
 if (!empty($result)){
     // Output data of each row.
@@ -87,6 +89,7 @@ if (!empty($result)){
         $quiza     = $DB->get_record('quiz_attempts', array('id'=>$attemptid));
 
         if(!$quiza || $quiza->state == 'finished') {
+//	if($quiza->state == 'finished') {
 //             $sql = 'DELETE FROM {quizaccess_hbmon_livetable} WHERE roomid = "' . $roomid . '"';
             $hblivetable = 'quizaccess_hbmon_livetable';
             $select = 'roomid = ?'; // Is put into the where clause.
