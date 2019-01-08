@@ -314,7 +314,8 @@ class timelimitoverride {
             // Trigger the override created event.
             $event->trigger();
         }
-
+        
+        
         quiz_update_open_attempts(array('quizid'=>$quiz->id));
         // if ($groupmode) {
         // Priorities may have shifted, so we need to update all of the calendar events for group overrides.
