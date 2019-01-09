@@ -33,7 +33,7 @@ var http 		= require('http').createServer(app);
 var io			= require('socket.io').listen(http);
 var bodyParser 	= require('body-parser');
 var mysql 		= require('mysql');
-var fs 			= require('fs');
+//var fs 			= require('fs');
 var obj;
 
 
@@ -43,24 +43,12 @@ var child = require('child_process').execSync('php -r \'define("CLI_SCRIPT", tru
 obj = JSON.parse(child);
 
 // DB CONN
-//console.log('-- Connecting to the db --');
-//console.log(obj.dbhost);
-//console.log(obj.dbuser);
-//console.log(obj.dbpass);
-//console.log(obj.dbname);
 var con = mysql.createConnection({
 	host 	 : obj.dbhost,
 	user 	 : obj.dbuser,
 	password : obj.dbpass,
 	database : obj.dbname
 });
-
-//var con = mysql.createConnection({
-//	host 	 : 'localhost',
-//	user 	 : 'moodle-owner',
-//	password : 'Moodle@123',
-//	database : 'moodle'
-//});
 
 app.use(bodyParser.urlencoded({ extended: true }));
 
@@ -109,7 +97,8 @@ var record = io.sockets.on('connection', function (socket) {
 		// This is the socket of each client in the room.
 		allsocketids.push(io.sockets.server.eio.clients[clientid].id);
 	}  
-	
+//	io.set('heartbeat timeout', 10);
+//	io.set('heartbeat interval', 4);
 	socket.on('attempt', function(data) {
 //		console.log('-- In attempt event --');
 		
@@ -300,6 +289,7 @@ var record = io.sockets.on('connection', function (socket) {
 			console.log('In \'error\' event. Connected sockets - ' + io.sockets.server.eio.clientsCount);
 		});
 	});
+	
 	
 	socket.on('disconnect', function() {
 //		console.log(socket.id + ' disconnected. Curr. TS - ' + (new Date().getTime()));

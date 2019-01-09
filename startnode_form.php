@@ -82,17 +82,19 @@ class startnode_form extends moodleform {
         $socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
         $phpws_result = @socket_connect($socket, '127.0.0.1', 3000);
 
-//         echo '<br><br><br>-- ws res in strtnd frm --';
-//         print_object($phpws_result);
+        //echo '<br><br><br>-- ws res in strtnd frm --';
+        //print_object($phpws_result);
 
         if(!$phpws_result) {
 //             exec("node /var/ww/html/moodle/mod/quiz/accessrule/heartbeatmonitor/server.js 2>&1", $output);
 //             die();
+            //echo 'start';
             $mform->addElement('static', 'description', '', 'Start the \'Time server\' by clicking \'Start\' button.');
 
             // Start button.
             $mform->addElement('submit', 'submitbutton', 'Start');
         } else {
+            //echo 'stop';
             $mform->addElement('static', 'description', '', 'Heartbeat time server is running. <br>Stop the time server by clicking on the \'Stop\' button.');
 
             // Stop button.

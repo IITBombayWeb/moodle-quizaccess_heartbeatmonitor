@@ -38,6 +38,7 @@ $quizid     = required_param('quizid', PARAM_INT);
 $courseid   = required_param('courseid', PARAM_INT);
 $cmid       = required_param('cmid', PARAM_INT);
 
+
 list($course, $cm) = get_course_and_cm_from_cmid($cmid, 'quiz');
 $quiz = $DB->get_record('quiz', array('id' => $cm->instance), '*', MUST_EXIST);
 
@@ -51,6 +52,9 @@ $heading    = get_string('heading', 'quizaccess_heartbeatmonitor', $quiz->name);
 $url = new moodle_url('/mod/quiz/accessrule/heartbeatmonitor/index.php', array('quizid'=>$quizid, 'courseid'=>$courseid, 'cmid'=>$cmid));
 $PAGE->set_url($url);
 
+//$url1=$_SERVER['REQUEST_URI'];
+//header("Refresh: 5;");
+
 require_login($course, false, $cm);
 
 $context = context_module::instance($cm->id);
@@ -60,14 +64,14 @@ require_capability('mod/quiz:manage', $context);
 
 // Display live users.
 // Fetch records from database.
-$sql = 'SELECT * FROM {quizaccess_hbmon_livetable}';  // Select data for a particular quiz and not entire table..insert quizid col in livetable for this.
+$sql = 'SELECT * FROM {quizaccess_hbmon_livetable} ORDER BY status, roomid';  // Todo: Select data for a particular quiz and not entire table. Insert quizid col in livetable for this.
 $arr = array();
 $roomid = null;
 
 $table = new html_table();
 $table->id = get_string('liveusers', 'quizaccess_heartbeatmonitor');
 $table->caption = get_string('usersattemptingquiz', 'quizaccess_heartbeatmonitor');
-$table->head = array(get_string('user', 'quizaccess_heartbeatmonitor'),
+$table->head = array('', get_string('user', 'quizaccess_heartbeatmonitor'), 'Id Number',
                         get_string('socketroomid', 'quizaccess_heartbeatmonitor'),
                         get_string('currentstatus', 'quizaccess_heartbeatmonitor'),
                         get_string('statusupdate', 'quizaccess_heartbeatmonitor'),
@@ -77,6 +81,8 @@ $table->head = array(get_string('user', 'quizaccess_heartbeatmonitor'),
 // $table->head = array('User', 'Socket room id', 'Current status', 'Status update on', 'Quiz time used up', 'Quiz time lost', 'Total extra time granted');
 
 $result    = $DB->get_records_sql($sql);
+// print_object($result);
+$count = 0;
 
 if (!empty($result)){
     // Output data of each row.
@@ -133,6 +139,13 @@ if (!empty($result)){
 
             $value = $roomid . '_' . $deadtime;
 
+            $count++;
+            $cell01 = new html_table_cell($count);
+            $cell01->id = 'srno';
+
+            $cell02 = new html_table_cell($user->idnumber);
+            $cell02->id = 'idno';
+
             $cell0 = new html_table_cell($user->firstname .  ' ' . $user->lastname);
             $cell0->id = 'user';
 
@@ -159,7 +172,10 @@ if (!empty($result)){
             $cell6->id = 'extratime';
             $cell6->attributes['value'] = $extratime;
 
+            $row->cells[] = $cell01;
+
             $row->cells[] = $cell0;
+            $row->cells[] = $cell02;
             $row->cells[] = $cell1;
             $row->cells[] = $cell2;
             $row->cells[] = $cell3;
@@ -260,18 +276,14 @@ if($fromform = $mform->get_data()) {
 } else {
     $startnode_form->display();
     if(empty($table->data)) {
-        echo get_string('h4open', 'quizaccess_heartbeatmonitor');
         echo html_writer::nonempty_tag('liveuserstblcaption', get_string('liveusers', 'quizaccess_heartbeatmonitor'));
-        echo get_string('h4close', 'quizaccess_heartbeatmonitor');
         echo $OUTPUT->notification(get_string('nodatafound', 'quizaccess_heartbeatmonitor'), 'info');
     } else {
-        echo get_string('h4open', 'quizaccess_heartbeatmonitor');
         echo html_writer::nonempty_tag('liveuserstblcaption', get_string('liveusers', 'quizaccess_heartbeatmonitor'));
-        echo get_string('h4close', 'quizaccess_heartbeatmonitor');
 
         // Display table.
         echo html_writer::table($table);
-        echo get_string('br', 'quizaccess_heartbeatmonitor');
+        echo '<br>';
         $mform->display();
     }
 }

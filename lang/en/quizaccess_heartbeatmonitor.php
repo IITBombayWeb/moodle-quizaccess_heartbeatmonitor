@@ -30,12 +30,12 @@ defined('MOODLE_INTERNAL') || die();
 
 $string['pluginname'] = 'Hearbeat monitor quiz access rule';
 $string['calculatetime'] = 'Calculate time';
-$string['liveusers'] = '<font color="#C7EA46">Users status';
+$string['liveusers'] = '<h4><b>Users status</b></h4>';
 $string['nodatafound'] = 'No data found.';
 $string['heading'] = '{$a} | Heartbeat monitor ';
 $string['honestycheckheader'] = 'Please read the following message';
 $string['honestychecklabel'] = 'I have read and agree to the above statement.';
-$string['honestycheckrequired'] = 'Hearbeat monitoring';
+$string['honestycheckrequired'] = 'Heartbeat monitoring';
 $string['honestycheckrequired_help'] = 'If you enable this option, quiz connections and disconnections will be monitored through the plugin.';
 $string['honestycheckrequiredoption'] = 'required';
 $string['honestycheckstatement'] = 'I understand that it is important that the attempt I am about to make is all my own work. I understand what constitutes plagiarism or cheating, and I will not undertake such activities.';
@@ -64,8 +64,8 @@ $string['timelost'] = 'Quiz time lost';
 $string['online'] = '<font color="green"><i>Online</i></font>';
 $string['offline'] = '<font color="red"><i>Offline</i></font>';
 $string['youhaveselected'] = '<br><h4>Selected users</h4><br><br>';
-$string['h4open'] = '<h4>';
-$string['h4close'] = '</h4>';
-$string['br'] = '<br>';
-
+$string['selectusers'] = '<b>Select users for creating user overrides </b><br>';
+$string['note1'] = '(Note: List contains users who are online and have a non-zero "Quiz time lost" value only.)';
+$string['createoverride'] = 'Create override';
+$string['note2'] = '(Note: No user meets minimum conditions required for creating a user override.)';
 

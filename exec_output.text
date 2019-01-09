@@ -1,71 +1,13 @@
-In 'disconnect' event. Connected sockets - 0
-'anisha_1_503' - Current deadtime is - 0 days, 0 hrs, 0 mins, 0 msecs
--- deadtime 1 -- 0
-In 'disconnect' event. Connected sockets - 0
-'anisha_1_503' - Current deadtime is - 0 days, 0 hrs, 0 mins, 0 msecs
--- deadtime 1 -- 0
-In 'disconnect' event. Connected sockets - 0
-'anisha_1_503' - Current deadtime is - 0 days, 0 hrs, 0 mins, 0 msecs
--- deadtime 1 -- 0
-In 'disconnect' event. Connected sockets - 0
-'anisha_1_503' - Current deadtime is - 0 days, 0 hrs, 0 mins, 294 msecs
--- deadtime 1 -- 294
-In 'disconnect' event. Connected sockets - 0
-'anisha_1_503' - Current deadtime is - 0 days, 0 hrs, 0 mins, 0 msecs
--- deadtime 1 -- 0
-In 'disconnect' event. Connected sockets - 0
-In 'disconnect' event. Connected sockets - 0
-'anisha_1_503' - Current deadtime is - 0 days, 0 hrs, 0 mins, 4 msecs
--- deadtime 1 -- 4
-In 'disconnect' event. Connected sockets - 0
-In 'disconnect' event. Connected sockets - 0
-'anisha_1_503' - Current deadtime is - 0 days, 0 hrs, 0 mins, 4 msecs
--- deadtime 1 -- 8
-In 'disconnect' event. Connected sockets - 1
-'reshma_1_504' - Current deadtime is - 0 days, 0 hrs, 0 mins, 0 msecs
--- deadtime 1 -- 0
-In 'disconnect' event. Connected sockets - 1
-In 'disconnect' event. Connected sockets - 0
-'reshma_1_504' - Current deadtime is - 0 days, 0 hrs, 0 mins, 380 msecs
--- deadtime 1 -- 380
-In 'disconnect' event. Connected sockets - 0
-'reshma_1_504' - Current deadtime is - 0 days, 0 hrs, 0 mins, 0 msecs
--- deadtime 1 -- 380
-In 'disconnect' event. Connected sockets - 0
-'reshma_1_504' - Current deadtime is - 0 days, 0 hrs, 0 mins, 0 msecs
--- deadtime 1 -- 380
-In 'disconnect' event. Connected sockets - 0
-'reshma_1_504' - Current deadtime is - 0 days, 0 hrs, 0 mins, 0 msecs
--- deadtime 1 -- 380
-'anisha_1_503' - Current deadtime is - 0 days, 0 hrs, 0 mins, 363 msecs
--- deadtime 1 -- 371
-In 'disconnect' event. Connected sockets - 1
-In 'disconnect' event. Connected sockets - 1
-'anisha_1_503' - Current deadtime is - 0 days, 0 hrs, 0 mins, 0 msecs
--- deadtime 1 -- 371
-In 'disconnect' event. Connected sockets - 1
-In 'disconnect' event. Connected sockets - 1
-'anisha_1_503' - Current deadtime is - 0 days, 0 hrs, 0 mins, 0 msecs
--- deadtime 1 -- 371
-In 'disconnect' event. Connected sockets - 1
-'anisha_1_503' - Current deadtime is - 0 days, 0 hrs, 0 mins, 0 msecs
--- deadtime 1 -- 0
-In 'disconnect' event. Connected sockets - 1
-'anisha_1_503' - Current deadtime is - 0 days, 0 hrs, 0 mins, 0 msecs
--- deadtime 1 -- 0
-In 'disconnect' event. Connected sockets - 1
-In 'disconnect' event. Connected sockets - 1
-'anisha_1_503' - Current deadtime is - 0 days, 0 hrs, 0 mins, 7 msecs
--- deadtime 1 -- 7
-In 'disconnect' event. Connected sockets - 1
-'reshma_1_504' - Current deadtime is - 0 days, 0 hrs, 0 mins, 0 msecs
--- deadtime 1 -- 0
-In 'disconnect' event. Connected sockets - 1
-'reshma_1_504' - Current deadtime is - 0 days, 0 hrs, 0 mins, 0 msecs
--- deadtime 1 -- 0
-In 'disconnect' event. Connected sockets - 1
-'reshma_1_504' - Current deadtime is - 0 days, 0 hrs, 0 mins, 0 msecs
--- deadtime 1 -- 0
-In 'disconnect' event. Connected sockets - 1
-'reshma_1_504' - Current deadtime is - 0 days, 0 hrs, 0 mins, 0 msecs
--- deadtime 1 -- 0
+events.js:141
+      throw er; // Unhandled 'error' event
+      ^
+
+Error: Connection lost: The server closed the connection.
+    at Protocol.end (/var/www/html/moodle/node_modules/mysql/lib/protocol/Protocol.js:112:13)
+    at Socket.<anonymous> (/var/www/html/moodle/node_modules/mysql/lib/Connection.js:97:28)
+    at Socket.<anonymous> (/var/www/html/moodle/node_modules/mysql/lib/Connection.js:502:10)
+    at emitNone (events.js:72:20)
+    at Socket.emit (events.js:166:7)
+    at endReadableNT (_stream_readable.js:905:12)
+    at nextTickCallbackWith2Args (node.js:441:9)
+    at process._tickCallback (node.js:355:17)

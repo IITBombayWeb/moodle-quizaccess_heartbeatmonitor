@@ -29,46 +29,25 @@ function client(Y, quizid, userid, username, attemptid, sessionkey, hbcfg)
 	var nodecfg = JSON.parse(hbcfg);
 //	console.log(obj);
 //	var socket = io('http://127.0.0.1:3000', {
-	var socket = io(nodecfg.wwwroot + ':' + nodecfg.port, {
-						'secure':                    false,
-					    'connect timeout':           5000,
-					    'try multiple transports':   true,
-					    'reconnect':                 true,
-					    'reconnection delay':        500,
-					    'reopen delay':              3000,
-					    'max reconnection attempts': 10,
-					    'sync disconnect on unload': true,
-					    'auto connect':              false,
-					    'remember transport':        false,
-					    transports: [
-					        'websocket'
-					      , 'flashsocket'
-					      , 'htmlfile'
-					      , 'xhr-multipart'
-					      , 'xhr-polling'
-					      , 'jsonp-polling']
-					});	
+	var socket = io(nodecfg.wwwroot + ':' + nodecfg.port);	
 	
 	var roomid = username + '_' + quizid + '_' + attemptid;	
 	
 	socket.on('connect', function() {
-		console.log('-- In client \'connect\' event --');
-//		console.log(obj);
-		console.log('-- After socket connected - ' + socket.id  + '. Curr. TS - ' + Math.floor(new Date().getTime()/1000));
+//		console.log('-- In client \'connect\' event --');
+//		console.log('-- After socket connected - ' + socket.id  + '. Curr. TS - ' + Math.floor(new Date().getTime()/1000));
 		socket.emit('attempt', { username:username, quizid:quizid, roomid:roomid, attemptid:attemptid });
 		
 	});	
 	
 	socket.on('timeserver', function(data) {
-		console.log('-- In timeserver event --');
-		console.log('-- Curr. Timeserver id - ' + data.currenttimeserverid);
-//		var variableToSend = 'foo';
-//		$.post('http://localhost/moodle/mod/quiz/attempt.php', {variable: variableToSend});
+//		console.log('-- In timeserver event --');
+//		console.log('-- Curr. Timeserver id - ' + data.currenttimeserverid);
 	});
 	
 	socket.on('disconnect', function() {
-		console.log('-- In client \'disconnect\' event --');
-		console.log('-- After socket disconnected - ' + socket.id  + '. Curr. TS - ' + Math.floor(new Date().getTime())/1000);
+//		console.log('-- In client \'disconnect\' event --');
+//		console.log('-- After socket disconnected - ' + socket.id  + '. Curr. TS - ' + Math.floor(new Date().getTime())/1000);
 	});
 }
 

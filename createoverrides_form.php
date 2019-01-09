@@ -72,35 +72,38 @@ class createoverrides_form extends moodleform {
 
         // Display live users.
         // Fetch records from database.
-        $sql1 = 'SELECT * FROM {quizaccess_hbmon_livetable} WHERE status = "Live" AND deadtime <> 0';
-        $result1    = $DB->get_records_sql($sql1);
-        $deadtime1  = null;
-        $userid1    = null;
+        $sql = 'SELECT *
+                    FROM {quizaccess_hbmon_livetable}
+                    WHERE status = "Live"
+                      AND deadtime <> 0';
+        $result     = $DB->get_records_sql($sql);
+        $deadtime   = null;
+        $userid     = null;
         $arr_users  = array();
 
-        if (!empty($result1)) {
+        if (!empty($result)) {
             // Output data of each row.
-            foreach ($result1 as $record) {
-                $roomid1        = $record->roomid;
-                $arr            = explode("_", $roomid1);
+            foreach ($result as $record) {
+                $roomid         = $record->roomid;
+                $arr            = explode("_", $roomid);
                 $attemptid      = array_splice($arr, -1)[0];
-                $quizid1        = array_splice($arr, -1)[0];
+                $quizid         = array_splice($arr, -1)[0];
                 $username       = implode("_", $arr);
                 $user           = $DB->get_record('user', array('username'=>$username));
-                $userid1        = $user->id;
+                $userid         = $user->id;
 
-                if($quizid1 == $quiz->id) {
-                    $status1          = $record->status;
-                    $timetoconsider1  = $record->timetoconsider;
-                    $livetime1        = $record->livetime;
-                    $deadtime1        = $record->deadtime;
-                    $arr_users[$roomid1] = $user->firstname .  ' ' . $user->lastname;
+                if($quizid == $quiz->id) {
+                    $status           = $record->status;
+                    $timetoconsider   = $record->timetoconsider;
+                    $livetime         = $record->livetime;
+                    $deadtime         = $record->deadtime;
+                    $arr_users[$roomid] = $user->firstname .  ' ' . $user->lastname;
                 }
             }
         }
 
         // Setup the form.
-        $timelimit          = $quiz->timelimit + intval($deadtime1 / 1000);
+        $timelimit          = $quiz->timelimit + intval($deadtime / 1000);
         $processoverrideurl = new moodle_url('/mod/quiz/accessrule/heartbeatmonitor/processoverride.php');
         $indexurl           = new moodle_url('/mod/quiz/accessrule/heartbeatmonitor/index.php');
 
@@ -110,17 +113,17 @@ class createoverrides_form extends moodleform {
 
         if($arr_users) {
             $attributes = null;
-            $select = $mform->addElement('select', 'users', '<b>Select users for creating user overrides </b><br>', $arr_users, $attributes);
+            $select = $mform->addElement('select', 'users', get_string('selectusers', 'quizaccess_heartbeatmonitor'), $arr_users, $attributes);
             // $mform->setDefault('users', 'No User');
             reset($arr_users);
             // $mform->getElement('users')->setSelected(array(key($arr_users)));
             $select->setMultiple(true);
-            $mform->addElement('static', 'description', '', '(Note: List contains users who are online and have a non-zero "Quiz time lost" value only.)');
+            $mform->addElement('static', 'description', '', get_string('note1', 'quizaccess_heartbeatmonitor'));
 
             // Submit button.
-            $mform->addElement('submit', 'submitbutton', 'Create override');
+            $mform->addElement('submit', 'submitbutton', get_string('createoverride', 'quizaccess_heartbeatmonitor'));
         } else {
-            $mform->addElement('static', 'description', '', '(Note: No user meets minimum conditions required for creating a user override.)');
+            $mform->addElement('static', 'description', '', get_string('note2', 'quizaccess_heartbeatmonitor'));
         }
     }
 }
