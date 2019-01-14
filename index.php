@@ -71,7 +71,7 @@ $roomid = null;
 $table = new html_table();
 $table->id = get_string('liveusers', 'quizaccess_heartbeatmonitor');
 $table->caption = get_string('usersattemptingquiz', 'quizaccess_heartbeatmonitor');
-$table->head = array('', get_string('user', 'quizaccess_heartbeatmonitor'), 'Id Number',
+$table->head = array('', get_string('user', 'quizaccess_heartbeatmonitor'), 'Id number',
                         get_string('socketroomid', 'quizaccess_heartbeatmonitor'),
                         get_string('currentstatus', 'quizaccess_heartbeatmonitor'),
                         get_string('statusupdate', 'quizaccess_heartbeatmonitor'),

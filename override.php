@@ -39,27 +39,26 @@ require_once($CFG->dirroot . '/mod/quiz/locallib.php');
  * @copyright  2017 IIT Bombay, India
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class timelimitoverride {
+class override {
 
-    public function create_timelimit_override($cmid, $roomid, $fromform, $quiz, $qa = null) {
-        global $DB;
+    public function create_user_override($quizobj, $attempt, $fromform) {
+        global $DB, $USER;
         list($course, $cm) = get_course_and_cm_from_cmid($cmid, 'quiz');
-//         $quiz = $DB->get_record('quiz', array('id' => $cm->instance), '*', MUST_EXIST);
 
         $course = $DB->get_record('course', array('id'=>$cm->course), '*', MUST_EXIST);
         $context = context_module::instance($cm->id);
 
-        // Creating a new override.
-//         $data = new stdClass();
+        // User details.
+        $sessionkey = sesskey();
+        $userid     = $USER->id;
+        $username   = $USER->username;
 
-        // Merge quiz defaults with data.
-//         $keys = array('timeopen', 'timeclose', 'timelimit', 'attempts', 'password');
-//         foreach ($keys as $key) {
-//             if (!isset($data->{$key}) || $reset) {
-//                 $data->{$key} = $quiz->{$key};
-//             }
-//         }
+        // Quiz details.
+        $quiz       = $this->quizobj->get_quiz();
+        $quizid     = $this->quizobj->get_quizid();
+        $cmid       = $this->quizobj->get_cmid();
 
+        /*
         if($roomid) {
             // Select data for a particular quiz and not entire table..insert quizid col in livetable for this.
             $select_sql = 'SELECT *
@@ -94,6 +93,7 @@ class timelimitoverride {
                         $livetime        = $record->livetime;
                         $deadtime        = $record->deadtime;
                         $extratime       = $record->extratime;
+*/
 
 //                         $currentTimestamp = intval(microtime(true)*1000);
                         $currentTimestamp = time();
@@ -218,10 +218,10 @@ class timelimitoverride {
                         $update_sql_result = $DB->execute($update_sql);
 
 
-                    }
-                }
-            }
-        }
+//                     }
+//                 }
+//             }
+//         }
     }
 
     public function reset_timelimit_override($cmid, $roomid, $fromform, $quiz) {

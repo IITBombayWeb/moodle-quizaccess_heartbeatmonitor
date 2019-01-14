@@ -33,7 +33,7 @@ function xmldb_quizaccess_heartbeatmonitor_upgrade($oldversion) {
 
     $dbman = $DB->get_manager();
 
-    if ($oldversion < 2017110208) {
+    if ($oldversion < 2017110209) {
 
         // Define table quizaccess_enable_hbmonto be created.
         $table = new xmldb_table('quizaccess_enable_hbmon');
@@ -76,8 +76,34 @@ function xmldb_quizaccess_heartbeatmonitor_upgrade($oldversion) {
         if (!$dbman->table_exists($table1)) {
             $dbman->create_table($table1);
         }
+
+        //---------------------------------------------------------------------------------------------
+
+        // Define table quizaccess_hbmon_socketinfo1 to be created.
+        $table2 = new xmldb_table('quizaccess_hbmon_socketinfo1');
+
+        // Adding fields to table quizaccess_hbmon_timeserver.
+        $table2->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table2->add_field('roomid', XMLDB_TYPE_CHAR, '100', null, XMLDB_NOTNULL, null);
+        $table2->add_field('socketid', XMLDB_TYPE_CHAR, '50', null, XMLDB_NOTNULL, null);
+        $table2->add_field('socketstatus', XMLDB_TYPE_CHAR, '20', null, XMLDB_NOTNULL, null);
+        $table2->add_field('ip', XMLDB_TYPE_CHAR, '20', null, XMLDB_NOTNULL, null);
+        $table2->add_field('timestamp', XMLDB_TYPE_INTEGER, '20', null, XMLDB_NOTNULL, null, '0');
+
+        // Adding keys to table quizaccess_hbmon_timeserver.
+        $table2->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+
+        // Adding indexes to table quizaccess_hbmon_timeserver.
+        //         $table->add_index('quizid-firstslot', XMLDB_INDEX_UNIQUE, array('quizid', 'firstslot'));
+
+        // Conditionally launch create table for quizaccess_hbmon_timeserver.
+        if (!$dbman->table_exists($table2)) {
+            $dbman->create_table($table2);
+        }
+
+        //---------------------------------------------------------------------------------------------
         // Heartbeatmonitor savepoint reached.
-        upgrade_plugin_savepoint(true, 2017110208, 'quizaccess', 'heartbeatmonitor');
+        upgrade_plugin_savepoint(true, 2017110209, 'quizaccess', 'heartbeatmonitor');
     }
 
 }

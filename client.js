@@ -23,7 +23,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-function client(Y, quizid, userid, username, attemptid, sessionkey, hbcfg)
+function client(Y, roomid, hbcfg)
 {
 //	var obj = JSON.parse(cfg);
 	var nodecfg = JSON.parse(hbcfg);
@@ -31,12 +31,12 @@ function client(Y, quizid, userid, username, attemptid, sessionkey, hbcfg)
 //	var socket = io('http://127.0.0.1:3000', {
 	var socket = io(nodecfg.wwwroot + ':' + nodecfg.port);	
 	
-	var roomid = username + '_' + quizid + '_' + attemptid;	
+//	var roomid = username + '_' + quizid + '_' + attemptid;	
 	
 	socket.on('connect', function() {
-//		console.log('-- In client \'connect\' event --');
-//		console.log('-- After socket connected - ' + socket.id  + '. Curr. TS - ' + Math.floor(new Date().getTime()/1000));
-		socket.emit('attempt', { username:username, quizid:quizid, roomid:roomid, attemptid:attemptid });
+		console.log('-- In client \'connect\' event --');
+		console.log('-- After socket connected - ' + socket.id  + '. Curr. TS - ' + Math.floor(new Date().getTime()/1000));
+		socket.emit('attempt', {roomid:roomid});
 		
 	});	
 	

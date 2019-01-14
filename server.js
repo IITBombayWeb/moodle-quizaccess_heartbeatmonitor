@@ -103,8 +103,8 @@ var record = io.sockets.on('connection', function (socket) {
 //		console.log('-- In attempt event --');
 		
 		// Append some extra data to the socket object.
-	    socket.username 		= "'" + data.username + "'";
-	    socket.quizid 			= data.quizid;
+//	    socket.username 		= "'" + data.username + "'";
+//	    socket.quizid 			= data.quizid;
         socket.roomid 			= "'" + data.roomid + "'";
         socket.socketid 		= "'" + socket.id + "'";
         socket.statusConnected 	= "'Connected'";
@@ -117,9 +117,9 @@ var record = io.sockets.on('connection', function (socket) {
 //        console.log('-- Socket time stamp --' + socket.timestampC);
 //        console.log('-- Current time stamp --' + Math.floor((new Date().getTime())/1000));
 
-        var sql = "INSERT INTO mdl_quizaccess_hbmon_socketinfo (username, quizid, roomid, socketid, socketstatus, ip, timestamp) VALUES" +
-         			"(" + socket.username + "," 
-         				+ socket.quizid + "," 
+        var sql = "INSERT INTO mdl_quizaccess_hbmon_socketinfo1 (roomid, socketid, socketstatus, ip, timestamp) VALUES" +
+         			"(" /*+ socket.username + "," 
+         				+ socket.quizid + "," */
          				+ socket.roomid + "," 
          				+ socket.socketid + "," 
          				+ socket.statusConnected + "," 
@@ -272,11 +272,11 @@ var record = io.sockets.on('connection', function (socket) {
 //                    }
                 } else {
                 	// Insert current status entry for this user in 'livetable'.                	
-                    var livetablesql = "INSERT INTO mdl_quizaccess_hbmon_livetable (roomid, status, timeserver, timetoconsider, livetime, deadtime) VALUES" +
+                    var livetablesql = "INSERT INTO mdl_quizaccess_hbmon_livetable (roomid, status, timeserver, timetoconsider, livetime, deadtime, extratime) VALUES" +
                                       	"(" + socket.roomid + "," 
                                       		+ socket.currentstatus + "," 
                                       		+ currenttimeserverid + "," 
-                                      		+ socket.timestampC + ", 0, 0 )";
+                                      		+ socket.timestampC + ", 0, 0 , 0)";
                     con.query(livetablesql, function(err, result) {
                         if (err) throw err;
                     });
@@ -312,9 +312,9 @@ var record = io.sockets.on('connection', function (socket) {
 			socket.statusDisconnected = "'Disconnected'";
 			
 		    // Insert disconnection record into database.
-			var sql = "INSERT INTO mdl_quizaccess_hbmon_socketinfo (username, quizid, roomid, socketid, socketstatus, ip, timestamp) VALUES" +
-					  	"(" + socket.username + "," 
-					  		+ socket.quizid + "," 
+			var sql = "INSERT INTO mdl_quizaccess_hbmon_socketinfo1 (roomid, socketid, socketstatus, ip, timestamp) VALUES" +
+					  	"(" /*+ socket.username + "," 
+					  		+ socket.quizid + "," */
 					  		+ socket.roomid + "," 
 					  		+ socket.socketid + "," 
 					  		+ socket.statusDisconnected + "," 
