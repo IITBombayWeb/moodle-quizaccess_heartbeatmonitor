@@ -41,8 +41,11 @@ require_once($CFG->dirroot . '/mod/quiz/locallib.php');
  */
 class timelimitoverride {
 
-    public function create_timelimit_override($cmid, $roomid, $fromform, $quiz) {
+    public function create_timelimit_override($cmid, $roomid, $fromform, $quiz, $qa) {
         global $DB;
+//	echo '<br><br><br> in cto tlovrde.php==========';
+//	print_object($qa);
+
         list($course, $cm) = get_course_and_cm_from_cmid($cmid, 'quiz');
 //         $quiz = $DB->get_record('quiz', array('id' => $cm->instance), '*', MUST_EXIST);
 
@@ -190,7 +193,11 @@ class timelimitoverride {
                             $event->trigger();
                         }
 
-                        quiz_update_open_attempts(array('quizid'=>$quiz->id));
+			// Update timecheckstate (as in quiz_update_open_attempts()).
+		        $timecheckstate = $qa->timestart + $timelimit;
+        		$DB->set_field('quiz_attempts', 'timecheckstate', $timecheckstate, array('id' => $qa->id));
+
+                        // quiz_update_open_attempts(array('quizid'=>$quiz->id));
                         // if ($groupmode) {
                         // Priorities may have shifted, so we need to update all of the calendar events for group overrides.
                             // quiz_update_events($quiz);
