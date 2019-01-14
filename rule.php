@@ -47,7 +47,38 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
         return new self($quizobj, $timenow);
     }
 
-    public function prevent_access() {
+    public function description() {
+        return get_string('quiztimelimit', 'quizaccess_timelimit',
+            format_time($this->quiz->timelimit));
+    }
+    
+    public function time_left_display($attempt, $timenow) {
+        // If this is a teacher preview after the time limit expires, don't show the time_left
+        $endtime = $this->end_time($attempt);
+        if ($attempt->preview && $timenow > $endtime) {
+            return false;
+        }
+        return $endtime - $timenow;
+    }
+    
+    public function is_preflight_check_required($attemptid) {
+        // Warning only required if the attempt is not already started.
+        return $attemptid === null;
+    }
+    
+    public function add_preflight_check_form_fields(mod_quiz_preflight_check_form $quizform,
+        MoodleQuickForm $mform, $attemptid) {
+            $mform->addElement('header', 'honestycheckheader',
+                get_string('confirmstartheader', 'quizaccess_timelimit'));
+            $mform->addElement('static', 'honestycheckmessage', '',
+                get_string('confirmstart', 'quizaccess_timelimit', format_time($this->quiz->timelimit)));
+    }
+    
+    public function end_time($attempt) {
+//         return $attempt->timestart + $this->quiz->timelimit;
+//     }
+    
+//     public function prevent_access() {
         global $CFG, $PAGE, $_SESSION, $DB, $USER, $HBCFG;
 
         $PAGE->requires->jquery();
@@ -154,7 +185,7 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
                                 foreach ($records as $record) {
                                     if($roomid == $record->roomid){
 //                                         echo '<br>-- In rule crtovrrd 2 --';
-                                        $this->create_user_override($roomid, $cmid, $quiz);
+                                        $this->create_user_override($roomid, $cmid, $quiz, null, $unfinishedattempt);
                                     }
                                     break;
                                 }
@@ -163,7 +194,7 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
                     }
                 }
             }
-            return false;
+            return $attempt->timestart + $this->quiz->timelimit;
         } else {
             if(!$phpws_result) {
                 // If new attempt.
@@ -236,7 +267,7 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
                 if (!empty($records)){
                     foreach ($records as $record) {
                         if($roomid == $record->roomid){
-                            $this->create_user_override($roomid, $cmid, $quiz, $state);
+                            $this->create_user_override($roomid, $cmid, $quiz, $state, null);
                         }
                     }
                 }
@@ -244,7 +275,7 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
         }
     }
 
-    protected function create_user_override($roomid, $cmid, $quiz, $state = null) {
+    protected function create_user_override($roomid, $cmid, $quiz, $state = null, $qa = null) {
         global $DB, $CFG;
 
 //         $context = context_module::instance($cmid);
@@ -292,12 +323,12 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
         } else {
 //             echo '<br>-- in create ovrrde --<br>';
 //             print_object($quiz);
-            $dataobj->create_timelimit_override($cmid, $roomid, $override, $quiz);
+            $dataobj->create_timelimit_override($cmid, $roomid, $override, $quiz, $qa);
         }
     }
 
     public function get_superceded_rules() {
-        return array();
+        return array('overridedemo' , 'timelimit');
     }
 
     public static function add_settings_form_fields(
