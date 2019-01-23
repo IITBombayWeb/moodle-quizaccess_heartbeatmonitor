@@ -246,7 +246,7 @@ var record = io.sockets.on('connection', function (socket) {
 //	            	    	}
 //	            	    	
                     	}
-	            	    if (status == 'Dead' && currenttimeserverid == room_timeserver) {
+                    	/*  if (status == 'Dead' && currenttimeserverid == room_timeserver) {
 //                    	} else {
                    	
 	                    	//--------------------------------------------------------------------------------------
@@ -268,7 +268,14 @@ var record = io.sockets.on('connection', function (socket) {
 							con.query(updatelivetablesql, function(err, result) {
 								if (err) throw err;
 							});
-            	    	}  
+							var updatelivetablesql1 = "UPDATE mdl_quizaccess_hbmon_livetable SET " 
+															+ " deadtime = 0" 
+															+ ", extratime = " + deadtime
+															+ " WHERE roomid = " + socket.roomid;
+							con.query(updatelivetablesql1, function(err, result) {
+								if (err) throw err;
+							});
+            	    	}  */
 //                    }
                 } else {
                 	// Insert current status entry for this user in 'livetable'.                	

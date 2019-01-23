@@ -127,7 +127,7 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
         $this->check_node_server_status($attempt);
 
         if(isset($attempt->id)) {
-            $deadtime = $this->get_deadtime($attempt);
+            /*$deadtime = $this->get_deadtime($attempt);
             // if deadtime  > 30
             if($deadtime > 60) {
                 // if attempt in progress
@@ -147,7 +147,42 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
                             );
                     $this->update_livetable_data($params);
                 }
-            }
+            } else {*/
+//                 $roomid = $this->construct_roomid($attempt->id);
+//                 echo '<br> roomid ' . $roomid;
+//                 $record = $this->get_livetable_data($roomid);
+//                 if (!is_null($record) && $record->status == "Dead") {
+//                     $timenow = time();
+//                     $deadtime = $timenow - $record->timetoconsider;
+
+                    $deadtime = $this->get_deadtime($attempt);
+
+                    if (!is_null($deadtime)) {
+                        $roomid = $this->construct_roomid($attempt->id);
+                        $record = $this->get_livetable_data($roomid);
+
+                        if ($record->status == 'Dead') {
+                            $params = array(
+                                    'status' => "'Live'",
+                                    'deadtime' => $deadtime,
+                                    'timetoconsider' => time(),
+                                    'roomid' => $roomid
+                            );
+                            $this->update_livetable_data($params);
+                        }
+                        if ($deadtime > 60) {
+                            $this->create_override_auto($attempt, $deadtime);
+
+                            $params = array(
+                                    'deadtime' => 0,
+                                    'extratime' => $record->extratime + $deadtime,
+                                    'roomid' => $roomid
+                            );
+                            $this->update_livetable_data($params);
+                        }
+                    }
+//                 }
+//             }
             // if attempt completed
             //create override($attempt, $deadtime, $newattempttrue) but builds on the prev attempt
         }
@@ -220,12 +255,18 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
         if (isset($attempt->id)) {
             $roomid = $this->construct_roomid($attempt->id);
             $record = $this->get_livetable_data($roomid);
+
             if (!is_null($record)) {
-                return $record->deadtime;
+                if ($record->status == "Dead") {
+                    $timenow = time();
+                    $deadtime = $record->deadtime + ($timenow - $record->timetoconsider);
+                    return $deadtime;
+                } else {
+                    return $record->deadtime;
+                }
             }
-        } else {
-            return null;
         }
+        return null;
     }
 
     protected function get_livetable_data($roomid) {
