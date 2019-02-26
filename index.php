@@ -219,7 +219,7 @@ if($nodestatus = $startnode_form->get_data()) {
 
         if(!$phpws_result) {
             $cmd = "node " . $CFG->dirroot . "/mod/quiz/accessrule/heartbeatmonitor/server.js";
-            file_put_contents($outputfile, '');
+            //file_put_contents($outputfile, '');
             file_put_contents($pidfile, '');
             exec(sprintf("%s > %s 2>&1 & echo $! >> %s", $cmd, $outputfile, $pidfile));
 

@@ -79,14 +79,9 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
         return array('overridedmo' , 'timelimit');
     }
 
-public function debuglog($message) {
-  $curtime = microtime(true) * 1000;
-  echo '<br><br>' . $curtime . ': ' . $message;
-}
-
     public function prevent_access() {
         global $CFG, $PAGE, $_SESSION, $DB, $USER, $HBCFG;
-$this->debuglog('       prevent access ----------');
+
         $PAGE->requires->jquery();
         $PAGE->requires->js( new moodle_url($HBCFG->wwwroot . ':' . $HBCFG->port . '/socket.io/socket.io.js'), true );
         $PAGE->requires->js( new moodle_url($CFG->wwwroot . '/mod/quiz/accessrule/heartbeatmonitor/client.js') );
@@ -104,7 +99,7 @@ $this->debuglog('       prevent access ----------');
 //         print_object($this);
 
         if ($unfinishedattempt = quiz_get_user_attempt_unfinished($quiz->id, $USER->id)) {
-            //echo '<br> in unfinished';
+            echo '<br> in unfinished';
             $unfinishedattemptid = $unfinishedattempt->id;
             $unfinished = $unfinishedattempt->state == quiz_attempt::IN_PROGRESS;
 
@@ -128,7 +123,6 @@ $this->debuglog('       prevent access ----------');
 
 //         echo '<br><br><br>-- In end time func --';
 //         print_object($attempt);
-$this->debuglog('       end time ----------');
 
         $this->check_node_server_status($attempt);
 
@@ -162,14 +156,12 @@ $this->debuglog('       end time ----------');
 //                     $deadtime = $timenow - $record->timetoconsider;
 
                     $deadtime = $this->get_deadtime($attempt);
-		    echo '<br><br><br> in endtime';
+
                     if (!is_null($deadtime)) {
-			echo '<br> in if';
                         $roomid = $this->construct_roomid($attempt->id);
                         $record = $this->get_livetable_data($roomid);
 
                         if ($record->status == 'Dead') {
-				echo '<br> in second if';
                             $params = array(
                                     'status' => "'Live'",
                                     'deadtime' => $deadtime,
@@ -213,7 +205,7 @@ $this->debuglog('       end time ----------');
             $socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
             $phpws_result = @socket_connect($socket, $HBCFG->host, $HBCFG->port);
         } catch (node_server_down_exception $e) {
-            echo '<br><br><br> in catch node down';
+            echo '<br> in catch node down';
             if (!is_null($attempt)) {
                 $roomid = $this->construct_roomid($attempt->id);
                 $this->process_node_server_down($roomid);
@@ -267,10 +259,8 @@ $this->debuglog('       end time ----------');
             if (!is_null($record)) {
                 if ($record->status == "Dead") {
                     $timenow = time();
-		    //echo "<br><br><br>dt";
                     $deadtime = $record->deadtime + ($timenow - $record->timetoconsider);
-                    //echo $deadtime;
-		    return $deadtime;
+                    return $deadtime;
                 } else {
                     return $record->deadtime;
                 }
@@ -295,7 +285,7 @@ $this->debuglog('       end time ----------');
     protected function update_livetable_data($params) { // Generalise this query to update all the values as provided.
         global $DB;
         $count = count($params) - 1;
-	echo '<br><br><br> in update';
+
         $sql = 'UPDATE {quizaccess_hbmon_livetable} SET ';
         foreach ($params as $key => $value) {
             $count--;
@@ -307,9 +297,8 @@ $this->debuglog('       end time ----------');
                 $sql .= $key . ' = ' . $value;
         }
         $sql .= ' WHERE roomid = "' . $params['roomid'] . '"';
-	echo "<br><br><br>sql " . $sql;
+
         $result = $DB->execute($sql);
-	print_object($result);
     }
 
     protected function create_override_auto($attempt, $deadtime) {
@@ -396,7 +385,7 @@ $this->debuglog('       end time ----------');
 
         // Update timecheckstate (as in quiz_update_open_attempts()).
         $timecheckstate = $attempt->timestart + $timelimit;
-        //echo '<br> tcs ' . $timecheckstate;
+        echo '<br> tcs ' . $timecheckstate;
         $DB->set_field('quiz_attempts', 'timecheckstate', $timecheckstate, array('id' => $attempt->id));
 
         // User override. We only need to update the calendar event for this user override.
@@ -408,7 +397,7 @@ $this->debuglog('       end time ----------');
     function extracodechecks() {
         // If unfinished attempt.
         if ($unfinishedattempt = quiz_get_user_attempt_unfinished($quiz->id, $USER->id)) {
-            //echo '<br> in unfinished';
+            echo '<br> in unfinished';
             $unfinishedattemptid = $unfinishedattempt->id;
             $unfinished = $unfinishedattempt->state == quiz_attempt::IN_PROGRESS;
 
@@ -606,7 +595,7 @@ $this->debuglog('       end time ----------');
         $hbmonsettingsarray[]= $mform->createElement('radio', 'hbmonmode', '', get_string('manual', 'quizaccess_heartbeatmonitor'), 0);
 //         $mform->addGroup($radioarray, 'radioar', '', array(' '), false);
 //         $hbmonsettingsarray[] = $radioarray;
-	$mform->setDefault('hbmonmode', 1);
+
         $mform->disabledIf('hbmonmode', 'hbmonrequired', 'neq', 1);
 
         $mform->addGroup($hbmonsettingsarray, 'enablehbmon', get_string('hbmonrequired', 'quizaccess_heartbeatmonitor'), array(' '), false);
