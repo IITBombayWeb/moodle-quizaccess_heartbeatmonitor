@@ -33,7 +33,7 @@ function xmldb_quizaccess_heartbeatmonitor_upgrade($oldversion) {
 
     $dbman = $DB->get_manager();
 
-    if ($oldversion < 2017110209) {
+    if ($oldversion < 2017110212) {
 
         // Define table quizaccess_enable_hbmonto be created.
         $table = new xmldb_table('quizaccess_enable_hbmon');
@@ -102,8 +102,45 @@ function xmldb_quizaccess_heartbeatmonitor_upgrade($oldversion) {
         }
 
         //---------------------------------------------------------------------------------------------
+
+        // Define table quizaccess_enable_hbmonto be created.
+        $table3 = new xmldb_table('quizaccess_enable_hbmon');
+        $field1 = new xmldb_field('nodehost', XMLDB_TYPE_CHAR, '25', null, XMLDB_NOTNULL, null, 'localhost');
+        $field2 = new xmldb_field('nodeport', XMLDB_TYPE_INTEGER, '4', null, XMLDB_NOTNULL, null, '3000');
+
+        // Conditionally launch create table for quizaccess_enable_hbmon.
+        if (!$dbman->table_exists($table3)) {
+            $dbman->create_table($table3);
+        }
+
+        // Adding fields to table quizaccess_enable_hbmon.
+        if ($dbman->field_exists($table3, $field1)) {
+            $dbman->drop_field($table3, $field1);
+        }
+        if ($dbman->field_exists($table3, $field2)) {
+            $dbman->drop_field($table3, $field2);
+        }
+
+        //---------------------------------------------------------------------------------------------
+
+        // Define table quizaccess_hbmon_node to be created.
+        $table4 = new xmldb_table('quizaccess_hbmon_node');
+
+        // Adding fields to table quizaccess_hbmon_node.
+        $table4->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table4->add_field('nodehost', XMLDB_TYPE_CHAR, '25', null, XMLDB_NOTNULL, null, 'localhost');
+        $table4->add_field('nodeport', XMLDB_TYPE_INTEGER, '4', null, XMLDB_NOTNULL, null, '3000');
+
+        // Adding keys to table quizaccess_hbmon_node.
+        $table4->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+
+        // Conditionally launch create table for quizaccess_hbmon_node.
+        if (!$dbman->table_exists($table4)) {
+            $dbman->create_table($table4);
+        }
+        //---------------------------------------------------------------------------------------------
         // Heartbeatmonitor savepoint reached.
-        upgrade_plugin_savepoint(true, 2017110209, 'quizaccess', 'heartbeatmonitor');
+        upgrade_plugin_savepoint(true, 2017110212, 'quizaccess', 'heartbeatmonitor');
     }
 
 }

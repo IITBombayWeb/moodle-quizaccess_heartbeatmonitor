@@ -40,7 +40,9 @@ var obj;
 // EXEC SYNC - WORKS
 //var child = require('child_process').execSync('php -r \'define("CLI_SCRIPT", true); include("../../../../config.php"); print json_encode($CFG);\'');
 var child = require('child_process').execSync('php -r \'define("CLI_SCRIPT", true); include("/var/www/html/moodle/config.php"); print json_encode($CFG);\'');
+//var child1 = require('child_process').execSync('php -r \'define("CLI_SCRIPT", true); include("/var/www/html/moodle/mod/quiz/accessrule/heartbeatmonitor/hbmonconfig.php"); print json_encode($HBCFG);\'');
 obj = JSON.parse(child);
+//obj1 = JSON.parse(child1);
 
 // DB CONN
 var con = mysql.createConnection({
@@ -52,7 +54,8 @@ var con = mysql.createConnection({
 
 app.use(bodyParser.urlencoded({ extended: true }));
 
-var port = 3000;
+//var port = 3000;
+//var port = obj1.port;
 var totalconnectedsockets;
 var roomwisesockets;
 var roomwisesocketids = [];
@@ -60,6 +63,35 @@ var allsocketscount;
 var allsocketids;
 var cfg;
 var timeserverid;
+var port;
+
+//Insert new record for node server.
+var nodesql = "Select * from mdl_quizaccess_hbmon_node";
+console.log('-- nodesql -- ');
+con.query(nodesql, function(err, result) {
+	console.log('-- nodesql -- ');
+	
+    if (err) throw err;                
+    if (result.length > 0) {
+        for (i in result) {
+        	console.log('-- nodesql -- ');
+        	console.log(result[i]);
+        	// Previous state details.
+            port = result[i].nodeport;
+            console.log('-- port -- ' + port);
+            http.listen(port, function() {
+            	console.log('-- Listening on port ' + port + ' --');
+
+            });
+        }
+    }
+});
+console.log('-- port out -- ' + port);
+//con.query(nodesql, function(err, result) {
+//	if (err) throw err;
+//	port = result.nodeport;
+////	console.log('-- here result insert id -- ' + result.insertId);
+//});
 
 // Insert new record for node server.
 var timeserversql = "INSERT INTO mdl_quizaccess_hbmon_timeserver (timestarted, lastlivetime) VALUES" +
@@ -246,7 +278,7 @@ var record = io.sockets.on('connection', function (socket) {
 //	            	    	}
 //	            	    	
                     	}
-                    	/*  if (status == 'Dead' && currenttimeserverid == room_timeserver) {
+                    	  if (status == 'Dead' && currenttimeserverid == room_timeserver) {
 //                    	} else {
                    	
 	                    	//--------------------------------------------------------------------------------------
@@ -275,7 +307,7 @@ var record = io.sockets.on('connection', function (socket) {
 							con.query(updatelivetablesql1, function(err, result) {
 								if (err) throw err;
 							});
-            	    	}  */
+            	    	}  
 //                    }
                 } else {
                 	// Insert current status entry for this user in 'livetable'.                	
@@ -421,8 +453,8 @@ http.on('listening',function(){
 //    });
 //});
 
-http.listen(port, function() {
-//	console.log('-- Listening on port ' + port + ' --');
-
-});
+//http.listen(port, function() {
+////	console.log('-- Listening on port ' + port + ' --');
+//
+//});
 

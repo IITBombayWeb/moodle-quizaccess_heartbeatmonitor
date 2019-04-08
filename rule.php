@@ -44,6 +44,7 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
         if (empty($quizobj->get_quiz()->hbmonrequired)) {
             return null;
         }
+
         return new self($quizobj, $timenow);
     }
 
@@ -81,6 +82,12 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
 
     public function prevent_access() {
         global $CFG, $PAGE, $_SESSION, $DB, $USER, $HBCFG;
+
+//         $quizid = $this->quizobj->get_quizid();
+//         $HBCFG = hbmonconfig($quizid);
+
+//         echo '<br> hbcfg -----------------';
+//         print_object($HBCFG);
 
         $PAGE->requires->jquery();
         $PAGE->requires->js( new moodle_url($HBCFG->wwwroot . ':' . $HBCFG->port . '/socket.io/socket.io.js'), true );
@@ -579,27 +586,49 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
 
     public static function add_settings_form_fields(
             mod_quiz_mod_form $quizform, MoodleQuickForm $mform) {
+
+       $mform->addElement('header', 'hbmonheader', 'Heartbeat monitor');
+
         $hbmonsettingsarray   = array();
 
-        $hbmonsettingsarray[] = $mform->createElement('select', 'hbmonrequired',
+//         $hbmonsettingsarray[] = $mform->createElement('select', 'hbmonrequired',
+//                 get_string('hbmonrequired', 'quizaccess_heartbeatmonitor'), array(
+//                         0 => get_string('notrequired', 'quizaccess_heartbeatmonitor'),
+//                         1 => get_string('hbmonrequiredoption', 'quizaccess_heartbeatmonitor')
+//                 ));
+        $mform->addElement('select', 'hbmonrequired',
                 get_string('hbmonrequired', 'quizaccess_heartbeatmonitor'), array(
                         0 => get_string('notrequired', 'quizaccess_heartbeatmonitor'),
                         1 => get_string('hbmonrequiredoption', 'quizaccess_heartbeatmonitor')
                 ));
-
-//         $hbmonsettingsarray[] = $mform->createElement('advcheckbox', 'allowifunassigned', '', 'Allow Unmapped', '', array(0, 1));
-//         $mform->disabledIf('allowifunassigned', 'hbmonrequired', 'neq', 1);
+        $mform->addHelpButton('hbmonrequired', 'hbmonrequired', 'quizaccess_heartbeatmonitor');
 
         $radioarray = array();
         $hbmonsettingsarray[]= $mform->createElement('radio', 'hbmonmode', '', get_string('automatic', 'quizaccess_heartbeatmonitor'), 1);
         $hbmonsettingsarray[]= $mform->createElement('radio', 'hbmonmode', '', get_string('manual', 'quizaccess_heartbeatmonitor'), 0);
 //         $mform->addGroup($radioarray, 'radioar', '', array(' '), false);
+        $mform->setDefault('hbmonmode', 1);
 //         $hbmonsettingsarray[] = $radioarray;
+        $mform->addGroup($hbmonsettingsarray, 'enablehbmon', 'Mode', array(' '), false);
         $mform->disabledIf('hbmonmode', 'hbmonrequired', 'neq', 1);
 
-        $mform->addGroup($hbmonsettingsarray, 'enablehbmon', get_string('hbmonrequired', 'quizaccess_heartbeatmonitor'), array(' '), false);
-        $mform->addHelpButton('enablehbmon', 'hbmonrequired', 'quizaccess_heartbeatmonitor');
-        $mform->setAdvanced('enablehbmon', true);
+//         $hbmonsettingsarray[] = $mform->createElement('text', 'nodehost', "Host", 'maxlength="25" size="15" ');
+        $mform->addElement('text', 'nodehost', "Node host", 'maxlength="25" size="15" ');
+        $mform->setType('nodehost', PARAM_HOST);
+        //         $mform->addRule('', get_string('missing'), 'required', null, 'server');
+        $mform->setDefault('nodehost', 'localhost');
+        $mform->disabledIf('nodehost', 'hbmonrequired', 'neq', 1);
+
+//         $hbmonsettingsarray[] = $mform->createElement('text', 'nodeport', 'Port', 'maxlength="4" size="4" ');
+        $mform->addElement('text', 'nodeport', 'Node port', 'maxlength="4" size="4" ');
+        $mform->setType('nodeport', PARAM_NUMBER);
+        $mform->setDefault('nodeport', '3000');
+        $mform->disabledIf('nodeport', 'hbmonrequired', 'neq', 1);
+
+//         $mform->addGroup($hbmonsettingsarray, 'enablehbmon', get_string('hbmonrequired', 'quizaccess_heartbeatmonitor'), array(' '), false);
+//         $mform->setAdvanced('enablehbmon', true);
+
+
     }
 
     public static function validate_settings_form_fields(array $errors,
@@ -622,6 +651,11 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
                 $record->hbmonrequired = 1;
                 $record->hbmonmode = $quiz->hbmonmode;
                 $DB->insert_record('quizaccess_enable_hbmon', $record);
+
+                $record1 = new stdClass();
+                $record1->nodehost = $quiz->nodehost;
+                $record1->nodeport = $quiz->nodeport;
+                $DB->insert_record('quizaccess_hbmon_node', $record1);
             } else {
                 $select = "quizid = $quiz->id";
                 $id = $DB->get_field_select('quizaccess_enable_hbmon', 'id', $select);
@@ -629,6 +663,15 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
                 $record->id = $id;
                 $record->hbmonmode = $quiz->hbmonmode;
                 $DB->update_record('quizaccess_enable_hbmon', $record);
+
+                $record1 = new stdClass();
+                $record1->nodehost = $quiz->nodehost;
+                $record1->nodeport = $quiz->nodeport;
+                if (!$DB->record_exists('quizaccess_hbmon_node')) {
+                    $DB->insert_record('quizaccess_hbmon_node', $record1);
+                } else {
+                    $DB->update_record('quizaccess_hbmon_node', $record1);
+                }
             }
         }
     }

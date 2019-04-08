@@ -68,3 +68,4 @@ $string['selectusers'] = '<b>Select users for creating user overrides </b><br>';
 $string['note1'] = '(Note: List contains users who are online and have a non-zero "Quiz time lost" value only.)';
 $string['createoverride'] = 'Create override';
 $string['note2'] = '(Note: No user meets minimum conditions required for creating a user override.)';
+$string['hbmon_cron'] = 'Heartbeat monitor cron job';
