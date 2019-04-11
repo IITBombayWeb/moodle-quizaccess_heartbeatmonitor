@@ -211,7 +211,7 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
             // Try connecting to the node server.
             $socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
             $phpws_result = @socket_connect($socket, $HBCFG->host, $HBCFG->port);
-        } catch (node_server_down_exception $e) {
+        } catch (Exception $e) {
             echo '<br> in catch node down';
             if (!is_null($attempt)) {
                 $roomid = $this->construct_roomid($attempt->id);
