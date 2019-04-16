@@ -25,13 +25,8 @@
 
 function client(Y, roomid, hbcfg)
 {
-//	var obj = JSON.parse(cfg);
 	var nodecfg = JSON.parse(hbcfg);
-//	console.log(obj);
-//	var socket = io('http://127.0.0.1:3000', {
 	var socket = io(nodecfg.wwwroot + ':' + nodecfg.port);	
-	
-//	var roomid = username + '_' + quizid + '_' + attemptid;	
 	
 	socket.on('connect', function() {
 		console.log('-- In client \'connect\' event --');

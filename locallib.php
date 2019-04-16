@@ -14,11 +14,11 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 /**
- * Library of functions used by the quizaccess_useripmapping plugin.
+ * Library of functions used by the quizaccess_heartbeatmonitor plugin.
  *
- * @package    quizaccess_useripmapping
+ * @package    quizaccess_heartbeatmonitor
  * @author     Amrata Ramchandani <ramchandani.amrata@gmail.com>
- * @copyright  2017 Indian Institute Of Technology,Bombay,India
+ * @copyright  2017 Indian Institute Of Technology Bombay, India
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 defined('MOODLE_INTERNAL') || die();

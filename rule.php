@@ -83,12 +83,6 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
     public function prevent_access() {
         global $CFG, $PAGE, $_SESSION, $DB, $USER, $HBCFG;
 
-//         $quizid = $this->quizobj->get_quizid();
-//         $HBCFG = hbmonconfig($quizid);
-
-//         echo '<br> hbcfg -----------------';
-//         print_object($HBCFG);
-
         $PAGE->requires->jquery();
         $PAGE->requires->js( new moodle_url($HBCFG->wwwroot . ':' . $HBCFG->port . '/socket.io/socket.io.js'), true );
         $PAGE->requires->js( new moodle_url($CFG->wwwroot . '/mod/quiz/accessrule/heartbeatmonitor/client.js') );
@@ -102,11 +96,8 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
         $quiz       = $this->quizobj->get_quiz();
         $quizid     = $this->quizobj->get_quizid();
         $cmid       = $this->quizobj->get_cmid();
-//         echo '<br><br><br> in prevent acc----------';
-//         print_object($this);
 
         if ($unfinishedattempt = quiz_get_user_attempt_unfinished($quiz->id, $USER->id)) {
-            echo '<br> in unfinished';
             $unfinishedattemptid = $unfinishedattempt->id;
             $unfinished = $unfinishedattempt->state == quiz_attempt::IN_PROGRESS;
 
@@ -119,6 +110,9 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
                     throw new moodle_quiz_exception($attemptobj->get_quizobj(), 'notyourattempt');
                 } else {
                     $roomid = $username . '_' . $quizid . '_' . $attemptid;
+
+                    $this->check_node_server_status($attempt);
+
                     $PAGE->requires->js_init_call('client', array($roomid, json_encode($HBCFG)));
                 }
             }
@@ -128,70 +122,32 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
     public function end_time($attempt) {
         global $CFG, $PAGE, $_SESSION, $DB, $USER, $HBCFG;
 
-//         echo '<br><br><br>-- In end time func --';
-//         print_object($attempt);
-
         $this->check_node_server_status($attempt);
 
         if(isset($attempt->id)) {
-            /*$deadtime = $this->get_deadtime($attempt);
-            // if deadtime  > 30
-            if($deadtime > 60) {
-                // if attempt in progress
-                echo '<br> attemptid ' . $attempt->id;
+            $deadtime = $this->get_deadtime($attempt);
+            if (!is_null($deadtime)) {
                 $roomid = $this->construct_roomid($attempt->id);
-                echo '<br> roomid ' . $roomid;
                 $record = $this->get_livetable_data($roomid);
-                if(!is_null($record)) {
-                    $deadtime = (time() - $record->timetoconsider) + $record->deadtime;
+                if ($record->status == 'Dead') {
+                    $params = array(
+                                'status' => "'Live'",
+                                'deadtime' => $deadtime,
+                                'timetoconsider' => time(),
+                                'roomid' => $roomid
+                                );
+                    $this->update_livetable_data($params);
+                }
+                if ($deadtime > 60) {
                     $this->create_override_auto($attempt, $deadtime);
-
-                    // Update livetable record.
                     $params = array(
                                 'deadtime' => 0,
                                 'extratime' => $record->extratime + $deadtime,
                                 'roomid' => $roomid
-                            );
+                                );
                     $this->update_livetable_data($params);
                 }
-            } else {*/
-//                 $roomid = $this->construct_roomid($attempt->id);
-//                 echo '<br> roomid ' . $roomid;
-//                 $record = $this->get_livetable_data($roomid);
-//                 if (!is_null($record) && $record->status == "Dead") {
-//                     $timenow = time();
-//                     $deadtime = $timenow - $record->timetoconsider;
-
-                    $deadtime = $this->get_deadtime($attempt);
-
-                    if (!is_null($deadtime)) {
-                        $roomid = $this->construct_roomid($attempt->id);
-                        $record = $this->get_livetable_data($roomid);
-
-                        if ($record->status == 'Dead') {
-                            $params = array(
-                                    'status' => "'Live'",
-                                    'deadtime' => $deadtime,
-                                    'timetoconsider' => time(),
-                                    'roomid' => $roomid
-                            );
-                            $this->update_livetable_data($params);
-                        }
-                        if ($deadtime > 60) {
-                            $this->create_override_auto($attempt, $deadtime);
-
-                            $params = array(
-                                    'deadtime' => 0,
-                                    'extratime' => $record->extratime + $deadtime,
-                                    'roomid' => $roomid
-                            );
-                            $this->update_livetable_data($params);
-                        }
-                    }
-//                 }
-//             }
-            // if attempt completed
-            //create override($attempt, $deadtime, $newattempttrue) but builds on the prev attempt
+            }
         }
         return $attempt->timestart + $this->quiz->timelimit;
     }
@@ -200,45 +156,53 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
         global $USER;
         $username   = $USER->username;
         $quizid     = $this->quizobj->get_quizid();
-        $roomid = $username . '_' . $quizid . '_' . $attemptid;
-
+        $roomid     = $username . '_' . $quizid . '_' . $attemptid;
         return $roomid;
     }
 
     protected function check_node_server_status($attempt = null) {
-        global $HBCFG;
+        global $HBCFG, $OUTPUT;
+
+        /*
         try {
             // Try connecting to the node server.
             $socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
             $phpws_result = @socket_connect($socket, $HBCFG->host, $HBCFG->port);
         } catch (Exception $e) {
-            echo '<br> in catch node down';
             if (!is_null($attempt)) {
                 $roomid = $this->construct_roomid($attempt->id);
                 $this->process_node_server_down($roomid);
             }
             throw new moodle_exception('servererr', 'quizaccess_heartbeatmonitor', $this->quizobj->view_url());
         }
+        */
+        $socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
+        $phpws_result = @socket_connect($socket, $HBCFG->host, $HBCFG->port);
+        if (!$phpws_result) {
+            echo $OUTPUT->notification('Heartbeat time server error. Please contact your site admin.');
+            if (!is_null($attempt)) {
+                $roomid = $this->construct_roomid($attempt->id);
+                $this->process_node_server_down($roomid);
+            }
+        }
+
     }
 
     protected function process_node_server_down($roomid) {
         $record = $this->get_livetable_data($roomid);   // worry later about handling debug if multiple records found
-
-        if (!empty($record)){
+        if (!empty($record)) {
             $currenttimestamp = intval(microtime(true));
-
             if ($record->status == 'Live') {
                 // ttc = ndwn ==== llt of prev tsvr
                 $tsrecord = $this->get_timeserver_data($record->timeserver);
-
-                if (!empty($tsrecord)){
+                if (!empty($tsrecord)) {
                     $livetimenow = ($tsrecord->lastlivetime - $record->timetoconsider) + $record->livetime;
                     $params = array(
-                            'status' => "Dead",
-                            'timetoconsider' => $tsrecord->lastlivetime,
-                            'livetime' => $livetimenow,
-                            'roomid' => $roomid
-                    );
+                                'status' => "'Dead'",
+                                'timetoconsider' => $tsrecord->lastlivetime,
+                                'livetime' => $livetimenow,
+                                'roomid' => $roomid
+                                );
                     $updateresult = $this->update_livetable_data($params);
                 }
             }
@@ -289,10 +253,9 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
         }
     }
 
-    protected function update_livetable_data($params) { // Generalise this query to update all the values as provided.
+    protected function update_livetable_data($params) {
         global $DB;
         $count = count($params) - 1;
-
         $sql = 'UPDATE {quizaccess_hbmon_livetable} SET ';
         foreach ($params as $key => $value) {
             $count--;
@@ -304,16 +267,13 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
                 $sql .= $key . ' = ' . $value;
         }
         $sql .= ' WHERE roomid = "' . $params['roomid'] . '"';
-
         $result = $DB->execute($sql);
     }
 
     protected function create_override_auto($attempt, $deadtime) {
         global $DB, $CFG, $USER;
-
         require_once($CFG->dirroot . '/mod/quiz/lib.php');
         require_once($CFG->dirroot . '/mod/quiz/locallib.php');
-
         $userid     = $USER->id;
         $quiz       = $this->quiz;
         $cmid       = $this->quizobj->get_cmid();
@@ -325,16 +285,14 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
 
         $timelimit = $quiz->timelimit + $deadtime;
         $override->timelimit = $timelimit;
-        echo '<br> cuo ovrde timelimit ' . $deadtime;
 
         // Direct manipulation of quiz timelimit for immediately changing the quiz->timelimit.
         // Required mainly for display of 'Timelimit' on quiz/view.php page.
         // Or else, it takes a page refresh for changes to take effect.
         $quiz->timelimit = $timelimit;
-        echo '<br> cuo quiz timelimit ' . $quiz->timelimit;
 
         // If timelimit is already modified (in end_time()).
-        //         $override->timelimit = $quiz->timelimit;
+        // $override->timelimit = $quiz->timelimit;
 
         if (($attempt->timestart + $timelimit) > $quiz->timeclose) {
             $timeclose = $attempt->timestart + $timelimit;
@@ -354,8 +312,9 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
 
         // See if we are replacing an existing override.
         $conditions = array(
-                'quiz' => $quiz->id,
-                'userid' => empty($override->userid)? null : $override->userid);
+                        'quiz' => $quiz->id,
+                        'userid' => empty($override->userid)? null : $override->userid
+                        );
         if ($oldoverride = $DB->get_record('quiz_overrides', $conditions)) {
             // There is an old override, so we merge any new settings on top of
             // the older override.
@@ -365,11 +324,11 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
                     $override->{$key} = $oldoverride->{$key};
                 }
             }
+
             // Set the course module id before calling quiz_delete_override().
             $quiz->cmid = $cmid;
             $override->id = $oldoverride->id;
-
-//             quiz_delete_override($quiz, $oldoverride->id);
+            // quiz_delete_override($quiz, $oldoverride->id);
             $DB->update_record('quiz_overrides', $override);
         } else {
             //unset($override->id);
@@ -392,85 +351,12 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
 
         // Update timecheckstate (as in quiz_update_open_attempts()).
         $timecheckstate = $attempt->timestart + $timelimit;
-        echo '<br> tcs ' . $timecheckstate;
         $DB->set_field('quiz_attempts', 'timecheckstate', $timecheckstate, array('id' => $attempt->id));
 
         // User override. We only need to update the calendar event for this user override.
         quiz_update_events($quiz, $override);
-
-
     }
-
-    function extracodechecks() {
-        // If unfinished attempt.
-        if ($unfinishedattempt = quiz_get_user_attempt_unfinished($quiz->id, $USER->id)) {
-            echo '<br> in unfinished';
-            $unfinishedattemptid = $unfinishedattempt->id;
-            $unfinished = $unfinishedattempt->state == quiz_attempt::IN_PROGRESS;
-
-            if ($unfinished) {
-                $attemptid  = $unfinishedattempt->id;
-                $attemptobj = quiz_attempt::create($attemptid);
-
-                // Check that this attempt belongs to this user.
-                if ($attemptobj->get_userid() != $USER->id) {
-                    throw new moodle_quiz_exception($attemptobj->get_quizobj(), 'notyourattempt');
-                } else {
-                    $roomid = $username . '_' . $quizid . '_' . $attemptid;
-
-                    // If node server is down.
-                    if(!$phpws_result) {
-                        return get_string('servererr', 'quizaccess_heartbeatmonitor');
-
-                    } else {
-                        echo '<br> in else js init call';
-                        $PAGE->requires->js_init_call('client', array($quizid, $userid, $username, $attemptid, $sessionkey, json_encode($HBCFG)));
-
-                        //                         $hbmonmodesql = "SELECT hbmonmode
-                        //                                             FROM {quizaccess_enable_hbmon}
-                        //                                             WHERE quizid = $quizid";
-                        //                         $hbmonmode = $DB->get_field_sql($hbmonmodesql);
-                        //                         if ($hbmonmode) {
-                        //                             echo '<br>-- In rule crtovrrde -- <br>-- qa state - ' . $quiza->state;
-                        // If deadtime is there, then create override.
-
-                        //                             $deadtime = $this->get_deadtime($roomid);
-                        $sql = 'SELECT *
-                                    FROM {quizaccess_hbmon_livetable}
-                                    WHERE roomid = "' . $roomid . '"' .
-                                    /*  AND status = "Live" */
-                                    'AND deadtime > 60';
-                        $record = $DB->get_record_sql($sql);
-                        if (!empty($record)) {
-                            $deadtime = $record->deadtime;
-                            return $deadtime;
-                        } else {
-                            return null;
-                        }
-                        //                             if(!is_null($deadtime)) {
-
-                        //                             if (!empty($records)){
-                        //                                 foreach ($records as $record) {
-                        //                                     if($roomid == $record->roomid){
-                            //                                         echo '<br>-- In rule crtovrrd 2 --';
-                            //                                     $this->create_override($roomid, $attempt, $deadtime);
-                        //                                     }
-                        //                                     break;
-                        //                                 }
-                        //                             }
-                        //                         }
-                    }
-            }
-        }
-        return $attempt->timestart + $this->quiz->timelimit;
-        } else {
-            if(!$phpws_result) {
-                // If new attempt.
-                return get_string('servererr', 'quizaccess_heartbeatmonitor');
-            }
-        }
-    }
-
+/*
     protected function create_override($roomid, $attempt, $deadtime) {
         global $DB, $CFG;
         $cmid       = $this->quizobj->get_cmid();
@@ -504,12 +390,7 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
         $override->attempts = null;
 
         $clsobj = new override();
-
-//         if($attempt->state === 'finished') {
-//             $clsobj->reset_timelimit_override($cmid, $roomid, $override, $quiz);
-//         } else {
-            $clsobj->create_user_override($attempt, $override);
-//         }
+        $clsobj->create_user_override($attempt, $override);
     }
 
     public function setup_attempt_page($page) {
@@ -521,7 +402,6 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
 
         // Use this to delete user-override when the attempt finishes.
 //         $this->current_attempt_finished();
-//         echo '<br><br><br>-- In setup attempt --';
 
         $sessionkey = sesskey();
         $userid     = $USER->id;
@@ -530,7 +410,6 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
         $quiz       = $this->quizobj->get_quiz();
         $quizid     = $this->quizobj->get_quizid();
         $cmid       = $this->quizobj->get_cmid();
-//         $context    = $this->quizobj->get_context();
 
         // To do - Get attempt id from url here.
         $sql = 'SELECT *
@@ -546,25 +425,8 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
             $attemptid  = $attempt->id;
             $quiza      = $DB->get_record('quiz_attempts', array('id' => $attemptid));
             $state      = $quiza->state;
-//             echo '<br>-- qa state - ' . $quiza->state;
 
             if($quiza->state == 'finished') {
-//                 echo '<br>-- qa state - ' . $quiza->state;
-                // Reset override to quiz timelimit. Initially, we were deleting the override.
-                /*
-                 $sql = 'SELECT *
-                             FROM {quiz_overrides}
-                             WHERE quiz = :quizid
-                             AND userid = :userid
-                             ORDER BY id DESC
-                             LIMIT 1';
-                 $params['quizid'] = $quiz->id;
-                 $params['userid'] = $userid;
-                 $override = $DB->get_record_sql($sql, $params);
-                 if ($override) {
-                     quiz_delete_override($quiz, $override->id);
-                 }
-                 */
                 $roomid = $username . '_' . $quizid . '_' . $attemptid;
                 $select_sql = 'SELECT *
                                     FROM {quizaccess_hbmon_livetable}
@@ -583,19 +445,12 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
             }
         }
     }
-
+*/
     public static function add_settings_form_fields(
             mod_quiz_mod_form $quizform, MoodleQuickForm $mform) {
-
-       $mform->addElement('header', 'hbmonheader', 'Heartbeat monitor');
+        $mform->addElement('header', 'hbmonheader', 'Heartbeat monitor');
 
         $hbmonsettingsarray   = array();
-
-//         $hbmonsettingsarray[] = $mform->createElement('select', 'hbmonrequired',
-//                 get_string('hbmonrequired', 'quizaccess_heartbeatmonitor'), array(
-//                         0 => get_string('notrequired', 'quizaccess_heartbeatmonitor'),
-//                         1 => get_string('hbmonrequiredoption', 'quizaccess_heartbeatmonitor')
-//                 ));
         $mform->addElement('select', 'hbmonrequired',
                 get_string('hbmonrequired', 'quizaccess_heartbeatmonitor'), array(
                         0 => get_string('notrequired', 'quizaccess_heartbeatmonitor'),
@@ -606,29 +461,19 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
         $radioarray = array();
         $hbmonsettingsarray[]= $mform->createElement('radio', 'hbmonmode', '', get_string('automatic', 'quizaccess_heartbeatmonitor'), 1);
         $hbmonsettingsarray[]= $mform->createElement('radio', 'hbmonmode', '', get_string('manual', 'quizaccess_heartbeatmonitor'), 0);
-//         $mform->addGroup($radioarray, 'radioar', '', array(' '), false);
         $mform->setDefault('hbmonmode', 1);
-//         $hbmonsettingsarray[] = $radioarray;
         $mform->addGroup($hbmonsettingsarray, 'enablehbmon', 'Mode', array(' '), false);
         $mform->disabledIf('hbmonmode', 'hbmonrequired', 'neq', 1);
 
-//         $hbmonsettingsarray[] = $mform->createElement('text', 'nodehost', "Host", 'maxlength="25" size="15" ');
         $mform->addElement('text', 'nodehost', "Node host", 'maxlength="25" size="15" ');
         $mform->setType('nodehost', PARAM_HOST);
-        //         $mform->addRule('', get_string('missing'), 'required', null, 'server');
         $mform->setDefault('nodehost', 'localhost');
         $mform->disabledIf('nodehost', 'hbmonrequired', 'neq', 1);
 
-//         $hbmonsettingsarray[] = $mform->createElement('text', 'nodeport', 'Port', 'maxlength="4" size="4" ');
         $mform->addElement('text', 'nodeport', 'Node port', 'maxlength="4" size="4" ');
         $mform->setType('nodeport', PARAM_NUMBER);
         $mform->setDefault('nodeport', '3000');
         $mform->disabledIf('nodeport', 'hbmonrequired', 'neq', 1);
-
-//         $mform->addGroup($hbmonsettingsarray, 'enablehbmon', get_string('hbmonrequired', 'quizaccess_heartbeatmonitor'), array(' '), false);
-//         $mform->setAdvanced('enablehbmon', true);
-
-
     }
 
     public static function validate_settings_form_fields(array $errors,
@@ -689,7 +534,7 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
         );
     }
 
-     public static function get_extra_settings($quizid) {
-         return array();
-     }
+    public static function get_extra_settings($quizid) {
+        return array();
+    }
 }

@@ -16,7 +16,7 @@
 
 /**
  * This page handles editing and creation of quiz overrides.
- *
+ * Original code taken from -
  * @package   mod_quiz
  * @copyright 2010 Matt Petro
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later

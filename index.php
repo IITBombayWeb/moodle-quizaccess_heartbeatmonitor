@@ -52,9 +52,6 @@ $heading    = get_string('heading', 'quizaccess_heartbeatmonitor', $quiz->name);
 $url = new moodle_url('/mod/quiz/accessrule/heartbeatmonitor/index.php', array('quizid'=>$quizid, 'courseid'=>$courseid, 'cmid'=>$cmid));
 $PAGE->set_url($url);
 
-//$url1=$_SERVER['REQUEST_URI'];
-//header("Refresh: 5;");
-
 require_login($course, false, $cm);
 
 $context = context_module::instance($cm->id);
@@ -78,10 +75,8 @@ $table->head = array('', get_string('user', 'quizaccess_heartbeatmonitor'), 'Id 
                         get_string('timeutilized', 'quizaccess_heartbeatmonitor'),
                         get_string('timelost', 'quizaccess_heartbeatmonitor'),
                         'Total extra time granted');
-// $table->head = array('User', 'Socket room id', 'Current status', 'Status update on', 'Quiz time used up', 'Quiz time lost', 'Total extra time granted');
 
 $result    = $DB->get_records_sql($sql);
-// print_object($result);
 $count = 0;
 
 if (!empty($result)){
@@ -93,7 +88,6 @@ if (!empty($result)){
         $quiza     = $DB->get_record('quiz_attempts', array('id'=>$attemptid));
 
         if(!$quiza || $quiza->state == 'finished') {
-//             $sql = 'DELETE FROM {quizaccess_hbmon_livetable} WHERE roomid = "' . $roomid . '"';
             $hblivetable = 'quizaccess_hbmon_livetable';
             $select = 'roomid = ?'; // Is put into the where clause.
             $params = array($roomid);
@@ -126,9 +120,6 @@ if (!empty($result)){
                 $statustodisplay = get_string('offline', 'quizaccess_heartbeatmonitor');
             }
 
-//             $humanisedlivetime = secondsToTime(intval($livetime));
-//             $humaniseddeadtime = secondsToTime(intval($deadtime));
-
             $humanisedlivetime = format_time($livetime);
             $humaniseddeadtime = format_time($deadtime);
 
@@ -137,7 +128,7 @@ if (!empty($result)){
             $row->id = $roomid;
             $row->attributes['class'] = $roomid;
 
-            $value = $roomid . '_' . $deadtime;
+//             $value = $roomid . '_' . $deadtime;
 
             $count++;
             $cell01 = new html_table_cell($count);
@@ -149,7 +140,6 @@ if (!empty($result)){
             $cell0 = new html_table_cell($user->firstname .  ' ' . $user->lastname);
             $cell0->id = 'user';
 
-//             $cell1 = new html_table_cell($roomid);
             $cell1 = new html_table_cell($user->lastip);
             $cell1->id = 'roomid';
 
@@ -157,7 +147,6 @@ if (!empty($result)){
             $cell2->id = 'status';
 
             $cell3 = new html_table_cell(date('g:i a, M j', intval($timetoconsider)));
-//             $cell3 = new html_table_cell(format_time($timetoconsider));
             $cell3->id = 'timetoconsider';
 
             $cell4 = new html_table_cell($humanisedlivetime);
@@ -196,15 +185,12 @@ $indexurl = new moodle_url('/mod/quiz/accessrule/heartbeatmonitor/index.php');
 $PAGE->set_pagelayout('admin');
 $PAGE->set_title($pluginname);
 $PAGE->set_heading($course->fullname);
-// $PAGE->requires->jquery();
 $PAGE->requires->jquery();
-// $PAGE->requires->js( new moodle_url($CFG->wwwroot . '/mod/quiz/accessrule/heartbeatmonitor/testnode.js') );
 
 echo $OUTPUT->header();
 echo $OUTPUT->heading(format_string($quiz->name, true, array('context' => $context)));
 
 $startnode_form = new startnode_form($url, $quiz, $course, $cm);
-// $startnode_form->set_data($node_up);
 static $node_up = 0;
 
 // Manage node server.
