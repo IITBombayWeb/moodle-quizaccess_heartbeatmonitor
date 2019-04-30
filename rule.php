@@ -110,10 +110,13 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
                     throw new moodle_quiz_exception($attemptobj->get_quizobj(), 'notyourattempt');
                 } else {
                     $roomid = $username . '_' . $quizid . '_' . $attemptid;
-
-                    $this->check_node_server_status($attempt);
-
-                    $PAGE->requires->js_init_call('client', array($roomid, json_encode($HBCFG)));
+                    $node_up = $this->check_node_server_status($unfinishedattempt);
+                    if($node_up) {
+                        $PAGE->requires->js_init_call('client', array($roomid, json_encode($HBCFG)));
+                        return false;
+                    } else {
+                        return 'Heartbeat time server error. Please contact your site admin.';
+                    }
                 }
             }
         }
@@ -122,7 +125,8 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
     public function end_time($attempt) {
         global $CFG, $PAGE, $_SESSION, $DB, $USER, $HBCFG;
 
-        $this->check_node_server_status($attempt);
+        $node_up = $this->check_node_server_status($attempt);
+        if(!$node_up) {} // Anything to do here?
 
         if(isset($attempt->id)) {
             $deadtime = $this->get_deadtime($attempt);
@@ -179,13 +183,13 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
         $socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
         $phpws_result = @socket_connect($socket, $HBCFG->host, $HBCFG->port);
         if (!$phpws_result) {
-            echo $OUTPUT->notification('Heartbeat time server error. Please contact your site admin.');
             if (!is_null($attempt)) {
                 $roomid = $this->construct_roomid($attempt->id);
                 $this->process_node_server_down($roomid);
+                return 0;
             }
         }
-
+        return 1;
     }
 
     protected function process_node_server_down($roomid) {
@@ -510,9 +514,10 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
                 $DB->update_record('quizaccess_enable_hbmon', $record);
 
                 $record1 = new stdClass();
+                $record1->id = 1;
                 $record1->nodehost = $quiz->nodehost;
                 $record1->nodeport = $quiz->nodeport;
-                if (!$DB->record_exists('quizaccess_hbmon_node')) {
+                if (!$DB->record_exists('quizaccess_hbmon_node', array('id' => 1))) {
                     $DB->insert_record('quizaccess_hbmon_node', $record1);
                 } else {
                     $DB->update_record('quizaccess_hbmon_node', $record1);

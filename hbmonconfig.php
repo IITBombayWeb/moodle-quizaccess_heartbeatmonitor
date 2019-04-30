@@ -9,4 +9,4 @@ $record = $DB->get_record('quizaccess_hbmon_node', array(), '*', MUST_EXIST);
 
 $HBCFG->host = $record->nodehost;
 $HBCFG->port = $record->nodeport;
-$HBCFG->wwwroot = 'http://localhost';
+$HBCFG->wwwroot = 'http://' . $HBCFG->host;

@@ -1,0 +1,267 @@
+Terminated
+---------------- -----  ----- Date: Tue Apr 23 2019 17:07:54 GMT+0530 (IST)
+1556019474: Socket XUYj3p797rKjnhZuAAAA connected.
+Date: Tue Apr 23 2019 17:07:54 GMT+0530 (IST)
+1556019475: In attempt event.
+Date: Tue Apr 23 2019 17:07:56 GMT+0530 (IST)
+1556019476: XUYj3p797rKjnhZuAAAA record inserted in 'socketinfo'.
+Date: Tue Apr 23 2019 17:10:26 GMT+0530 (IST)
+1556019626: XUYj3p797rKjnhZuAAAA disconnected.
+Date: Tue Apr 23 2019 17:10:26 GMT+0530 (IST)
+1556019626: XUYj3p797rKjnhZuAAAA record inserted in 'socketinfo'.
+/var/www/html/moodle/node_modules/mysql/lib/protocol/Parser.js:80
+        throw err; // Rethrow non-MySQL errors
+        ^
+
+Error: ER_BAD_FIELD_ERROR: Unknown column 'NaN' in 'field list'
+    at Query.Sequence._packetToError (/var/www/html/moodle/node_modules/mysql/lib/protocol/sequences/Sequence.js:47:14)
+    at Query.ErrorPacket (/var/www/html/moodle/node_modules/mysql/lib/protocol/sequences/Query.js:77:18)
+    at Protocol._parsePacket (/var/www/html/moodle/node_modules/mysql/lib/protocol/Protocol.js:278:23)
+    at Parser.write (/var/www/html/moodle/node_modules/mysql/lib/protocol/Parser.js:76:12)
+    at Protocol.write (/var/www/html/moodle/node_modules/mysql/lib/protocol/Protocol.js:38:16)
+    at Socket.<anonymous> (/var/www/html/moodle/node_modules/mysql/lib/Connection.js:91:28)
+    at Socket.<anonymous> (/var/www/html/moodle/node_modules/mysql/lib/Connection.js:502:10)
+    at emitOne (events.js:77:13)
+    at Socket.emit (events.js:169:7)
+    at readableAddChunk (_stream_readable.js:146:16)
+    --------------------
+    at Protocol._enqueue (/var/www/html/moodle/node_modules/mysql/lib/protocol/Protocol.js:144:48)
+    at Connection.query (/var/www/html/moodle/node_modules/mysql/lib/Connection.js:200:25)
+    at Query.<anonymous> (/var/www/html/moodle/mod/quiz/accessrule/heartbeatmonitor/server.js:330:13)
+    at Query.<anonymous> (/var/www/html/moodle/node_modules/mysql/lib/Connection.js:502:10)
+    at Query._callback (/var/www/html/moodle/node_modules/mysql/lib/Connection.js:468:16)
+    at Query.Sequence.end (/var/www/html/moodle/node_modules/mysql/lib/protocol/sequences/Sequence.js:83:24)
+    at Query._handleFinalResultPacket (/var/www/html/moodle/node_modules/mysql/lib/protocol/sequences/Query.js:139:8)
+    at Query.EofPacket (/var/www/html/moodle/node_modules/mysql/lib/protocol/sequences/Query.js:123:8)
+    at Protocol._parsePacket (/var/www/html/moodle/node_modules/mysql/lib/protocol/Protocol.js:278:23)
+    at Parser.write (/var/www/html/moodle/node_modules/mysql/lib/protocol/Parser.js:76:12)
+ ----- Date: Wed Apr 24 2019 12:51:59 GMT+0530 (IST)
+1556090520: Socket 4aoHVP2L4AlOtVb9AAAA connected.
+Date: Wed Apr 24 2019 12:52:00 GMT+0530 (IST)
+1556090520: In attempt event.
+Date: Wed Apr 24 2019 12:52:01 GMT+0530 (IST)
+1556090521: 4aoHVP2L4AlOtVb9AAAA record inserted in 'socketinfo'.
+Date: Wed Apr 24 2019 12:52:01 GMT+0530 (IST)
+1556090521: 4aoHVP2L4AlOtVb9AAAA record inserted in 'livetable'.
+Date: Wed Apr 24 2019 12:52:48 GMT+0530 (IST)
+1556090568: 4aoHVP2L4AlOtVb9AAAA disconnected.
+Date: Wed Apr 24 2019 12:52:48 GMT+0530 (IST)
+1556090568: 4aoHVP2L4AlOtVb9AAAA record inserted in 'socketinfo'.
+Date: Wed Apr 24 2019 12:52:49 GMT+0530 (IST)
+1556090569: Socket XVJZIdy4QlRR29P6AAAB connected.
+Date: Wed Apr 24 2019 12:52:49 GMT+0530 (IST)
+1556090569: In attempt event.
+Date: Wed Apr 24 2019 12:52:49 GMT+0530 (IST)
+1556090569: 4aoHVP2L4AlOtVb9AAAA status updated to 'Dead'.
+Date: Wed Apr 24 2019 12:52:49 GMT+0530 (IST)
+1556090569: XVJZIdy4QlRR29P6AAAB record inserted in 'socketinfo'.
+Date: Wed Apr 24 2019 12:52:49 GMT+0530 (IST)
+1556090569: XVJZIdy4QlRR29P6AAAB status updated to 'Live'.
+Date: Wed Apr 24 2019 12:52:50 GMT+0530 (IST)
+1556090570: XVJZIdy4QlRR29P6AAAB's extratime updated.
+Date: Wed Apr 24 2019 12:52:53 GMT+0530 (IST)
+1556090573: XVJZIdy4QlRR29P6AAAB disconnected.
+Date: Wed Apr 24 2019 12:52:54 GMT+0530 (IST)
+1556090574: Socket J2joF_7LjBL8kE-XAAAC connected.
+Date: Wed Apr 24 2019 12:52:54 GMT+0530 (IST)
+1556090574: XVJZIdy4QlRR29P6AAAB record inserted in 'socketinfo'.
+Date: Wed Apr 24 2019 12:52:54 GMT+0530 (IST)
+1556090574: In attempt event.
+Date: Wed Apr 24 2019 12:52:54 GMT+0530 (IST)
+1556090574: XVJZIdy4QlRR29P6AAAB status updated to 'Dead'.
+Date: Wed Apr 24 2019 12:52:54 GMT+0530 (IST)
+1556090574: J2joF_7LjBL8kE-XAAAC record inserted in 'socketinfo'.
+Date: Wed Apr 24 2019 12:52:55 GMT+0530 (IST)
+1556090575: J2joF_7LjBL8kE-XAAAC status updated to 'Live'.
+Date: Wed Apr 24 2019 12:52:55 GMT+0530 (IST)
+1556090575: J2joF_7LjBL8kE-XAAAC's extratime updated.
+Date: Wed Apr 24 2019 13:12:07 GMT+0530 (IST)
+1556091727: J2joF_7LjBL8kE-XAAAC disconnected.
+Date: Wed Apr 24 2019 13:12:07 GMT+0530 (IST)
+1556091727: J2joF_7LjBL8kE-XAAAC record inserted in 'socketinfo'.
+Date: Wed Apr 24 2019 13:12:09 GMT+0530 (IST)
+1556091729: J2joF_7LjBL8kE-XAAAC status updated to 'Dead'.
+ ----- events.js:141
+      throw er; // Unhandled 'error' event
+      ^
+
+Error: Connection lost: The server closed the connection.
+    at Protocol.end (/var/www/html/moodle/node_modules/mysql/lib/protocol/Protocol.js:112:13)
+    at Socket.<anonymous> (/var/www/html/moodle/node_modules/mysql/lib/Connection.js:97:28)
+    at Socket.<anonymous> (/var/www/html/moodle/node_modules/mysql/lib/Connection.js:502:10)
+    at emitNone (events.js:72:20)
+    at Socket.emit (events.js:166:7)
+    at endReadableNT (_stream_readable.js:905:12)
+    at nextTickCallbackWith2Args (node.js:441:9)
+    at process._tickCallback (node.js:355:17)
+ ----- Date: Mon Apr 29 2019 11:19:33 GMT+0530 (IST)
+1556516973: Socket CSVCnwe8h0nVSLXfAAAA connected.
+Date: Mon Apr 29 2019 11:19:33 GMT+0530 (IST)
+1556516973: In attempt event.
+Date: Mon Apr 29 2019 11:19:33 GMT+0530 (IST)
+1556516973: CSVCnwe8h0nVSLXfAAAA record inserted in 'socketinfo'.
+Date: Mon Apr 29 2019 11:19:33 GMT+0530 (IST)
+1556516973: CSVCnwe8h0nVSLXfAAAA record inserted in 'livetable'.
+Date: Mon Apr 29 2019 11:19:53 GMT+0530 (IST)
+1556516993: CSVCnwe8h0nVSLXfAAAA disconnected.
+Date: Mon Apr 29 2019 11:19:53 GMT+0530 (IST)
+1556516993: CSVCnwe8h0nVSLXfAAAA record inserted in 'socketinfo'.
+Date: Mon Apr 29 2019 11:19:54 GMT+0530 (IST)
+1556516994: Socket _9Wnf3EQkyxgi0HrAAAB connected.
+Date: Mon Apr 29 2019 11:19:54 GMT+0530 (IST)
+1556516994: CSVCnwe8h0nVSLXfAAAA status updated to 'Dead'.
+Date: Mon Apr 29 2019 11:19:54 GMT+0530 (IST)
+1556516994: In attempt event.
+Date: Mon Apr 29 2019 11:19:54 GMT+0530 (IST)
+1556516994: _9Wnf3EQkyxgi0HrAAAB record inserted in 'socketinfo'.
+Date: Mon Apr 29 2019 11:19:54 GMT+0530 (IST)
+1556516994: _9Wnf3EQkyxgi0HrAAAB status updated to 'Live'.
+Date: Mon Apr 29 2019 11:19:54 GMT+0530 (IST)
+1556516994: _9Wnf3EQkyxgi0HrAAAB's extratime updated.
+Date: Mon Apr 29 2019 11:20:12 GMT+0530 (IST)
+1556517012: _9Wnf3EQkyxgi0HrAAAB disconnected.
+Date: Mon Apr 29 2019 11:20:12 GMT+0530 (IST)
+1556517012: _9Wnf3EQkyxgi0HrAAAB record inserted in 'socketinfo'.
+Date: Mon Apr 29 2019 11:20:12 GMT+0530 (IST)
+1556517012: _9Wnf3EQkyxgi0HrAAAB status updated to 'Dead'.
+Date: Mon Apr 29 2019 11:20:13 GMT+0530 (IST)
+1556517013: Socket g7VBaIYdxgTc5O3SAAAC connected.
+Date: Mon Apr 29 2019 11:20:13 GMT+0530 (IST)
+1556517013: In attempt event.
+Date: Mon Apr 29 2019 11:20:13 GMT+0530 (IST)
+1556517013: g7VBaIYdxgTc5O3SAAAC record inserted in 'socketinfo'.
+Date: Mon Apr 29 2019 11:20:13 GMT+0530 (IST)
+1556517013: g7VBaIYdxgTc5O3SAAAC status updated to 'Live'.
+Date: Mon Apr 29 2019 11:20:13 GMT+0530 (IST)
+1556517013: g7VBaIYdxgTc5O3SAAAC's extratime updated.
+Date: Mon Apr 29 2019 11:20:23 GMT+0530 (IST)
+1556517023: g7VBaIYdxgTc5O3SAAAC disconnected.
+Date: Mon Apr 29 2019 11:20:23 GMT+0530 (IST)
+1556517023: g7VBaIYdxgTc5O3SAAAC record inserted in 'socketinfo'.
+Date: Mon Apr 29 2019 11:20:24 GMT+0530 (IST)
+1556517024: Socket NQE5ghvdUprMVCjGAAAD connected.
+Date: Mon Apr 29 2019 11:20:24 GMT+0530 (IST)
+1556517024: g7VBaIYdxgTc5O3SAAAC status updated to 'Dead'.
+Date: Mon Apr 29 2019 11:20:24 GMT+0530 (IST)
+1556517024: In attempt event.
+Date: Mon Apr 29 2019 11:20:24 GMT+0530 (IST)
+1556517024: NQE5ghvdUprMVCjGAAAD record inserted in 'socketinfo'.
+Date: Mon Apr 29 2019 11:20:24 GMT+0530 (IST)
+1556517024: NQE5ghvdUprMVCjGAAAD status updated to 'Live'.
+Date: Mon Apr 29 2019 11:20:24 GMT+0530 (IST)
+1556517024: NQE5ghvdUprMVCjGAAAD's extratime updated.
+Date: Mon Apr 29 2019 11:20:36 GMT+0530 (IST)
+1556517036: NQE5ghvdUprMVCjGAAAD disconnected.
+Date: Mon Apr 29 2019 11:20:36 GMT+0530 (IST)
+1556517036: NQE5ghvdUprMVCjGAAAD record inserted in 'socketinfo'.
+Date: Mon Apr 29 2019 11:20:36 GMT+0530 (IST)
+1556517036: Socket ZYgdH-y3-RpPT3xlAAAE connected.
+Date: Mon Apr 29 2019 11:20:36 GMT+0530 (IST)
+1556517036: In attempt event.
+Date: Mon Apr 29 2019 11:20:36 GMT+0530 (IST)
+1556517036: NQE5ghvdUprMVCjGAAAD status updated to 'Dead'.
+Date: Mon Apr 29 2019 11:20:36 GMT+0530 (IST)
+1556517036: ZYgdH-y3-RpPT3xlAAAE record inserted in 'socketinfo'.
+Date: Mon Apr 29 2019 11:20:36 GMT+0530 (IST)
+1556517036: ZYgdH-y3-RpPT3xlAAAE status updated to 'Live'.
+Date: Mon Apr 29 2019 11:20:36 GMT+0530 (IST)
+1556517036: ZYgdH-y3-RpPT3xlAAAE's extratime updated.
+Date: Mon Apr 29 2019 11:20:58 GMT+0530 (IST)
+1556517058: ZYgdH-y3-RpPT3xlAAAE disconnected.
+Date: Mon Apr 29 2019 11:20:59 GMT+0530 (IST)
+1556517059: ZYgdH-y3-RpPT3xlAAAE record inserted in 'socketinfo'.
+Date: Mon Apr 29 2019 11:20:59 GMT+0530 (IST)
+1556517059: Socket DOqG7BeuWl4t67tlAAAF connected.
+Date: Mon Apr 29 2019 11:20:59 GMT+0530 (IST)
+1556517059: ZYgdH-y3-RpPT3xlAAAE status updated to 'Dead'.
+Date: Mon Apr 29 2019 11:20:59 GMT+0530 (IST)
+1556517059: In attempt event.
+Date: Mon Apr 29 2019 11:20:59 GMT+0530 (IST)
+1556517059: DOqG7BeuWl4t67tlAAAF record inserted in 'socketinfo'.
+Date: Mon Apr 29 2019 11:20:59 GMT+0530 (IST)
+1556517059: DOqG7BeuWl4t67tlAAAF status updated to 'Live'.
+Date: Mon Apr 29 2019 11:20:59 GMT+0530 (IST)
+1556517059: DOqG7BeuWl4t67tlAAAF's extratime updated.
+Date: Mon Apr 29 2019 11:21:16 GMT+0530 (IST)
+1556517076: DOqG7BeuWl4t67tlAAAF disconnected.
+Date: Mon Apr 29 2019 11:21:16 GMT+0530 (IST)
+1556517076: DOqG7BeuWl4t67tlAAAF record inserted in 'socketinfo'.
+Date: Mon Apr 29 2019 11:21:16 GMT+0530 (IST)
+1556517076: Socket eJ0A9n5sZan6DEPeAAAG connected.
+Date: Mon Apr 29 2019 11:21:16 GMT+0530 (IST)
+1556517076: DOqG7BeuWl4t67tlAAAF status updated to 'Dead'.
+Date: Mon Apr 29 2019 11:21:16 GMT+0530 (IST)
+1556517076: In attempt event.
+Date: Mon Apr 29 2019 11:21:17 GMT+0530 (IST)
+1556517077: eJ0A9n5sZan6DEPeAAAG record inserted in 'socketinfo'.
+Date: Mon Apr 29 2019 11:21:17 GMT+0530 (IST)
+1556517077: eJ0A9n5sZan6DEPeAAAG status updated to 'Live'.
+Date: Mon Apr 29 2019 11:21:17 GMT+0530 (IST)
+1556517077: eJ0A9n5sZan6DEPeAAAG's extratime updated.
+Date: Mon Apr 29 2019 11:21:27 GMT+0530 (IST)
+1556517087: eJ0A9n5sZan6DEPeAAAG disconnected.
+Date: Mon Apr 29 2019 11:21:27 GMT+0530 (IST)
+1556517087: eJ0A9n5sZan6DEPeAAAG record inserted in 'socketinfo'.
+Date: Mon Apr 29 2019 11:21:27 GMT+0530 (IST)
+1556517087: eJ0A9n5sZan6DEPeAAAG status updated to 'Dead'.
+Date: Mon Apr 29 2019 11:24:13 GMT+0530 (IST)
+1556517253: Socket Dm6_BBZLMOx_4CEwAAAH connected.
+Date: Mon Apr 29 2019 11:24:13 GMT+0530 (IST)
+1556517253: In attempt event.
+Date: Mon Apr 29 2019 11:24:13 GMT+0530 (IST)
+1556517253: Dm6_BBZLMOx_4CEwAAAH record inserted in 'socketinfo'.
+Date: Mon Apr 29 2019 11:24:26 GMT+0530 (IST)
+1556517266: Dm6_BBZLMOx_4CEwAAAH disconnected.
+Date: Mon Apr 29 2019 11:24:26 GMT+0530 (IST)
+1556517266: Dm6_BBZLMOx_4CEwAAAH record inserted in 'socketinfo'.
+Date: Mon Apr 29 2019 11:24:26 GMT+0530 (IST)
+1556517266: Dm6_BBZLMOx_4CEwAAAH status updated to 'Dead'.
+Date: Mon Apr 29 2019 11:24:26 GMT+0530 (IST)
+1556517266: Socket 89ttCGTQ0TdF6RiKAAAI connected.
+Date: Mon Apr 29 2019 11:24:27 GMT+0530 (IST)
+1556517267: In attempt event.
+Date: Mon Apr 29 2019 11:24:27 GMT+0530 (IST)
+1556517267: 89ttCGTQ0TdF6RiKAAAI record inserted in 'socketinfo'.
+Date: Mon Apr 29 2019 11:24:27 GMT+0530 (IST)
+1556517267: 89ttCGTQ0TdF6RiKAAAI status updated to 'Live'.
+Date: Mon Apr 29 2019 11:24:27 GMT+0530 (IST)
+1556517267: 89ttCGTQ0TdF6RiKAAAI's extratime updated.
+Date: Mon Apr 29 2019 11:24:30 GMT+0530 (IST)
+1556517270: 89ttCGTQ0TdF6RiKAAAI disconnected.
+Date: Mon Apr 29 2019 11:24:30 GMT+0530 (IST)
+1556517270: 89ttCGTQ0TdF6RiKAAAI record inserted in 'socketinfo'.
+Date: Mon Apr 29 2019 11:24:30 GMT+0530 (IST)
+1556517270: 89ttCGTQ0TdF6RiKAAAI status updated to 'Dead'.
+Date: Mon Apr 29 2019 11:24:30 GMT+0530 (IST)
+1556517270: Socket zULMRKtbO7qtUyQFAAAJ connected.
+Date: Mon Apr 29 2019 11:24:30 GMT+0530 (IST)
+1556517270: In attempt event.
+Date: Mon Apr 29 2019 11:24:30 GMT+0530 (IST)
+1556517270: zULMRKtbO7qtUyQFAAAJ record inserted in 'socketinfo'.
+Date: Mon Apr 29 2019 11:24:30 GMT+0530 (IST)
+1556517270: zULMRKtbO7qtUyQFAAAJ status updated to 'Live'.
+Date: Mon Apr 29 2019 11:24:30 GMT+0530 (IST)
+1556517270: zULMRKtbO7qtUyQFAAAJ's extratime updated.
+Date: Mon Apr 29 2019 11:26:52 GMT+0530 (IST)
+1556517412: zULMRKtbO7qtUyQFAAAJ disconnected.
+Date: Mon Apr 29 2019 11:26:52 GMT+0530 (IST)
+1556517412: zULMRKtbO7qtUyQFAAAJ record inserted in 'socketinfo'.
+Date: Mon Apr 29 2019 11:26:52 GMT+0530 (IST)
+1556517412: zULMRKtbO7qtUyQFAAAJ status updated to 'Dead'.
+Date: Mon Apr 29 2019 11:26:52 GMT+0530 (IST)
+1556517412: Socket h1yCYu_QbrkcZq-LAAAK connected.
+Date: Mon Apr 29 2019 11:26:52 GMT+0530 (IST)
+1556517412: In attempt event.
+Date: Mon Apr 29 2019 11:26:52 GMT+0530 (IST)
+1556517412: h1yCYu_QbrkcZq-LAAAK record inserted in 'socketinfo'.
+Date: Mon Apr 29 2019 11:26:52 GMT+0530 (IST)
+1556517412: h1yCYu_QbrkcZq-LAAAK status updated to 'Live'.
+Date: Mon Apr 29 2019 11:26:53 GMT+0530 (IST)
+1556517413: h1yCYu_QbrkcZq-LAAAK's extratime updated.
+Date: Mon Apr 29 2019 11:42:14 GMT+0530 (IST)
+1556518334: h1yCYu_QbrkcZq-LAAAK disconnected.
+Date: Mon Apr 29 2019 11:42:15 GMT+0530 (IST)
+1556518335: h1yCYu_QbrkcZq-LAAAK record inserted in 'socketinfo'.
+Date: Mon Apr 29 2019 11:42:15 GMT+0530 (IST)
+1556518335: h1yCYu_QbrkcZq-LAAAK status updated to 'Dead'.
+ ----- 
