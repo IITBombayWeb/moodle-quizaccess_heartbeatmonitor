@@ -471,7 +471,8 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
 
         $mform->addElement('text', 'nodehost', "Node host", 'maxlength="25" size="15" ');
         $mform->setType('nodehost', PARAM_HOST);
-        $mform->setDefault('nodehost', 'localhost');
+        //$mform->setDefault('nodehost', 'localhost');
+        $mform->setDefault('nodehost', '10.102.1.115');
         $mform->disabledIf('nodehost', 'hbmonrequired', 'neq', 1);
 
         $mform->addElement('text', 'nodeport', 'Node port', 'maxlength="4" size="4" ');
