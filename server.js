@@ -31,7 +31,7 @@ var mysql 		= require('mysql');
 var obj;
 
 // EXEC SYNC - WORKS
-var child = require('child_process').execSync('php -r \'define("CLI_SCRIPT", true); include("/var/www/html/moodle/config.php"); print json_encode($CFG);\'');
+var child = require('child_process').execSync('php -r \'define("CLI_SCRIPT", true); include("/var/www/html/exams/config.php"); print json_encode($CFG);\'');
 obj = JSON.parse(child);
 
 // DB CONN
@@ -54,19 +54,23 @@ var timeserverid;
 var port;
 
 //Insert new record for node server.
-var nodesql = "Select * from mdl_quizaccess_hbmon_node";
+var nodesql = "Select * from exm_quizaccess_hbmon_node";
 con.query(nodesql, function(err, result) {
     if (err) throw err;                
+    /*
     if (result.length > 0) {
         for (i in result) {
             port = result[i].nodeport;
             http.listen(port, function(){});
+	    break;
         }
     }
+    */
+    http.listen(3000, function(){});
 });
 
 // Insert new record for node server.
-var timeserversql = "INSERT INTO mdl_quizaccess_hbmon_timeserver (timestarted, lastlivetime) VALUES" +
+var timeserversql = "INSERT INTO exm_quizaccess_hbmon_timeserver (timestarted, lastlivetime) VALUES" +
 							"(" + Math.floor((new Date().getTime())/1000) + "," 
 								+ Math.floor((new Date().getTime())/1000) + ")";
 con.query(timeserversql, function(err, result) {
@@ -76,7 +80,7 @@ con.query(timeserversql, function(err, result) {
     	
 // Update record for node server.
 var interval = setInterval(function() {
-	var updatetstablesql = "UPDATE mdl_quizaccess_hbmon_timeserver SET lastlivetime = "
+	var updatetstablesql = "UPDATE exm_quizaccess_hbmon_timeserver SET lastlivetime = "
 									+ Math.floor((new Date().getTime())/1000) 
 									+ " WHERE timeserverid = " + currenttimeserverid;
 	con.query(updatetstablesql, function(err, result) {
@@ -110,7 +114,7 @@ var record = io.sockets.on('connection', function (socket) {
         socket.timestampC 		= Math.floor((socket.timestampC1)/1000);
         socket.ip 				= "'" + socket.request.connection.remoteAddress + "'";
 
-        var sql = "INSERT INTO mdl_quizaccess_hbmon_socketinfo1 (roomid, socketid, socketstatus, ip, timestamp) VALUES" +
+        var sql = "INSERT INTO exm_quizaccess_hbmon_socketinfo1 (roomid, socketid, socketstatus, ip, timestamp) VALUES" +
          			"(" + socket.roomid + "," 
          				+ socket.socketid + "," 
          				+ socket.statusConnected + "," 
@@ -143,7 +147,7 @@ var record = io.sockets.on('connection', function (socket) {
 	    	// 'livetable' reflects current status of a user. There is one entry per user in this table. 
 	    	// If exists, fetch previous entry for this user from 'livetable'.
 	    	var liverecordexistsql = "SELECT * " +
-	    								"FROM mdl_quizaccess_hbmon_livetable " +
+	    								"FROM exm_quizaccess_hbmon_livetable " +
 	    								"WHERE roomid = " + socket.roomid;
 	    	con.query(liverecordexistsql, function(err, result) {
                 if (err) throw err;                
@@ -163,7 +167,7 @@ var record = io.sockets.on('connection', function (socket) {
                     var lastlivetime;
                         
                 	if(currenttimeserverid != room_timeserver) {
-                    	var tssql = "SELECT * FROM mdl_quizaccess_hbmon_timeserver WHERE timeserverid IN (" + room_timeserver + ", " + currenttimeserverid + ")";
+                    	var tssql = "SELECT * FROM exm_quizaccess_hbmon_timeserver WHERE timeserverid IN (" + room_timeserver + ", " + currenttimeserverid + ")";
             	    	var value = con.query(tssql, function(err, tsresult) {
                             if (err) throw err;  
                             var timeserver = [];
@@ -196,7 +200,7 @@ var record = io.sockets.on('connection', function (socket) {
     	                        	deadtime = parseInt(deadtime) + parseInt(maxdowntime);
     	                        }
 	                	    		
-	                            var updatelivetablesql = "UPDATE mdl_quizaccess_hbmon_livetable SET status = " 	+ socket.currentstatus 
+	                            var updatelivetablesql = "UPDATE exm_quizaccess_hbmon_livetable SET status = " 	+ socket.currentstatus 
 																+ ", deadtime = "  	+ deadtime 
 																+ ", timetoconsider = " + socket.timestampC
 																+ ", timeserver = " + currenttimeserverid
@@ -216,7 +220,7 @@ var record = io.sockets.on('connection', function (socket) {
 		            	
 		                // Compute cumulative deadtime.
 		                deadtime = parseInt(deadtime) + parseInt(socket.timestampC - timetoconsider);                
-		                var updatelivetablesql = "UPDATE mdl_quizaccess_hbmon_livetable SET status = " 	+ socket.currentstatus 
+		                var updatelivetablesql = "UPDATE exm_quizaccess_hbmon_livetable SET status = " 	+ socket.currentstatus 
 														+ ", deadtime = " + deadtime 
 														+ ", timetoconsider = " + socket.timestampC
 														+ ", timeserver = " + currenttimeserverid
@@ -226,7 +230,7 @@ var record = io.sockets.on('connection', function (socket) {
 							else debuglog(socket.id + ' status updated to \'Live\'.');
 						});
 						
-						var updatelivetablesql1 = "UPDATE mdl_quizaccess_hbmon_livetable SET " 
+						var updatelivetablesql1 = "UPDATE exm_quizaccess_hbmon_livetable SET " 
 														+ " deadtime = 0" 
 														+ ", extratime = " + deadtime
 														+ " WHERE roomid = " + socket.roomid;
@@ -237,7 +241,7 @@ var record = io.sockets.on('connection', function (socket) {
             		} 
 		    	} else {
 	            	// Insert current status entry for this user in 'livetable'.                	
-	                var livetablesql = "INSERT INTO mdl_quizaccess_hbmon_livetable (roomid, status, timeserver, timetoconsider, livetime, deadtime, extratime) VALUES" +
+	                var livetablesql = "INSERT INTO exm_quizaccess_hbmon_livetable (roomid, status, timeserver, timetoconsider, livetime, deadtime, extratime) VALUES" +
 	                                  	"(" + socket.roomid + "," 
 	                                  		+ socket.currentstatus + "," 
 	                                  		+ currenttimeserverid + "," 
@@ -275,7 +279,7 @@ var record = io.sockets.on('connection', function (socket) {
 			socket.statusDisconnected = "'Disconnected'";
 			
 		    // Insert disconnection record into database.
-			var sql = "INSERT INTO mdl_quizaccess_hbmon_socketinfo1 (roomid, socketid, socketstatus, ip, timestamp) VALUES" +
+			var sql = "INSERT INTO exm_quizaccess_hbmon_socketinfo1 (roomid, socketid, socketstatus, ip, timestamp) VALUES" +
 					  	"(" + socket.roomid + "," 
 					  		+ socket.socketid + "," 
 					  		+ socket.statusDisconnected + "," 
@@ -308,7 +312,7 @@ var record = io.sockets.on('connection', function (socket) {
 			    socket.currentstatus = "'Dead'";
 			    
 			    // Fetch previous entry for this user from 'livetable'.
-			    var fetchtimesql = "SELECT timetoconsider, livetime FROM mdl_quizaccess_hbmon_livetable WHERE roomid = " + socket.roomid;
+			    var fetchtimesql = "SELECT timetoconsider, livetime FROM exm_quizaccess_hbmon_livetable WHERE roomid = " + socket.roomid;
 			    
 			    con.query(fetchtimesql, function(err, result) {
 			    	if (err) throw err;
@@ -322,7 +326,7 @@ var record = io.sockets.on('connection', function (socket) {
 			    	livetime = parseInt(livetime) + parseInt(socket.timestampD - timetoconsider);
 				
 			    	// Update 'status' entry for this user in 'livetable'.
-			    	var updatelivetablesql = "UPDATE mdl_quizaccess_hbmon_livetable SET status = " + socket.currentstatus 
+			    	var updatelivetablesql = "UPDATE exm_quizaccess_hbmon_livetable SET status = " + socket.currentstatus 
 			    									+ ", timetoconsider = " + socket.timestampD 
 			    									+ ", livetime = " + livetime 
 			    									+ " where roomid = " + socket.roomid;

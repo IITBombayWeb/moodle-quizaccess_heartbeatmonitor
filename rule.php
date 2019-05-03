@@ -183,7 +183,7 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
         $socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
         $phpws_result = @socket_connect($socket, $HBCFG->host, $HBCFG->port);
         if (!$phpws_result) {
-            if (!is_null($attempt)) {
+            if (!empty($attempt->id)) {
                 $roomid = $this->construct_roomid($attempt->id);
                 $this->process_node_server_down($roomid);
                 return 0;
@@ -216,7 +216,7 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
     protected function get_timeserver_data($timeserver) {
         global $DB;
         $sql = 'SELECT *
-                    FROM mdl_quizaccess_hbmon_timeserver
+                    FROM {quizaccess_hbmon_timeserver}
                     WHERE timeserverid = ' . $timeserver;
         $record = $DB->get_record_sql($sql);
         if (!is_null($record)) {
