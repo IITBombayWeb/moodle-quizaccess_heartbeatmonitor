@@ -89,8 +89,8 @@ var interval = setInterval(function() {
 }, 5000);
 
 function debuglog (msg) {
-	console.log('Date: ' + new Date().toString());
-	console.log(Math.floor((new Date().getTime())/1000) + ": " + msg);
+	console.log(new Date().toString() + " " + Math.floor((new Date().getTime())/1000) +": " + msg);
+	//console.log(Math.floor((new Date().getTime())/1000) + ": " + msg);
 }
 
 // Socket.IO
@@ -124,7 +124,7 @@ var record = io.sockets.on('connection', function (socket) {
 	    	if (err) 
 	    		throw err;
 	    	else
-	    		debuglog(socket.id + ' record inserted in \'socketinfo\'.');
+	    		debuglog(socket.id + ' - ' + socket.roomid + ' record inserted in \'socketinfo\'.');
 		});
 
 	    // Join the connected socket to the room. 'roomid' is the concatenation of (username + quizid + attemptid).
@@ -207,7 +207,7 @@ var record = io.sockets.on('connection', function (socket) {
 																+ " WHERE roomid = " + socket.roomid;
 								con.query(updatelivetablesql, function(err, result) {
 									if (err) throw err;
-									else debuglog(socket.id + ' status updated to \'Live\'.');
+									else debuglog(socket.id + ' - ' + socket.roomid + ' status updated to \'Live\'.');
 								});
                             }
                             return timeserver;
@@ -227,7 +227,7 @@ var record = io.sockets.on('connection', function (socket) {
 														+ " WHERE roomid = " + socket.roomid;
 						con.query(updatelivetablesql, function(err, result) {
 							if (err) throw err;
-							else debuglog(socket.id + ' status updated to \'Live\'.');
+							else debuglog(socket.id + ' - ' + socket.roomid + ' status updated to \'Live\'.');
 						});
 						
 						var updatelivetablesql1 = "UPDATE exm_quizaccess_hbmon_livetable SET " 
@@ -236,7 +236,7 @@ var record = io.sockets.on('connection', function (socket) {
 														+ " WHERE roomid = " + socket.roomid;
 						con.query(updatelivetablesql1, function(err, result) {
 							if (err) throw err;
-							else debuglog(socket.id + '\'s extratime updated.');
+							else debuglog(socket.id + ' - ' + socket.roomid + '\'s extratime updated.');
 						}); 
             		} 
 		    	} else {
@@ -248,7 +248,7 @@ var record = io.sockets.on('connection', function (socket) {
 	                                  		+ socket.timestampC + ", 0, 0 , 0)";
 	                con.query(livetablesql, function(err, result) {
 	                    if (err) throw err;
-	                    else debuglog(socket.id + ' record inserted in \'livetable\'.');
+	                    else debuglog(socket.id + ' - ' + socket.roomid + ' record inserted in \'livetable\'.');
 	                });
 	            }
 	        });	
@@ -287,7 +287,7 @@ var record = io.sockets.on('connection', function (socket) {
 					  		+ socket.timestampD + ")";
 		    con.query(sql, function(err, result) {
 		    	if (err) throw err;	 
-		    	else debuglog(socket.id + ' record inserted in \'socketinfo\'.');
+		    	else debuglog(socket.id + ' - ' + socket.roomid + ' record inserted in \'socketinfo\'.');
 		    });
 		    
 		    // Find the total connected sockets in the room.
@@ -316,8 +316,9 @@ var record = io.sockets.on('connection', function (socket) {
 			    
 			    con.query(fetchtimesql, function(err, result) {
 			    	if (err) throw err;
-			
-			    	for (i in result) {
+ 				else debuglog(socket.id + ' - ' + socket.roomid + ' select query in discon.');			
+			    	
+				for (i in result) {
 			    		var timetoconsider = result[i].timetoconsider;
 			    		var livetime = result[i].livetime;
 			    	}
@@ -331,9 +332,12 @@ var record = io.sockets.on('connection', function (socket) {
 			    									+ ", livetime = " + livetime 
 			    									+ " where roomid = " + socket.roomid;
 				    con.query(updatelivetablesql, function(err, result) {
-				    	if (err) throw err;
-				    	else debuglog(socket.id + ' status updated to \'Dead\'.');
-//				    	if (err) console.log(err.code);
+				    	if (err) {
+                                          debuglog(socket.id + ' - ' + socket.roomid + ' Error thrown');
+                                          throw err;
+					}
+				    	else debuglog(socket.id + ' - ' + socket.roomid + ' status updated to \'Dead\'.');
+				    	//if (err) console.log(err);
 				    });
 				});
 			}
