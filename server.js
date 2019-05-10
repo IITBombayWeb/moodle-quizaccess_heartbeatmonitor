@@ -95,7 +95,7 @@ function debuglog (msg) {
 
 // Socket.IO
 var record = io.sockets.on('connection', function (socket) {
-	debuglog('Socket ' + socket.id + ' connected.');
+	debuglog(socket.id + ' - ' + ' connected');
 	allsocketscount = io.sockets.server.eio.clientsCount;
 	var allclients = io.sockets.server.eio.clients;
 	allsocketids = [];
@@ -114,6 +114,9 @@ var record = io.sockets.on('connection', function (socket) {
         socket.timestampC 		= Math.floor((socket.timestampC1)/1000);
         socket.ip 				= "'" + socket.request.connection.remoteAddress + "'";
 
+	debuglog(socket.id + ' - ' + socket.roomid + ' connected');
+
+
         var sql = "INSERT INTO exm_quizaccess_hbmon_socketinfo1 (roomid, socketid, socketstatus, ip, timestamp) VALUES" +
          			"(" + socket.roomid + "," 
          				+ socket.socketid + "," 
@@ -121,11 +124,13 @@ var record = io.sockets.on('connection', function (socket) {
          				+ socket.ip + "," 
          				+ socket.timestampC + ")";
 	    con.query(sql, function(err, result) {
-	    	if (err) 
+	    	if (err) {
+	            debuglog(socket.id + ' - ' + socket.roomid + ' IP:' + socket.ip + ' record insert err \'socketinfo\'. (connect)');
 	    		throw err;
-	    	else
-	    		debuglog(socket.id + ' - ' + socket.roomid + ' record inserted in \'socketinfo\'.');
-		});
+                }
+		else 
+	          debuglog(socket.id + ' - ' + socket.roomid + ' IP:' + socket.ip + ' record inserted in \'socketinfo\'. (connect)');
+	    });
 
 	    // Join the connected socket to the room. 'roomid' is the concatenation of (username + quizid + attemptid).
 	    // Here, 'roomid' corresponds to a particular user.
@@ -206,8 +211,13 @@ var record = io.sockets.on('connection', function (socket) {
 																+ ", timeserver = " + currenttimeserverid
 																+ " WHERE roomid = " + socket.roomid;
 								con.query(updatelivetablesql, function(err, result) {
-									if (err) throw err;
-									else debuglog(socket.id + ' - ' + socket.roomid + ' status updated to \'Live\'.');
+									if (err) {
+									  debuglog(socket.id + ' - ' + socket.roomid + ' status update err \'Live\'.');
+									  throw err;
+									}
+									else
+									  debuglog(socket.id + ' - ' + socket.roomid + ' status updated to \'Live\'.');
+
 								});
                             }
                             return timeserver;
@@ -226,8 +236,12 @@ var record = io.sockets.on('connection', function (socket) {
 														+ ", timeserver = " + currenttimeserverid
 														+ " WHERE roomid = " + socket.roomid;
 						con.query(updatelivetablesql, function(err, result) {
-							if (err) throw err;
-							else debuglog(socket.id + ' - ' + socket.roomid + ' status updated to \'Live\'.');
+							if (err) {
+							  debuglog(socket.id + ' - ' + socket.roomid + ' status update err \'Live\'.');
+							  throw err;
+							}
+							else 
+							  debuglog(socket.id + ' - ' + socket.roomid + ' status updated to \'Live\'.');
 						});
 						
 						var updatelivetablesql1 = "UPDATE exm_quizaccess_hbmon_livetable SET " 
@@ -235,8 +249,13 @@ var record = io.sockets.on('connection', function (socket) {
 														+ ", extratime = " + deadtime
 														+ " WHERE roomid = " + socket.roomid;
 						con.query(updatelivetablesql1, function(err, result) {
-							if (err) throw err;
-							else debuglog(socket.id + ' - ' + socket.roomid + '\'s extratime updated.');
+							if (err) {
+							  debuglog(socket.id + ' - ' + socket.roomid + '\'s extratime update err.');
+
+							  throw err;
+							}
+							else
+							  debuglog(socket.id + ' - ' + socket.roomid + '\'s extratime updated.');
 						}); 
             		} 
 		    	} else {
@@ -247,8 +266,12 @@ var record = io.sockets.on('connection', function (socket) {
 	                                  		+ currenttimeserverid + "," 
 	                                  		+ socket.timestampC + ", 0, 0 , 0)";
 	                con.query(livetablesql, function(err, result) {
-	                    if (err) throw err;
-	                    else debuglog(socket.id + ' - ' + socket.roomid + ' record inserted in \'livetable\'.');
+	                    if (err) {
+	                      debuglog(socket.id + ' - ' + socket.roomid + ' record insert err \'livetable\'.');
+			      throw err;
+			    }
+			    else
+	                      debuglog(socket.id + ' - ' + socket.roomid + ' record inserted in \'livetable\'.');
 	                });
 	            }
 	        });	
@@ -262,7 +285,7 @@ var record = io.sockets.on('connection', function (socket) {
 	
 
 	socket.on('disconnect', function() {
-		debuglog(socket.id + ' disconnected.');
+		debuglog(socket.id + ' disconnect.');
 		allsocketscount = io.sockets.server.eio.clientsCount;
 		var allclients = io.sockets.server.eio.clients;
 		allsocketids = [];
@@ -274,6 +297,7 @@ var record = io.sockets.on('connection', function (socket) {
 		}
 	
 		if(socket.roomid != undefined) {			
+	                debuglog(socket.id + ' - ' + socket.roomid + ' disconnected');
 			// Construct record for the disconnected socket.
 			socket.timestampD = Math.floor((new Date().getTime())/1000);
 			socket.statusDisconnected = "'Disconnected'";
@@ -286,8 +310,12 @@ var record = io.sockets.on('connection', function (socket) {
 					  		+ socket.ip + "," 
 					  		+ socket.timestampD + ")";
 		    con.query(sql, function(err, result) {
-		    	if (err) throw err;	 
-		    	else debuglog(socket.id + ' - ' + socket.roomid + ' record inserted in \'socketinfo\'.');
+		    	if (err) {
+		    	  debuglog(socket.id + ' - ' + socket.roomid + ' record insert err \'socketinfo\'. (disconnect)');
+			  throw err;	 
+			}
+			else
+		    	  debuglog(socket.id + ' - ' + socket.roomid + ' record inserted in \'socketinfo\'. (disconnect)');
 		    });
 		    
 		    // Find the total connected sockets in the room.
@@ -315,9 +343,14 @@ var record = io.sockets.on('connection', function (socket) {
 			    var fetchtimesql = "SELECT timetoconsider, livetime FROM exm_quizaccess_hbmon_livetable WHERE roomid = " + socket.roomid;
 			    
 			    con.query(fetchtimesql, function(err, result) {
-			    	if (err) throw err;
- 				else debuglog(socket.id + ' - ' + socket.roomid + ' select query in discon.');			
+			    	if (err) { // TODO is this required?
+ 				  debuglog(socket.id + ' - ' + socket.roomid + ' select query err discon.');			
+				  throw err;
+				}
+				else
+ 				  debuglog(socket.id + ' - ' + socket.roomid + ' select query in discon.');			
 			    	
+				if (result.length > 0) {
 				for (i in result) {
 			    		var timetoconsider = result[i].timetoconsider;
 			    		var livetime = result[i].livetime;
@@ -333,12 +366,14 @@ var record = io.sockets.on('connection', function (socket) {
 			    									+ " where roomid = " + socket.roomid;
 				    con.query(updatelivetablesql, function(err, result) {
 				    	if (err) {
-                                          debuglog(socket.id + ' - ' + socket.roomid + ' Error thrown');
+				    	  debuglog(socket.id + ' - ' + socket.roomid + ' status update err \'Dead\'.');
                                           throw err;
 					}
-				    	else debuglog(socket.id + ' - ' + socket.roomid + ' status updated to \'Dead\'.');
+					else
+				    	  debuglog(socket.id + ' - ' + socket.roomid + ' status updated to \'Dead\'.');
 				    	//if (err) console.log(err);
 				    });
+				}
 				});
 			}
 		}

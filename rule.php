@@ -142,7 +142,7 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
                                 );
                     $this->update_livetable_data($params);
                 }
-                if ($deadtime > 60) {
+                if ($deadtime > 180) {
                     $this->create_override_auto($attempt, $deadtime);
                     $params = array(
                                 'deadtime' => 0,
