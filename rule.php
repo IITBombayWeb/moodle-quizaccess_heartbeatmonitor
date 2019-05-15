@@ -126,32 +126,35 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
         global $CFG, $PAGE, $_SESSION, $DB, $USER, $HBCFG;
 
         $node_up = $this->check_node_server_status($attempt);
-        if(!$node_up) {} // Anything to do here?
-
-        if(isset($attempt->id)) {
-            $deadtime = $this->get_deadtime($attempt);
-            if (!is_null($deadtime)) {
-                $roomid = $this->construct_roomid($attempt->id);
-                $record = $this->get_livetable_data($roomid);
-                if ($record->status == 'Dead') {
-                    $params = array(
-                                'status' => "'Live'",
-                                'deadtime' => $deadtime,
-                                'timetoconsider' => time(),
-                                'roomid' => $roomid
-                                );
-                    $this->update_livetable_data($params);
-                }
-                if ($deadtime > 180) {
-                    $this->create_override_auto($attempt, $deadtime);
-                    $params = array(
-                                'deadtime' => 0,
-                                'extratime' => $record->extratime + $deadtime,
-                                'roomid' => $roomid
-                                );
-                    $this->update_livetable_data($params);
+        echo '<br><br><br> node status in rule';
+        print_object($node_up);
+        if($node_up) {
+            if(isset($attempt->id)) {
+                $deadtime = $this->get_deadtime($attempt);
+                if (!is_null($deadtime)) {
+                    $roomid = $this->construct_roomid($attempt->id);
+                    $record = $this->get_livetable_data($roomid);
+                    if ($record->status == 'Dead') {
+                        $params = array(
+                                    'status' => "'Live'",
+                                    'deadtime' => $deadtime,
+                                    'timetoconsider' => time(),
+                                    'roomid' => $roomid
+                                    );
+                        $this->update_livetable_data($params);
+                    }
+                    if ($deadtime > 180) {
+                        $this->create_override_auto($attempt, $deadtime);
+                        $params = array(
+                                    'deadtime' => 0,
+                                    'extratime' => $record->extratime + $deadtime,
+                                    'roomid' => $roomid
+                                    );
+                        $this->update_livetable_data($params);
+                    }
                 }
             }
+//             return $attempt->timestart + $this->quiz->timelimit;
         }
         return $attempt->timestart + $this->quiz->timelimit;
     }
@@ -471,8 +474,8 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
 
         $mform->addElement('text', 'nodehost', "Node host", 'maxlength="25" size="15" ');
         $mform->setType('nodehost', PARAM_HOST);
-        //$mform->setDefault('nodehost', 'localhost');
-        $mform->setDefault('nodehost', '10.102.1.115');
+        $mform->setDefault('nodehost', 'localhost');
+//         $mform->setDefault('nodehost', '10.102.1.115');
         $mform->disabledIf('nodehost', 'hbmonrequired', 'neq', 1);
 
         $mform->addElement('text', 'nodeport', 'Node port', 'maxlength="4" size="4" ');
