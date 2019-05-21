@@ -33,7 +33,7 @@ function xmldb_quizaccess_heartbeatmonitor_upgrade($oldversion) {
 
     $dbman = $DB->get_manager();
 
-    if ($oldversion < 2017110212) {
+    if ($oldversion < 2017110220) {
 
         // Define table quizaccess_enable_hbmonto be created.
         $table = new xmldb_table('quizaccess_enable_hbmon');
@@ -138,9 +138,39 @@ function xmldb_quizaccess_heartbeatmonitor_upgrade($oldversion) {
         if (!$dbman->table_exists($table4)) {
             $dbman->create_table($table4);
         }
+
+        //---------------------------------------------------------------------------------------------
+
+        // Define table quizaccess_hbmon_node to be created.
+        echo '<br><br><br> in find key name before';
+        $table5 = new xmldb_table('quizaccess_hbmon_node');
+
+        // Adding fields to table quizaccess_hbmon_node.
+        $field1 = new xmldb_field('quizid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+
+        $key2 = new xmldb_key('quizid');
+        $key2->set_attributes(XMLDB_KEY_FOREIGN, array('quizid'), 'quiz', array('id'));
+
+//         $table5->addKey($key2);
+//         $table5->add_key('quizid', XMLDB_KEY_FOREIGN, array('quizid'), 'quiz', array('id'));
+
+        // Conditionally launch create table for quizaccess_hbmon_node.
+        if (!$dbman->table_exists($table5)) {
+            $dbman->create_table($table5);
+        }
+        if (!$dbman->field_exists($table5, $field1)) {
+            $dbman->add_field($table5, $field1);
+        }
+//         if (!$dbman->find_key_name('quizaccess_hbmon_node', 'quizid')) {
+//         if (!$dbman->find_key_name($table5, $key2)) {
+//             echo '<br><br><br> in find key name ';
+//             $table5->addKey($key2);
+            $dbman->add_key($table5, $key2);
+//         }
+
         //---------------------------------------------------------------------------------------------
         // Heartbeatmonitor savepoint reached.
-        upgrade_plugin_savepoint(true, 2017110212, 'quizaccess', 'heartbeatmonitor');
+        upgrade_plugin_savepoint(true, 2017110220, 'quizaccess', 'heartbeatmonitor');
     }
 
 }

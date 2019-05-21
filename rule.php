@@ -497,6 +497,7 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
         global $DB;
         if (empty($quiz->hbmonrequired)) {
             $DB->delete_records('quizaccess_enable_hbmon', array('quizid' => $quiz->id));
+            $DB->delete_records('quizaccess_hbmon_node', array('quizid' => $quiz->id));
         } else {
             if (!$DB->record_exists('quizaccess_enable_hbmon', array('quizid' => $quiz->id))) {
                 $record = new stdClass();
@@ -504,11 +505,6 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
                 $record->hbmonrequired = 1;
                 $record->hbmonmode = $quiz->hbmonmode;
                 $DB->insert_record('quizaccess_enable_hbmon', $record);
-
-                $record1 = new stdClass();
-                $record1->nodehost = $quiz->nodehost;
-                $record1->nodeport = $quiz->nodeport;
-                $DB->insert_record('quizaccess_hbmon_node', $record1);
             } else {
                 $select = "quizid = $quiz->id";
                 $id = $DB->get_field_select('quizaccess_enable_hbmon', 'id', $select);
@@ -516,16 +512,22 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
                 $record->id = $id;
                 $record->hbmonmode = $quiz->hbmonmode;
                 $DB->update_record('quizaccess_enable_hbmon', $record);
+            }
 
+            if (!$DB->record_exists('quizaccess_hbmon_node', array('quizid' => $quiz->id))) {
                 $record1 = new stdClass();
-                $record1->id = 1;
                 $record1->nodehost = $quiz->nodehost;
                 $record1->nodeport = $quiz->nodeport;
-                if (!$DB->record_exists('quizaccess_hbmon_node', array('id' => 1))) {
-                    $DB->insert_record('quizaccess_hbmon_node', $record1);
-                } else {
-                    $DB->update_record('quizaccess_hbmon_node', $record1);
-                }
+                $record1->quizid = $quiz->id;
+                $DB->insert_record('quizaccess_hbmon_node', $record1);
+            } else {
+                $select = "quizid = $quiz->id";
+                $id = $DB->get_field_select('quizaccess_hbmon_node', 'id', $select);
+                $record1 = new stdClass();
+                $record1->id = $id;
+                $record1->nodehost = $quiz->nodehost;
+                $record1->nodeport = $quiz->nodeport;
+                $DB->update_record('quizaccess_hbmon_node', $record1);
             }
         }
     }
@@ -533,14 +535,21 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
     public static function delete_settings($quiz) {
         global $DB;
         $DB->delete_records('quizaccess_enable_hbmon', array('quizid' => $quiz->id));
+        $DB->delete_records('quizaccess_hbmon_node', array('quizid' => $quiz->id));
     }
 
     public static function get_settings_sql($quizid) {
         return array(
-                'hbmonrequired',
-                'LEFT JOIN {quizaccess_enable_hbmon} enable_hbmon ON enable_hbmon.quizid = quiz.id',
+                'hbmon.hbmonrequired as hbmonrequired, node.nodehost as nodehost, node.nodeport as nodeport',
+                'LEFT JOIN {quizaccess_enable_hbmon} hbmon ON hbmon.quizid = quiz.id
+                LEFT JOIN {quizaccess_hbmon_node} node ON node.quizid = quiz.id',
                 array()
         );
+//         return array(
+//                 'hbmon_hbmonrequired as hbmonrequired',
+//                 'LEFT JOIN {quizaccess_enable_hbmon} hbmon ON hbmon.quizid = quiz.id',
+//                 array()
+//         );
     }
 
     public static function get_extra_settings($quizid) {
