@@ -54,6 +54,37 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
                 format_time($this->quiz->timelimit));
     }
 
+    public function debuglog($fn, $msgarg = '', $record = null) {
+        global $CFG;
+        //         date('D M d Y H'); date('l jS \of F Y h:i:s A')
+        $msg = $msgarg;
+        $log = null;
+
+        $fileName = $CFG->dirroot . "/mod/quiz/accessrule/heartbeatmonitor/phplogs.text";
+        $fp = fopen($fileName,"a+");
+        if( $fp == false )
+        {
+            echo ( "Error in opening file" );
+            exit();
+        }
+        if ($record) {
+            $log = "\ndebug: " . date('D M d Y H:i:s'). " GMT+0530 (IST) " . (microtime(True)*10000) . ", " .
+                    "rule.php | " . $fn;
+            if ($msg !== '') {
+                $log .= ", " . $msg . " " .
+                        $record->roomid . " " . $record->status;
+            } else {
+                $log .= ", " . $record->roomid . " " . $record->status;
+            }
+        } else {
+            $log = "\ndebug: " . date('D M d Y H:i:s'). " GMT+0530 (IST) " . (microtime(True)*10000) . ", " .
+                    "rule.php | " . $fn;
+            if ($msg !== '' && $msg !== "\n")
+                $log .= ", " . $msg;
+        }
+        fwrite($fp, $log);
+    }
+
     public function time_left_display($attempt, $timenow) {
         // If this is a teacher preview after the time limit expires, don't show the time_left
         $endtime = $this->end_time($attempt);
@@ -82,6 +113,9 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
 
     public function prevent_access() {
         global $CFG, $PAGE, $_SESSION, $DB, $USER, $HBCFG;
+        $fn = 'prevent_access';
+        $this->debuglog('', "\n");
+//         $this->debuglog($fn);
 
         $PAGE->requires->jquery();
         $PAGE->requires->js( new moodle_url($HBCFG->wwwroot . ':' . $HBCFG->port . '/socket.io/socket.io.js'), true );
@@ -112,6 +146,7 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
                     $roomid = $username . '_' . $quizid . '_' . $attemptid;
                     $node_up = $this->check_node_server_status($unfinishedattempt);
                     if($node_up) {
+                        $this->debuglog($fn, 'call to client.js');
                         $PAGE->requires->js_init_call('client', array($roomid, json_encode($HBCFG)));
                         return false;
                     } else {
@@ -124,17 +159,29 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
 
     public function end_time($attempt) {
         global $CFG, $PAGE, $_SESSION, $DB, $USER, $HBCFG;
+        $fn = 'end_time';
+        $this->debuglog('', "\n");
+//         $this->debuglog($fn);
 
         $node_up = $this->check_node_server_status($attempt);
-        echo '<br><br><br> node status in rule';
-        print_object($node_up);
+        $this->debuglog($fn, 'node status: ' . $node_up);
+
         if($node_up) {
             if(isset($attempt->id)) {
                 $deadtime = $this->get_deadtime($attempt);
+                $this->debuglog($fn, 'deadtime: ' . $deadtime);
+
                 if (!is_null($deadtime)) {
+                    $this->debuglog($fn, 'in 1st if');
+
                     $roomid = $this->construct_roomid($attempt->id);
+                    $this->debuglog($fn, 'roomid: ' . $roomid);
+
                     $record = $this->get_livetable_data($roomid);
+                    $this->debuglog($fn, 'record:' , $record);
+
                     if ($record->status == 'Dead') {
+                        $this->debuglog($fn, 'in 2nd if');
                         $params = array(
                                     'status' => "'Live'",
                                     'deadtime' => $deadtime,
@@ -143,7 +190,8 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
                                     );
                         $this->update_livetable_data($params);
                     }
-                    if ($deadtime > 180) {
+
+                    if ($deadtime > 60) {
                         $this->create_override_auto($attempt, $deadtime);
                         $params = array(
                                     'deadtime' => 0,
@@ -197,10 +245,15 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
 
     protected function process_node_server_down($roomid) {
         $record = $this->get_livetable_data($roomid);   // worry later about handling debug if multiple records found
+        $fn = 'process_node_server_down';
+//         $this->debuglog('', "\n");
+//         $this->debuglog($fn);
+
         if (!empty($record)) {
             $currenttimestamp = intval(microtime(true));
             if ($record->status == 'Live') {
                 // ttc = ndwn ==== llt of prev tsvr
+                $this->debuglog($fn);
                 $tsrecord = $this->get_timeserver_data($record->timeserver);
                 if (!empty($tsrecord)) {
                     $livetimenow = ($tsrecord->lastlivetime - $record->timetoconsider) + $record->livetime;
@@ -249,11 +302,17 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
 
     protected function get_livetable_data($roomid) {
         global $DB;
+        $fn = 'get_livetable_data';
+//         $this->debuglog('', "\n");
+//         $this->debuglog($fn);
+
         $sql = 'SELECT *
                     FROM {quizaccess_hbmon_livetable}
                     WHERE roomid = "' . $roomid . '"';
         $record = $DB->get_record_sql($sql);
         if (!empty($record)) {
+            $this->debuglog($fn, 'record:', $record);
+
             return $record;
         } else {
             return null;
@@ -262,6 +321,10 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
 
     protected function update_livetable_data($params) {
         global $DB;
+        $fn = 'update_livetable_data';
+//         $this->debuglog('', "\n");
+//         $this->debuglog($fn);
+
         $count = count($params) - 1;
         $sql = 'UPDATE {quizaccess_hbmon_livetable} SET ';
         foreach ($params as $key => $value) {
@@ -274,7 +337,9 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
                 $sql .= $key . ' = ' . $value;
         }
         $sql .= ' WHERE roomid = "' . $params['roomid'] . '"';
+
         $result = $DB->execute($sql);
+        $this->debuglog($fn, 'sql result ' . $result);
     }
 
     protected function create_override_auto($attempt, $deadtime) {
@@ -542,7 +607,7 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
         return array(
                 'hbmon.hbmonrequired as hbmonrequired, node.nodehost as nodehost, node.nodeport as nodeport',
                 'LEFT JOIN {quizaccess_enable_hbmon} hbmon ON hbmon.quizid = quiz.id
-                LEFT JOIN {quizaccess_hbmon_node} node ON node.quizid = quiz.id',
+                 LEFT JOIN {quizaccess_hbmon_node} node ON node.quizid = quiz.id',
                 array()
         );
 //         return array(
