@@ -169,6 +169,7 @@ var record = io.sockets.on('connection', function (socket) {
                         var timetoconsider 	= result[i].timetoconsider;
                         var deadtime 		= result[i].deadtime;
                         var livetime 		= result[i].livetime;
+                        var extratime 		= result[i].extratime;
                     }
                     debuglog(fn , socket.id + ' - ' + socket.roomid + ' status : ' + result[i].status + '.');
                     
@@ -210,6 +211,7 @@ var record = io.sockets.on('connection', function (socket) {
     	            	    	
                 	    		if(maxdowntime) {
     	                        	deadtime = parseInt(deadtime) + parseInt(maxdowntime);
+    	                        	extratime = parseInt(deadtime) + parseInt(extratime);
     	                        }
                 	    		
 	                            var updatelivetablesql = "UPDATE " + dbprefix + "quizaccess_hbmon_livetable SET status = " 	+ socket.currentstatus 
@@ -225,19 +227,19 @@ var record = io.sockets.on('connection', function (socket) {
 									    debuglog(fn , socket.id + ' - ' + socket.roomid + ' status updated to \'Live\'.');
 								});
 								
-//								if(deadtime > 180) {
-//								var updatelivetablesql1 = "UPDATE " + dbprefix + "quizaccess_hbmon_livetable SET " 
-//																+ " deadtime = 0" 
-//																+ ", extratime = " + deadtime
-//																+ " WHERE roomid = " + socket.roomid;
-//								con.query(updatelivetablesql1, function(err, result) {
-//									if (err) {
-//									    debuglog(fn , socket.id + ' - ' + socket.roomid + '\'s extratime update err.');
-//									    throw err;
-//									} else
-//									    debuglog(fn , socket.id + ' - ' + socket.roomid + '\'s extratime updated.');
-//								}); 
-//                	    		}
+								if(deadtime > 60) {
+									var updatelivetablesql1 = "UPDATE " + dbprefix + "quizaccess_hbmon_livetable SET " 
+																	+ " deadtime = 0" 
+																	+ ", extratime = " + extratime
+																	+ " WHERE roomid = " + socket.roomid;
+									con.query(updatelivetablesql1, function(err, result) {
+										if (err) {
+										    debuglog(fn , socket.id + ' - ' + socket.roomid + '\'s extratime update err.');
+										    throw err;
+										} else
+										    debuglog(fn , socket.id + ' - ' + socket.roomid + '\'s extratime ' + extratime + ' updated.');
+									}); 
+                	    		}
                             }
                             return timeserver;    
             	    	});  	
@@ -247,33 +249,35 @@ var record = io.sockets.on('connection', function (socket) {
 		                // This is required when there is only one connected socket for that user.
 		            	
 		                // Compute cumulative deadtime.
-//		                deadtime = parseInt(deadtime) + parseInt(socket.timestampC - timetoconsider);                
-//		                var updatelivetablesql = "UPDATE " + dbprefix + "quizaccess_hbmon_livetable SET status = " 	+ socket.currentstatus 
-//														+ ", deadtime = " + deadtime 
-//														+ ", timetoconsider = " + socket.timestampC
-//														+ ", timeserver = " + currenttimeserverid
-//														+ " WHERE roomid = " + socket.roomid;
-//						con.query(updatelivetablesql, function(err, result) {
-//							if (err) {
-//							    debuglog(fn , socket.id + ' - ' + socket.roomid + ' status update err \'Live\'.');
-//							    throw err;
-//							} else 
-//							    debuglog(fn , socket.id + ' - ' + socket.roomid + ' status updated to \'Live\'.');
-//						});
+		                deadtime = parseInt(deadtime) + parseInt(socket.timestampC - timetoconsider);  
+                    	extratime = parseInt(deadtime) + parseInt(extratime);
+                    	
+		                var updatelivetablesql = "UPDATE " + dbprefix + "quizaccess_hbmon_livetable SET status = " 	+ socket.currentstatus 
+														+ ", deadtime = " + deadtime 
+														+ ", timetoconsider = " + socket.timestampC
+														+ ", timeserver = " + currenttimeserverid
+														+ " WHERE roomid = " + socket.roomid;
+						con.query(updatelivetablesql, function(err, result) {
+							if (err) {
+							    debuglog(fn , socket.id + ' - ' + socket.roomid + ' status update err \'Live\'.');
+							    throw err;
+							} else 
+							    debuglog(fn , socket.id + ' - ' + socket.roomid + ' status updated to \'Live\'.');
+						});
 						
-//						if(deadtime > 180) {
-//						var updatelivetablesql1 = "UPDATE " + dbprefix + "quizaccess_hbmon_livetable SET " 
-//														+ " deadtime = 0" 
-//														+ ", extratime = " + deadtime
-//														+ " WHERE roomid = " + socket.roomid;
-//						con.query(updatelivetablesql1, function(err, result) {
-//							if (err) {
-//							    debuglog(fn , socket.id + ' - ' + socket.roomid + '\'s extratime update err.');
-//							    throw err;
-//							} else
-//							    debuglog(fn , socket.id + ' - ' + socket.roomid + '\'s extratime updated.');
-//						}); 
-//						}
+						if(deadtime > 60) {
+							var updatelivetablesql1 = "UPDATE " + dbprefix + "quizaccess_hbmon_livetable SET " 
+															+ " deadtime = 0" 
+															+ ", extratime = " + extratime
+															+ " WHERE roomid = " + socket.roomid;
+							con.query(updatelivetablesql1, function(err, result) {
+								if (err) {
+								    debuglog(fn , socket.id + ' - ' + socket.roomid + '\'s extratime update err.');
+								    throw err;
+								} else
+								    debuglog(fn , socket.id + ' - ' + socket.roomid + '\'s extratime ' + extratime + ' updated.');
+							}); 
+						}
             		} 
 		    	} else {
 	            	// Insert current status entry for this user in 'livetable'.                	
