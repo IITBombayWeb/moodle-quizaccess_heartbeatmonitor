@@ -205,17 +205,24 @@ var record = io.sockets.on('connection', function (socket) {
     	            	    	var udowntimeend = socket.timestampC;
     	            	    	userdowntime = udowntimeend - udowntimestart;
     	            	    	
+    	            	    	// Depends on policy setup.
+    	            	    	var userdowntime2;
+    	            	    	userdowntime2 = udowntimeend - sdowntimestart;
+    	            	    	
     	                      	// Condition 2 - Server and user, both go down.	   	    	            	    	
     	            	    	var maxdowntime;
-    	            	    	maxdowntime = Math.max(serverdowntime, userdowntime);
+    	            	    	maxdowntime = Math.max(serverdowntime, userdowntime, userdowntime2);
     	            	    	
+    	            	    	debuglog(fn , socket.id + ' - ' + socket.roomid + ' extratime before ' + extratime);
                 	    		if(maxdowntime) {
     	                        	deadtime = parseInt(deadtime) + parseInt(maxdowntime);
     	                        	extratime = parseInt(deadtime) + parseInt(extratime);
     	                        }
+                	    		debuglog(fn , socket.id + ' - ' + socket.roomid + ' deadtime ' + deadtime);
+                	    		debuglog(fn , socket.id + ' - ' + socket.roomid + ' extratime after ' + extratime);
                 	    		
 	                            var updatelivetablesql = "UPDATE " + dbprefix + "quizaccess_hbmon_livetable SET status = " 	+ socket.currentstatus 
-																+ ", deadtime = "  	+ deadtime 
+//																+ ", deadtime = "  	+ deadtime 
 																+ ", timetoconsider = " + socket.timestampC
 																+ ", timeserver = " + currenttimeserverid
 																+ " WHERE roomid = " + socket.roomid;
@@ -226,7 +233,7 @@ var record = io.sockets.on('connection', function (socket) {
 									} else
 									    debuglog(fn , socket.id + ' - ' + socket.roomid + ' status updated to \'Live\'.');
 								});
-								
+								/*
 								if(deadtime > 60) {
 									var updatelivetablesql1 = "UPDATE " + dbprefix + "quizaccess_hbmon_livetable SET " 
 																	+ " deadtime = 0" 
@@ -240,6 +247,7 @@ var record = io.sockets.on('connection', function (socket) {
 										    debuglog(fn , socket.id + ' - ' + socket.roomid + '\'s extratime ' + extratime + ' updated.');
 									}); 
                 	    		}
+                	    		*/
                             }
                             return timeserver;    
             	    	});  	
@@ -265,6 +273,7 @@ var record = io.sockets.on('connection', function (socket) {
 							    debuglog(fn , socket.id + ' - ' + socket.roomid + ' status updated to \'Live\'.');
 						});
 						
+						// Is this required? Check.
 						if(deadtime > 60) {
 							var updatelivetablesql1 = "UPDATE " + dbprefix + "quizaccess_hbmon_livetable SET " 
 															+ " deadtime = 0" 

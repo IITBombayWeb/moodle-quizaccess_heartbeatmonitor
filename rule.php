@@ -68,8 +68,8 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
             exit();
         }
         if (isset($record->roomid)) {
-            echo '<br><br><br>in debuglog record obj';
-            print_object($record);
+//             echo '<br><br><br>in debuglog record obj';
+//             print_object($record);
 
             $log = "\ndebug: " . date('D M d Y H:i:s'). " GMT+0530 (IST) " . (microtime(True)*10000) . ", " .
                     "rule.php | " . $fn;
@@ -182,26 +182,35 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
                     $record = $this->get_livetable_data($roomid);
                     $this->debuglog($fn, 'record:' , $record);
 
-                    if ($record->status == 'Dead') {
-                        $this->debuglog($fn, 'in 2nd if');
-                        $params = array(
-                                    'status' => "'Live'",
-                                    'deadtime' => $deadtime,
-                                    'timetoconsider' => time(),
-                                    'roomid' => $roomid
-                                    );
-                        $this->update_livetable_data($params);
-                    }
+                    $tsrecord = $this->get_timeserver_data($record->timeserver);
 
-                    if ($deadtime > 60) {
-                        $this->create_override_auto($attempt, $deadtime);
-                        $params = array(
-                                    'deadtime' => 0,
-                                    'extratime' => $record->extratime + $deadtime,
-                                    'roomid' => $roomid
-                                    );
-                        $this->update_livetable_data($params);
-                    }
+                    $tssql = "SELECT * FROM {quizaccess_hbmon_timeserver} ORDER BY timeserverid DESC LIMIT 1";
+                    $tsrecord2 = $DB->get_record_sql($tssql);
+
+//                     if (!empty($tsrecord2) && $tsrecord2->timeserverid == $record->timeserver) {
+                        $this->debuglog($fn, 'ts: ' . $tsrecord2->timeserverid . ' roomts: ' . $record->timeserver);
+
+                        if ($record->status == 'Dead') {
+                            $this->debuglog($fn, 'in 2nd if');
+                            $params = array(
+                                        'status' => "'Live'",
+                                        'deadtime' => $deadtime,
+                                        'timetoconsider' => time(),
+                                        'roomid' => $roomid
+                                        );
+                            $this->update_livetable_data($params);
+                        }
+
+                        if ($deadtime > 60) {
+                            $this->create_override_auto($attempt, $deadtime);
+                            $params = array(
+                                        'deadtime' => 0,
+                                        'extratime' => $record->extratime + $deadtime,
+                                        'roomid' => $roomid
+                                        );
+                            $this->update_livetable_data($params);
+                        }
+//                     }
                 }
             }
 //             return $attempt->timestart + $this->quiz->timelimit;
@@ -254,7 +263,7 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
             $currenttimestamp = intval(microtime(true));
             if ($record->status == 'Live') {
                 // ttc = ndwn ==== llt of prev tsvr
-                $this->debuglog($fn, "record:", $record);
+                $this->debuglog($fn, "record:", $record);$this->get_timeserver_data($record->timeserver);
 
                 $tsrecord = $this->get_timeserver_data($record->timeserver);
                 if (!empty($tsrecord)) {
