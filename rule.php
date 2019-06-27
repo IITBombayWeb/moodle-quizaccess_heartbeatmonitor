@@ -121,7 +121,7 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
 
         $PAGE->requires->jquery();
         $PAGE->requires->js( new moodle_url($HBCFG->wwwroot . ':' . $HBCFG->port . '/socket.io/socket.io.js'), true );
-        $PAGE->requires->js( new moodle_url($CFG->wwwroot . '/mod/quiz/accessrule/heartbeatmonitor/client.js') );
+        $PAGE->requires->js( new moodle_url($CFG->wwwroot . '/mod/quiz/accessrule/heartbeatmonitor/client.js'), true );
 
         // User details.
         $sessionkey = sesskey();
@@ -182,13 +182,14 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
                     $record = $this->get_livetable_data($roomid);
                     $this->debuglog($fn, 'record:' , $record);
 
-                    $tsrecord = $this->get_timeserver_data($record->timeserver);
+//                     $tsrecord = $this->get_timeserver_data($record->timeserver);
 
-                    $tssql = "SELECT * FROM {quizaccess_hbmon_timeserver} ORDER BY timeserverid DESC LIMIT 1";
-                    $tsrecord2 = $DB->get_record_sql($tssql);
+//                     $tssql = "SELECT * FROM {quizaccess_hbmon_timeserver} ORDER BY timeserverid DESC LIMIT 1";
+//                     $tsrecord2 = $DB->get_record_sql($tssql);
 
 //                     if (!empty($tsrecord2) && $tsrecord2->timeserverid == $record->timeserver) {
-                        $this->debuglog($fn, 'ts: ' . $tsrecord2->timeserverid . ' roomts: ' . $record->timeserver);
+                        // User down.
+//                         $this->debuglog($fn, 'ts: ' . $tsrecord2->timeserverid . ' roomts: ' . $record->timeserver);
 
                         if ($record->status == 'Dead') {
                             $this->debuglog($fn, 'in 2nd if');
@@ -210,7 +211,9 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
                                         );
                             $this->update_livetable_data($params);
                         }
-//                     }
+//                     } else {
+                        // Server down.
+//                 }
                 }
             }
 //             return $attempt->timestart + $this->quiz->timelimit;
@@ -294,15 +297,48 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
     }
 
     protected function get_deadtime($attempt) {
+        global $DB;
+        $fn = 'get_deadtime';
+
         if (isset($attempt->id)) {
             $roomid = $this->construct_roomid($attempt->id);
             $record = $this->get_livetable_data($roomid);
 
+            $tssql = "SELECT * FROM {quizaccess_hbmon_timeserver} ORDER BY timeserverid DESC LIMIT 1";
+            $tsrecord2 = $DB->get_record_sql($tssql);
+
             if (!is_null($record)) {
-                if ($record->status == "Dead") {
+                $this->debuglog($fn, 'ts: ' . $tsrecord2->timeserverid . ' roomts: ' . $record->timeserver);
+
+                if (!empty($tsrecord2) && ($tsrecord2->timeserverid == $record->timeserver) && $record->status == "Dead") {
                     $timenow = time();
                     $deadtime = $record->deadtime + ($timenow - $record->timetoconsider);
                     return $deadtime;
+                } elseif (!empty($tsrecord2) && ($tsrecord2->timeserverid != $record->timeserver)) {
+                    // Server down.
+                    if (isset($record->timeserver))
+                        $tsrecord = $this->get_timeserver_data($record->timeserver);
+
+                    $serverdowntime;
+                    $sdowntimestart = $tsrecord->lastlivetime;
+                    $sdowntimeend = $tsrecord2->timestarted;
+                    $serverdowntime = $sdowntimeend - $sdowntimestart;
+
+                    $userdowntime;
+                    $udowntimestart = $record->timetoconsider;
+                    $udowntimeend = time();
+                    $userdowntime = $udowntimeend - $udowntimestart;
+
+                    // Depends on policy setup.
+                    $userdowntime2;
+                    $userdowntime2 = $udowntimeend - $sdowntimestart;
+
+                    // Condition 2 - Server and user, both go down.
+                    $maxdowntime;
+                    $arr = array($serverdowntime, $userdowntime, $userdowntime2);
+                    $maxdowntime = max($arr);
+
+                    return $maxdowntime;
                 } else {
                     return $record->deadtime;
                 }
