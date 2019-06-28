@@ -146,7 +146,7 @@ function xmldb_quizaccess_heartbeatmonitor_upgrade($oldversion) {
         $table5 = new xmldb_table('quizaccess_hbmon_node');
 
         // Adding fields to table quizaccess_hbmon_node.
-        $field1 = new xmldb_field('quizid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $field1 = new xmldb_field('quizid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
 
         $key2 = new xmldb_key('quizid');
         $key2->set_attributes(XMLDB_KEY_FOREIGN, array('quizid'), 'quiz', array('id'));
