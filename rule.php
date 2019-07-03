@@ -41,6 +41,7 @@ require_once($CFG->dirroot . '/mod/quiz/accessrule/heartbeatmonitor/override.php
 class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
 
     public static function make(quiz $quizobj, $timenow, $canignoretimelimits) {
+        global $CFG;
         if (empty($quizobj->get_quiz()->hbmonrequired)) {
             return null;
         }
@@ -50,40 +51,49 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
 
     // Timelimit override functions. Since, we are superceeding this rule.
     public function description() {
+        global $CFG;
+
+        $phplogs_temp = $CFG->dirroot . "/mod/quiz/accessrule/heartbeatmonitor/phplogs_temp.text";
+        $phplogs = $CFG->dirroot . "/mod/quiz/accessrule/heartbeatmonitor/phplogs.text";
+
+        file_put_contents($phplogs, file_get_contents($phplogs_temp), FILE_APPEND | LOCK_EX);
+        file_put_contents($phplogs, " ----- \n" . date('l jS \of F Y h:i:s A'), FILE_APPEND | LOCK_EX);
+        file_put_contents($phplogs_temp, '');
+        file_put_contents($phplogs_temp, date('l jS \of F Y h:i:s A'));
+
         return get_string('quiztimelimit', 'quizaccess_timelimit',
                 format_time($this->quiz->timelimit));
     }
 
-    public function debuglog($fn, $msgarg = '', $record = null) {
+    public function debuglog($fn, $msgarg = '', $obj = null) {
         global $CFG;
-        //         date('D M d Y H'); date('l jS \of F Y h:i:s A')
         $msg = $msgarg;
         $log = null;
 
-        $fileName = $CFG->dirroot . "/mod/quiz/accessrule/heartbeatmonitor/phplogs.text";
-        $fp = fopen($fileName,"a+");
+        $phplogs_temp = $CFG->dirroot . "/mod/quiz/accessrule/heartbeatmonitor/phplogs_temp.text";
+        $phplogs = $CFG->dirroot . "/mod/quiz/accessrule/heartbeatmonitor/phplogs.text";
+
+        $fp = fopen($phplogs_temp,"a+");
         if( $fp == false )
         {
             echo ( "Error in opening file" );
             exit();
         }
-        if (isset($record->roomid)) {
-//             echo '<br><br><br>in debuglog record obj';
-//             print_object($record);
 
-            $log = "\ndebug: " . date('D M d Y H:i:s'). " GMT+0530 (IST) " . (microtime(True)*10000) . ", " .
-                    "rule.php | " . $fn;
-            if ($msg !== '') {
-                $log .= ", " . $msg . " " . $record->roomid . " " . $record->status;
-            } else {
-                $log .= ", " . $record->roomid . " " . $record->status;
+        $log = "\ndebug: " . date('D M d Y H:i:s'). " GMT+0530 (IST) " . (microtime(True)*10000) . ", " .
+                "rule.php | " . $fn;
+
+        if ($msg !== '')
+            $log .= ", " . $msg;
+
+        if (!empty($obj)) {
+//             echo '<br><br><br>in debuglog record obj';
+//             print_object($obj);
+            foreach ($obj as $key => $value) {
+                $log .= " $key => $value";
             }
-        } else {
-            $log = "\ndebug: " . date('D M d Y H:i:s'). " GMT+0530 (IST) " . (microtime(True)*10000) . ", " .
-                    "rule.php | " . $fn;
-            if ($msg !== '' && $msg !== "\n")
-                $log .= ", " . $msg;
         }
+
         fwrite($fp, $log);
     }
 
@@ -116,8 +126,12 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
     public function prevent_access() {
         global $CFG, $PAGE, $_SESSION, $DB, $USER, $HBCFG;
         $fn = 'prevent_access';
-        $this->debuglog('', "\n");
         $this->debuglog($fn);
+
+        $node_up = $this->check_node_server_status();
+        $this->debuglog($fn, 'node status: ' . $node_up);
+
+        if($node_up) {
 
         $PAGE->requires->jquery();
         $PAGE->requires->js( new moodle_url($HBCFG->wwwroot . ':' . $HBCFG->port . '/socket.io/socket.io.js'), true );
@@ -157,12 +171,14 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
                 }
             }
         }
+        } else {
+            return 'Heartbeat time server error. Please contact your site admin.';
+        }
     }
 
     public function end_time($attempt) {
         global $CFG, $PAGE, $_SESSION, $DB, $USER, $HBCFG;
         $fn = 'end_time';
-        $this->debuglog('', "\n");
         $this->debuglog($fn);
 
         $node_up = $this->check_node_server_status($attempt);
@@ -170,17 +186,25 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
 
         if($node_up) {
             if(isset($attempt->id)) {
-                $deadtime = $this->get_deadtime($attempt);
+                $roomid = $this->construct_roomid($attempt->id);
+                $this->debuglog($fn, 'roomid: ' . $roomid);
+
+                $record = $this->get_livetable_data($roomid);
+                $this->debuglog($fn, 'record:' , $record);
+
+                if(isset($record->deadtime)) {
+                $deadtime = $record->deadtime;
+//                 $deadtime = $this->get_deadtime($attempt);
                 $this->debuglog($fn, 'deadtime: ' . $deadtime);
 
                 if (!is_null($deadtime)) {
                     $this->debuglog($fn, 'in 1st if');
 
-                    $roomid = $this->construct_roomid($attempt->id);
-                    $this->debuglog($fn, 'roomid: ' . $roomid);
+//                     $roomid = $this->construct_roomid($attempt->id);
+//                     $this->debuglog($fn, 'roomid: ' . $roomid);
 
-                    $record = $this->get_livetable_data($roomid);
-                    $this->debuglog($fn, 'record:' , $record);
+//                     $record = $this->get_livetable_data($roomid);
+//                     $this->debuglog($fn, 'record:' , $record);
 
 //                     $tsrecord = $this->get_timeserver_data($record->timeserver);
 
@@ -191,17 +215,18 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
                         // User down.
 //                         $this->debuglog($fn, 'ts: ' . $tsrecord2->timeserverid . ' roomts: ' . $record->timeserver);
 
-                        if ($record->status == 'Dead') {
-                            $this->debuglog($fn, 'in 2nd if');
-                            $params = array(
-                                        'status' => "'Live'",
-                                        'deadtime' => $deadtime,
-                                        'timetoconsider' => time(),
-                                        'roomid' => $roomid
-                                        );
-                            $this->update_livetable_data($params);
-                        }
+//                         if ($record->status == 'Dead') {
+//                             $this->debuglog($fn, 'in 2nd if');
+//                             $params = array(
+//                                         'status' => "'Live'",
+//                                         'deadtime' => $deadtime,
+//                                         'timetoconsider' => time(),
+//                                         'roomid' => $roomid
+//                                         );
+//                             $this->update_livetable_data($params);
+//                         }
 
+                        if ($record->status == 'Live') {
                         if ($deadtime > 60) {
                             $this->create_override_auto($attempt, $deadtime);
                             $params = array(
@@ -211,10 +236,14 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
                                         );
                             $this->update_livetable_data($params);
                         }
+                        }
 //                     } else {
                         // Server down.
 //                 }
                 }
+                }
+            } else {
+                $this->debuglog($fn, 'attempt:' , $attempt);
             }
 //             return $attempt->timestart + $this->quiz->timelimit;
         }
@@ -251,8 +280,8 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
             if (!empty($attempt->id)) {
                 $roomid = $this->construct_roomid($attempt->id);
                 $this->process_node_server_down($roomid);
-                return 0;
             }
+            return 0;
         }
         return 1;
     }
@@ -311,11 +340,12 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
                 $this->debuglog($fn, 'ts: ' . $tsrecord2->timeserverid . ' roomts: ' . $record->timeserver);
 
                 if (!empty($tsrecord2) && ($tsrecord2->timeserverid == $record->timeserver) && $record->status == "Dead") {
+                    // Condition 1 - User down.
                     $timenow = time();
                     $deadtime = $record->deadtime + ($timenow - $record->timetoconsider);
                     return $deadtime;
                 } elseif (!empty($tsrecord2) && ($tsrecord2->timeserverid != $record->timeserver)) {
-                    // Server down.
+                    // Condition 2 - Server down.
                     if (isset($record->timeserver))
                         $tsrecord = $this->get_timeserver_data($record->timeserver);
 
@@ -333,7 +363,7 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
                     $userdowntime2;
                     $userdowntime2 = $udowntimeend - $sdowntimestart;
 
-                    // Condition 2 - Server and user, both go down.
+                    // Condition 3 - Server and user, both go down.
                     $maxdowntime;
                     $arr = array($serverdowntime, $userdowntime, $userdowntime2);
                     $maxdowntime = max($arr);
@@ -395,7 +425,7 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
         $context    = context_module::instance($cmid);
         $fn = "create_override_auto";
 
-        $this->debuglog($fn, 'deadtime', $deadtime);
+        $this->debuglog($fn, 'deadtime: ' . $deadtime);
 
         // Setup the form data required for processing as in overrideedit.php file.
         $override = new stdClass();
@@ -411,6 +441,8 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
 
         // If timelimit is already modified (in end_time()).
         // $override->timelimit = $quiz->timelimit;
+
+//         echo '<br><br><br> quiz timeclose: ' . $quiz->timeclose;
 
         if (($attempt->timestart + $timelimit) > $quiz->timeclose) {
             $timeclose = $attempt->timestart + $timelimit;
