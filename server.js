@@ -174,11 +174,11 @@ var record = io.sockets.on('connection', function (socket) {
                     debuglog(fn , socket.id + ' - ' + socket.roomid + ' status : ' + result[i].status + '.');
                     
                 	// Time server check.
-//                	var timeserver = [];
+//                	var timeserver = [];timeservertimeserver
 //                	var timeserverid;
 //                    var timestarted;
 //                    var lastlivetime;
-                        
+/*                        
                 	if(currenttimeserverid != room_timeserver) {
                 		
                     	var tssql = "SELECT * FROM " + dbprefix + "quizaccess_hbmon_timeserver WHERE timeserverid IN (" + room_timeserver + ", " + currenttimeserverid + ")";
@@ -194,7 +194,7 @@ var record = io.sockets.on('connection', function (socket) {
                                     	lastlivetime : tsresult[i].lastlivetime
                                     })
                                 }
-
+/*
                                 // Condition 1 - Server goes down.
     	            	    	var serverdowntime;
     	            	    	var sdowntimestart = timeserver[0].lastlivetime;
@@ -221,9 +221,9 @@ var record = io.sockets.on('connection', function (socket) {
     	                        }
                 	    		debuglog(fn , socket.id + ' - ' + socket.roomid + ' deadtime ' + deadtime);
                 	    		debuglog(fn , socket.id + ' - ' + socket.roomid + ' extratime after ' + extratime);
-                	    		
+           */     	    		
 	                            var updatelivetablesql = "UPDATE " + dbprefix + "quizaccess_hbmon_livetable SET status = " 	+ socket.currentstatus 
-																+ ", deadtime = "  	+ deadtime 
+//																+ ", deadtime = "  	+ deadtime 
 																+ ", timetoconsider = " + socket.timestampC
 																+ ", timeserver = " + currenttimeserverid
 																+ " WHERE roomid = " + socket.roomid;
@@ -249,20 +249,21 @@ var record = io.sockets.on('connection', function (socket) {
 									}); 
                 	    		}
                 	    		*/
-                            }
+/*                            }
                             return timeserver;    
-            	    	});  	
+            	    	});  
+	    			
             		} else if (status == 'Dead' && currenttimeserverid == room_timeserver) {
 		            	// Condition 3 - User goes down.                
 		                // Check whether it is a ques switch or not. Ques switch time is approx. betwn. 0-2 secs.
 		                // This is required when there is only one connected socket for that user.
 		            	
 		                // Compute cumulative deadtime.
-		                deadtime = parseInt(deadtime) + parseInt(socket.timestampC - timetoconsider);  
-                    	extratime = parseInt(deadtime) + parseInt(extratime);
+//		                deadtime = parseInt(deadtime) + parseInt(socket.timestampC - timetoconsider);  
+//                    	extratime = parseInt(deadtime) + parseInt(extratime);
                     	
 		                var updatelivetablesql = "UPDATE " + dbprefix + "quizaccess_hbmon_livetable SET status = " 	+ socket.currentstatus 
-														+ ", deadtime = " + deadtime 
+//														+ ", deadtime = " + deadtime 
 														+ ", timetoconsider = " + socket.timestampC
 														+ ", timeserver = " + currenttimeserverid
 														+ " WHERE roomid = " + socket.roomid;
@@ -273,7 +274,6 @@ var record = io.sockets.on('connection', function (socket) {
 							} else 
 							    debuglog(fn , socket.id + ' - ' + socket.roomid + ' status updated to \'Live\'.');
 						});
-						
 						/*
 						// Is this required? Check.
 						if(deadtime > 60) {
@@ -288,9 +288,9 @@ var record = io.sockets.on('connection', function (socket) {
 								} else
 								    debuglog(fn , socket.id + ' - ' + socket.roomid + '\'s extratime ' + extratime + ' updated.');
 							}); 
-						}
-						*/
-            		} 
+						}		
+						*/	
+//            		} 
 		    	} else {
 	            	// Insert current status entry for this user in 'livetable'.                	
 	                var livetablesql = "INSERT INTO " + dbprefix + "quizaccess_hbmon_livetable (roomid, status, timeserver, timetoconsider, livetime, deadtime, extratime) VALUES" +

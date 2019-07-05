@@ -76,8 +76,7 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
         $phplogs = $CFG->dirroot . "/mod/quiz/accessrule/heartbeatmonitor/phplogs.text";
 
         $fp = fopen($phplogs_temp,"a+");
-        if( $fp == false )
-        {
+        if( $fp == false ) {
             echo ( "Error in opening file" );
             exit();
         }
@@ -134,47 +133,46 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
         $this->debuglog($fn, 'node status: ' . $node_up);
 
         if($node_up) {
+            $PAGE->requires->jquery();
+            $PAGE->requires->js( new moodle_url($HBCFG->wwwroot . ':' . $HBCFG->port . '/socket.io/socket.io.js'), true );
+            $PAGE->requires->js( new moodle_url($CFG->wwwroot . '/mod/quiz/accessrule/heartbeatmonitor/client.js'), true );
 
-        $PAGE->requires->jquery();
-        $PAGE->requires->js( new moodle_url($HBCFG->wwwroot . ':' . $HBCFG->port . '/socket.io/socket.io.js'), true );
-        $PAGE->requires->js( new moodle_url($CFG->wwwroot . '/mod/quiz/accessrule/heartbeatmonitor/client.js'), true );
+            // User details.
+            $sessionkey = sesskey();
+            $userid     = $USER->id;
+            $username   = $USER->username;
 
-        // User details.
-        $sessionkey = sesskey();
-        $userid     = $USER->id;
-        $username   = $USER->username;
+            // Quiz details.
+            $quiz       = $this->quizobj->get_quiz();
+            $quizid     = $this->quizobj->get_quizid();
+            $cmid       = $this->quizobj->get_cmid();
 
-        // Quiz details.
-        $quiz       = $this->quizobj->get_quiz();
-        $quizid     = $this->quizobj->get_quizid();
-        $cmid       = $this->quizobj->get_cmid();
+            if ($unfinishedattempt = quiz_get_user_attempt_unfinished($quiz->id, $USER->id)) {
+                $unfinishedattemptid = $unfinishedattempt->id;
+                $unfinished = $unfinishedattempt->state == quiz_attempt::IN_PROGRESS;
 
-        if ($unfinishedattempt = quiz_get_user_attempt_unfinished($quiz->id, $USER->id)) {
-            $unfinishedattemptid = $unfinishedattempt->id;
-            $unfinished = $unfinishedattempt->state == quiz_attempt::IN_PROGRESS;
+                if ($unfinished) {
+                    $attemptid  = $unfinishedattempt->id;
+                    $attemptobj = quiz_attempt::create($attemptid);
 
-            if ($unfinished) {
-                $attemptid  = $unfinishedattempt->id;
-                $attemptobj = quiz_attempt::create($attemptid);
-
-                // Check that this attempt belongs to this user.
-                if ($attemptobj->get_userid() != $USER->id) {
-                    throw new moodle_quiz_exception($attemptobj->get_quizobj(), 'notyourattempt');
-                } else {
-                    $roomid = $username . '_' . $quizid . '_' . $attemptid;
-                    $node_up = $this->check_node_server_status($unfinishedattempt);
-//                     if($node_up) {
-                        $this->debuglog($fn, 'include client.js');
-                        $PAGE->requires->js_init_call('client', array($roomid, json_encode($HBCFG)));
-                        return false;
-//                     } else {
-//                         return 'Heartbeat time server error. Please contact your site admin.';
-//                     }
+                    // Check that this attempt belongs to this user.
+                    if ($attemptobj->get_userid() != $USER->id) {
+                        throw new moodle_quiz_exception($attemptobj->get_quizobj(), 'notyourattempt');
+                    } else {
+                        $roomid = $username . '_' . $quizid . '_' . $attemptid;
+                        $node_up = $this->check_node_server_status($unfinishedattempt);
+    //                     if($node_up) {
+                            $this->debuglog($fn, 'include client.js');
+                            $PAGE->requires->js_init_call('client', array($roomid, json_encode($HBCFG)));
+                            return false;
+    //                     } else {
+    //                         return 'Heartbeat time server error. Please contact your site admin.';
+    //                     }
+                    }
                 }
+            } else {
+                $this->debuglog($fn, 'fresh attempt');
             }
-        } else {
-            $this->debuglog($fn, 'fresh attempt');
-        }
         } else {
             return 'Heartbeat time server error. Please contact your site admin.';
         }
@@ -197,8 +195,8 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
                 $this->debuglog($fn, 'record:' , $record);
 
                 if(isset($record->deadtime)) {
-                $deadtime = $record->deadtime;
-//                 $deadtime = $this->get_deadtime($attempt);
+//                 $deadtime = $record->deadtime;
+                $deadtime = $this->get_deadtime($attempt);
                 $this->debuglog($fn, 'deadtime: ' . $deadtime);
 
                 if (!is_null($deadtime)) {
@@ -216,21 +214,21 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
 //                     $tsrecord2 = $DB->get_record_sql($tssql);
 
 //                     if (!empty($tsrecord2) && $tsrecord2->timeserverid == $record->timeserver) {
-                        // User down.
+//                         // User down.
 //                         $this->debuglog($fn, 'ts: ' . $tsrecord2->timeserverid . ' roomts: ' . $record->timeserver);
 
-//                         if ($record->status == 'Dead') {
-//                             $this->debuglog($fn, 'in 2nd if');
-//                             $params = array(
-//                                         'status' => "'Live'",
-//                                         'deadtime' => $deadtime,
-//                                         'timetoconsider' => time(),
-//                                         'roomid' => $roomid
-//                                         );
-//                             $this->update_livetable_data($params);
-//                         }
+                        if ($record->status == 'Dead') {
+                            $this->debuglog($fn, 'record->status: dead');
+                            $params = array(
+                                        'status' => "'Live'",
+                                        'deadtime' => $deadtime,
+                                        'timetoconsider' => time(),
+                                        'roomid' => $roomid
+                                        );
+                            $this->update_livetable_data($params);
+                        }
 
-                        if ($record->status == 'Live') {
+//                         if ($record->status == 'Live') {
                         if ($deadtime > 60) {
                             $this->create_override_auto($attempt, $deadtime);
                             $params = array(
@@ -240,7 +238,7 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
                                         );
                             $this->update_livetable_data($params);
                         }
-                        }
+//                         }
 //                     } else {
                         // Server down.
 //                 }
@@ -355,22 +353,22 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
 
                     $serverdowntime;
                     $sdowntimestart = $tsrecord->lastlivetime;
-                    $sdowntimeend = $tsrecord2->timestarted;
+                    $sdowntimeend   = $tsrecord2->timestarted;
                     $serverdowntime = $sdowntimeend - $sdowntimestart;
 
                     $userdowntime;
                     $udowntimestart = $record->timetoconsider;
-                    $udowntimeend = time();
-                    $userdowntime = $udowntimeend - $udowntimestart;
+                    $udowntimeend   = time();
+                    $userdowntime   = $udowntimeend - $udowntimestart;
 
                     // Depends on policy setup.
                     $userdowntime2;
-                    $userdowntime2 = $udowntimeend - $sdowntimestart;
+                    $userdowntime2  = $udowntimeend - $sdowntimestart;
 
                     // Condition 3 - Server and user, both go down.
                     $maxdowntime;
                     $arr = array($serverdowntime, $userdowntime, $userdowntime2);
-                    $maxdowntime = max($arr);
+                    $maxdowntime    = max($arr);
 
                     return $maxdowntime;
                 } else {
@@ -448,7 +446,7 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
 
         echo '<br><br><br> quiz timeclose: ' . $quiz->timeclose;
 
-        if (($attempt->timestart + $timelimit) > $quiz->timeclose) {
+        if (($quiz->timeclose != 0) && (($attempt->timestart + $timelimit) > $quiz->timeclose)) {
             $timeclose = $attempt->timestart + $timelimit;
             $override->timeclose = $timeclose;
         } else {
