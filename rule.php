@@ -127,7 +127,7 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
     public function prevent_access() {
         global $CFG, $PAGE, $_SESSION, $DB, $USER, $HBCFG;
         $fn = 'prevent_access';
-//         $this->debuglog($fn);
+        $this->debuglog($fn, "begin ---");
 
         $node_up = $this->check_node_server_status();
         $this->debuglog($fn, 'node status: ' . $node_up);
@@ -164,6 +164,7 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
     //                     if($node_up) {
                             $this->debuglog($fn, 'include client.js');
                             $PAGE->requires->js_init_call('client', array($roomid, json_encode($HBCFG)));
+                            $this->debuglog($fn, "end ---");
                             return false;
     //                     } else {
     //                         return 'Heartbeat time server error. Please contact your site admin.';
@@ -171,9 +172,11 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
                     }
                 }
             } else {
-                $this->debuglog($fn, 'fresh attempt');
+                $this->debuglog($fn, "fresh attempt");
+                $this->debuglog($fn, "end ---");
             }
         } else {
+            $this->debuglog($fn, "end ---");
             return 'Heartbeat time server error. Please contact your site admin.';
         }
     }
@@ -181,7 +184,7 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
     public function end_time($attempt) {
         global $CFG, $PAGE, $_SESSION, $DB, $USER, $HBCFG;
         $fn = 'end_time';
-//         $this->debuglog($fn);
+        $this->debuglog($fn, "begin ---");
 
         $node_up = $this->check_node_server_status($attempt);
         $this->debuglog($fn, 'node status: ' . $node_up);
@@ -249,6 +252,7 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
             }
 //             return $attempt->timestart + $this->quiz->timelimit;
         }
+        $this->debuglog($fn, "end ---");
         return $attempt->timestart + $this->quiz->timelimit;
     }
 
