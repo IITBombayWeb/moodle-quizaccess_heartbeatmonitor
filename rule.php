@@ -81,7 +81,7 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
             exit();
         }
 
-        $log = "\ndebug: " . date('D M d Y H:i:s'). " GMT+0530 (IST) " . (microtime(True)*10000) . ", " .
+        $log = "\ndebug: " . date('D M d Y H:i:s'). " " . (microtime(True)*10000) . ", " .
                 "rule.php | " . $fn;
 
         if ($msg !== '')
@@ -94,7 +94,7 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
                 $log .= "; $key => $value";
             }
         }
-
+	
         fwrite($fp, $log);
     }
 

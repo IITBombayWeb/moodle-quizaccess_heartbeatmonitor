@@ -31,7 +31,7 @@ var mysql 		= require('mysql');
 var obj;
 
 // EXEC SYNC - WORKS
-var child = require('child_process').execSync('php -r \'define("CLI_SCRIPT", true); include("/var/www/html/moodle/config.php"); print json_encode($CFG);\'');
+var child = require('child_process').execSync('php -r \'define("CLI_SCRIPT", true); include("/var/www/html/moodle363/config.php"); print json_encode($CFG);\'');
 obj = JSON.parse(child);
 
 // DB CONN
@@ -92,7 +92,11 @@ var interval = setInterval(function() {
 }, 5000);
 
 function debuglog (fn, msg) {
-	console.log("debug: " + new Date().toString() + " " + Math.floor((new Date().getTime()))  + " , " + "server.js | " + fn + " , " + msg);
+	dtobj = new Date();
+	dtstr = dtobj.toString();
+	dtarr = dtstr.split("GMT");
+	dt    = dtarr[0].trim();
+	console.log("debug: " + dt + " " + Math.floor((dtobj.getTime()))  + " , " + "server.js | " + fn + " , " + msg);
 	//console.log(Math.floor((new Date().getTime())/1000) + ": " + msg);
 }
 
