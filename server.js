@@ -225,7 +225,7 @@ var record = io.sockets.on('connection', function (socket) {
     	                        }
                 	    		debuglog(fn , socket.id + ' - ' + socket.roomid + ' deadtime ' + deadtime);
                 	    		debuglog(fn , socket.id + ' - ' + socket.roomid + ' extratime after ' + extratime);
-           */     	    		
+                	    		
 	                            var updatelivetablesql = "UPDATE " + dbprefix + "quizaccess_hbmon_livetable SET status = " 	+ socket.currentstatus 
 //																+ ", deadtime = "  	+ deadtime 
 																+ ", timetoconsider = " + socket.timestampC
@@ -257,7 +257,9 @@ var record = io.sockets.on('connection', function (socket) {
                             return timeserver;    
             	    	});  
 	    			
-            		} else if (status == 'Dead' && currenttimeserverid == room_timeserver) {
+            		} else 
+            		*/
+            		if (status == 'Dead' ){//&& currenttimeserverid == room_timeserver) {
 		            	// Condition 3 - User goes down.                
 		                // Check whether it is a ques switch or not. Ques switch time is approx. betwn. 0-2 secs.
 		                // This is required when there is only one connected socket for that user.
@@ -294,7 +296,7 @@ var record = io.sockets.on('connection', function (socket) {
 							}); 
 						}		
 						*/	
-//            		} 
+            		} 
 		    	} else {
 	            	// Insert current status entry for this user in 'livetable'.                	
 	                var livetablesql = "INSERT INTO " + dbprefix + "quizaccess_hbmon_livetable (roomid, status, timeserver, timetoconsider, livetime, deadtime, extratime) VALUES" +

@@ -94,7 +94,7 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
                 $log .= "; $key => $value";
             }
         }
-	
+
         fwrite($fp, $log);
     }
 
@@ -195,15 +195,15 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
 //                 $this->debuglog($fn, 'roomid: ' . $roomid);
 
                 $record = $this->get_livetable_data($roomid);
-                $this->debuglog($fn, 'record:' , $record);
+                $this->debuglog($fn, 'record' , $record);
 
                 if(isset($record->deadtime)) {
 //                 $deadtime = $record->deadtime;
                 $deadtime = $this->get_deadtime($attempt);
                 $this->debuglog($fn, 'deadtime: ' . $deadtime);
 
-                if (!is_null($deadtime)) {
-                    $this->debuglog($fn, 'deadtime > 0');
+                if (!is_null($deadtime) && $deadtime > 0) {
+                    $this->debuglog($fn, 'deadtime not null');
 
 //                     $roomid = $this->construct_roomid($attempt->id);
 //                     $this->debuglog($fn, 'roomid: ' . $roomid);
@@ -240,6 +240,7 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
                                         'roomid' => $roomid
                                         );
                             $this->update_livetable_data($params);
+                            $this->debuglog($fn, 'record after update' , $record);
                         }
 //                         }
 //                     } else {
