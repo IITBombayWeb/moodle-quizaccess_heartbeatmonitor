@@ -57,7 +57,9 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
         $phplogs_temp = $CFG->dirroot . "/mod/quiz/accessrule/heartbeatmonitor/phplogs_temp.text";
         $phplogs = $CFG->dirroot . "/mod/quiz/accessrule/heartbeatmonitor/phplogs.text";
 
-        file_put_contents($phplogs, file_get_contents($phplogs_temp), FILE_APPEND | LOCK_EX);
+	if(file_exists($phplogs_temp)) {
+        	file_put_contents($phplogs, file_get_contents($phplogs_temp), FILE_APPEND | LOCK_EX);
+	}
 //         file_put_contents($phplogs, " ----- \n" . date('l jS \of F Y h:i:s A'), FILE_APPEND | LOCK_EX);
         $this->debuglog($fn);
         file_put_contents($phplogs_temp, '');
@@ -449,7 +451,7 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
         // If timelimit is already modified (in end_time()).
         // $override->timelimit = $quiz->timelimit;
 
-        echo '<br><br><br> quiz timeclose: ' . $quiz->timeclose;
+//        echo '<br><br><br> quiz timeclose: ' . $quiz->timeclose;
 
         if (($quiz->timeclose != 0) && (($attempt->timestart + $timelimit) > $quiz->timeclose)) {
             $timeclose = $attempt->timestart + $timelimit;
@@ -487,9 +489,11 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
             $override->id = $oldoverride->id;
             // quiz_delete_override($quiz, $oldoverride->id);
             $DB->update_record('quiz_overrides', $override);
+	    $this->debuglog($fn, "override updated", $override);
         } else {
             //unset($override->id);
             $override->id = $DB->insert_record('quiz_overrides', $override);
+	    $this->debuglog($fn, "new override", $override);
         }
         // Parameters for events we may be triggering.
         $params = array(
