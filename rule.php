@@ -223,7 +223,6 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
 //                         $this->debuglog($fn, 'ts: ' . $tsrecord2->timeserverid . ' roomts: ' . $record->timeserver);
 
                         if ($record->status == 'Dead') {
-                            $this->debuglog($fn, 'record->status: dead');
                             $params = array(
                                         'status' => "'Live'",
                                         'deadtime' => $deadtime,
@@ -231,7 +230,8 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
                                         'roomid' => $roomid
                                         );
                             $this->update_livetable_data($params);
-                        }
+			    $this->debuglog($fn, 'record->status updated to live'); 
+                       }
 
 //                         if ($record->status == 'Live') {
                         if ($deadtime > 60) {
