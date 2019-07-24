@@ -182,14 +182,14 @@ var record = io.sockets.on('connection', function (socket) {
 //                	var timeserverid;
 //                    var timestarted;
 //                    var lastlivetime;
-/*                        
+                        
                 	if(currenttimeserverid != room_timeserver) {
                 		
                     	var tssql = "SELECT * FROM " + dbprefix + "quizaccess_hbmon_timeserver WHERE timeserverid IN (" + room_timeserver + ", " + currenttimeserverid + ")";
             	    	var value = con.query(tssql, function(err, tsresult) {
                             if (err) throw err;  
                             var timeserver = [];
-                            if (tsresult.length > 0) {
+/*                            if (tsresult.length > 0) {
                                 for (i in tsresult) {
                                 	// Previous state details.
                                     timeserver.push({
@@ -225,10 +225,10 @@ var record = io.sockets.on('connection', function (socket) {
     	                        }
                 	    		debuglog(fn , socket.id + ' - ' + socket.roomid + ' deadtime ' + deadtime);
                 	    		debuglog(fn , socket.id + ' - ' + socket.roomid + ' extratime after ' + extratime);
-                	    		
+*/                	    		
 	                            var updatelivetablesql = "UPDATE " + dbprefix + "quizaccess_hbmon_livetable SET status = " 	+ socket.currentstatus 
 //																+ ", deadtime = "  	+ deadtime 
-																+ ", timetoconsider = " + socket.timestampC
+//																+ ", timetoconsider = " + socket.timestampC
 																+ ", timeserver = " + currenttimeserverid
 																+ " WHERE roomid = " + socket.roomid;
 								con.query(updatelivetablesql, function(err, result) {
@@ -251,15 +251,14 @@ var record = io.sockets.on('connection', function (socket) {
 										} else
 										    debuglog(fn , socket.id + ' - ' + socket.roomid + '\'s extratime ' + extratime + ' updated.');
 									}); 
-                	    		}
-                	    		*/
-/*                            }
+               	    		}
+              	    		
+                            }
+*/
                             return timeserver;    
             	    	});  
 	    			
-            		} else 
-            		*/
-            		if (status == 'Dead' ){//&& currenttimeserverid == room_timeserver) {
+            		} else if (status == 'Dead' && currenttimeserverid == room_timeserver) {
 		            	// Condition 3 - User goes down.                
 		                // Check whether it is a ques switch or not. Ques switch time is approx. betwn. 0-2 secs.
 		                // This is required when there is only one connected socket for that user.
