@@ -31,7 +31,7 @@ var mysql 		= require('mysql');
 var obj;
 
 // EXEC SYNC - WORKS
-var child = require('child_process').execSync('php -r \'define("CLI_SCRIPT", true); include("/var/www/html/moodle363/config.php"); print json_encode($CFG);\'');
+var child = require('child_process').execSync('php -r \'define("CLI_SCRIPT", true); include("/var/www/html/moodle/config.php"); print json_encode($CFG);\'');
 obj = JSON.parse(child);
 
 // DB CONN
