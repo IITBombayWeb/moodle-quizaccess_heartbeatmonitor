@@ -59,7 +59,6 @@ var currenttimeserverid;
 var nodesql = "Select * from " + dbprefix + "quizaccess_hbmon_node";
 con.query(nodesql, function(err, result) {
     if (err) throw err;                
-    
     if (result.length > 0) {
         for (i in result) {
             port = result[i].nodeport;
@@ -115,8 +114,7 @@ var record = io.sockets.on('connection', function (socket) {
 	
 	socket.on('attempt', function(data) {
 		fn = 'connect:attempt';
-//		debuglog(fn , 'In attempt event.');
-		
+//		debuglog(fn , 'In attempt event.');		
 		// Append some extra data to the socket object.
         socket.roomid 			= "'" + data.roomid + "'";
         socket.socketid 		= "'" + socket.id + "'";
@@ -176,99 +174,30 @@ var record = io.sockets.on('connection', function (socket) {
                         var extratime 		= result[i].extratime;
                     }
                     debuglog(fn , socket.id + ' - ' + socket.roomid + ' status : ' + result[i].status + '.');
-                    
-                	// Time server check.
-//                	var timeserver = [];timeservertimeserver
-//                	var timeserverid;
-//                    var timestarted;
-//                    var lastlivetime;
                         
                 	if(currenttimeserverid != room_timeserver) {
-                		
                     	var tssql = "SELECT * FROM " + dbprefix + "quizaccess_hbmon_timeserver WHERE timeserverid IN (" + room_timeserver + ", " + currenttimeserverid + ")";
             	    	var value = con.query(tssql, function(err, tsresult) {
                             if (err) throw err;  
-                            var timeserver = [];
-/*                            if (tsresult.length > 0) {
-                                for (i in tsresult) {
-                                	// Previous state details.
-                                    timeserver.push({
-                                    	timeserverid : tsresult[i].timeserverid,
-                                    	timestarted  : tsresult[i].timestarted,
-                                    	lastlivetime : tsresult[i].lastlivetime
-                                    })
-                                }
-/*
-                                // Condition 1 - Server goes down.
-    	            	    	var serverdowntime;
-    	            	    	var sdowntimestart = timeserver[0].lastlivetime;
-    	            	    	var sdowntimeend = timeserver[1].timestarted;
-    	            	    	serverdowntime = sdowntimeend - sdowntimestart;
-    	            	    	
-    	            	    	var userdowntime;
-    	            	    	var udowntimestart = timetoconsider;
-    	            	    	var udowntimeend = socket.timestampC;
-    	            	    	userdowntime = udowntimeend - udowntimestart;
-    	            	    	
-    	            	    	// Depends on policy setup.
-    	            	    	var userdowntime2;
-    	            	    	userdowntime2 = udowntimeend - sdowntimestart;
-    	            	    	
-    	                      	// Condition 2 - Server and user, both go down.	   	    	            	    	
-    	            	    	var maxdowntime;
-    	            	    	maxdowntime = Math.max(serverdowntime, userdowntime, userdowntime2);
-    	            	    	
-    	            	    	debuglog(fn , socket.id + ' - ' + socket.roomid + ' extratime before ' + extratime);
-                	    		if(maxdowntime) {
-    	                        	deadtime = parseInt(deadtime) + parseInt(maxdowntime);
-    	                        	extratime = parseInt(deadtime) + parseInt(extratime);
-    	                        }
-                	    		debuglog(fn , socket.id + ' - ' + socket.roomid + ' deadtime ' + deadtime);
-                	    		debuglog(fn , socket.id + ' - ' + socket.roomid + ' extratime after ' + extratime);
-*/                	    		
-	                            var updatelivetablesql = "UPDATE " + dbprefix + "quizaccess_hbmon_livetable SET status = " 	+ socket.currentstatus 
-//																+ ", deadtime = "  	+ deadtime 
-																+ ", timetoconsider = " + socket.timestampC
-																+ ", timeserver = " + currenttimeserverid
-																+ " WHERE roomid = " + socket.roomid;
-								con.query(updatelivetablesql, function(err, result) {
-									if (err) {
-									    debuglog(fn , socket.id + ' - ' + socket.roomid + ' status update err \'Live\'.');
-									    throw err;
-									} else
-									    debuglog(fn , socket.id + ' - ' + socket.roomid + ' status updated to \'Live\'.');
-								});
-								/*
-								if(deadtime > 60) {
-									var updatelivetablesql1 = "UPDATE " + dbprefix + "quizaccess_hbmon_livetable SET " 
-																	+ " deadtime = 0" 
-																	+ ", extratime = " + extratime
-																	+ " WHERE roomid = " + socket.roomid;
-									con.query(updatelivetablesql1, function(err, result) {
-										if (err) {
-										    debuglog(fn , socket.id + ' - ' + socket.roomid + '\'s extratime update err.');
-										    throw err;
-										} else
-										    debuglog(fn , socket.id + ' - ' + socket.roomid + '\'s extratime ' + extratime + ' updated.');
-									}); 
-               	    		}
-              	    		
-                            }
-*/
-                            return timeserver;    
+                            // Condition 1 - Server goes down.
+                            // Condition 2 - Server and user, both are down.
+                            var updatelivetablesql = "UPDATE " + dbprefix + "quizaccess_hbmon_livetable SET status = " 	+ socket.currentstatus 
+															+ ", timetoconsider = " + socket.timestampC
+															+ ", timeserver = " + currenttimeserverid
+															+ " WHERE roomid = " + socket.roomid;
+							con.query(updatelivetablesql, function(err, result) {
+								if (err) {
+								    debuglog(fn , socket.id + ' - ' + socket.roomid + ' status update err \'Live\'.');
+								    throw err;
+								} else
+								    debuglog(fn , socket.id + ' - ' + socket.roomid + ' status updated to \'Live\'.');
+							});
             	    	});  
-	    			
             		} else if (status == 'Dead' && currenttimeserverid == room_timeserver) {
 		            	// Condition 3 - User goes down.                
 		                // Check whether it is a ques switch or not. Ques switch time is approx. betwn. 0-2 secs.
-		                // This is required when there is only one connected socket for that user.
-		            	
-		                // Compute cumulative deadtime.
-//		                deadtime = parseInt(deadtime) + parseInt(socket.timestampC - timetoconsider);  
-//                    	extratime = parseInt(deadtime) + parseInt(extratime);
-                    	
+		                // This is required when there is only one connected socket for that user.                   	
 		                var updatelivetablesql = "UPDATE " + dbprefix + "quizaccess_hbmon_livetable SET status = " 	+ socket.currentstatus 
-//														+ ", deadtime = " + deadtime 
 														+ ", timetoconsider = " + socket.timestampC
 														+ ", timeserver = " + currenttimeserverid
 														+ " WHERE roomid = " + socket.roomid;
@@ -279,22 +208,6 @@ var record = io.sockets.on('connection', function (socket) {
 							} else 
 							    debuglog(fn , socket.id + ' - ' + socket.roomid + ' status updated to \'Live\'.');
 						});
-						/*
-						// Is this required? Check.
-						if(deadtime > 60) {
-							var updatelivetablesql1 = "UPDATE " + dbprefix + "quizaccess_hbmon_livetable SET " 
-															+ " deadtime = 0" 
-															+ ", extratime = " + extratime
-															+ " WHERE roomid = " + socket.roomid;
-							con.query(updatelivetablesql1, function(err, result) {
-								if (err) {
-								    debuglog(fn , socket.id + ' - ' + socket.roomid + '\'s extratime update err.');
-								    throw err;
-								} else
-								    debuglog(fn , socket.id + ' - ' + socket.roomid + '\'s extratime ' + extratime + ' updated.');
-							}); 
-						}		
-						*/	
             		} 
 		    	} else {
 	            	// Insert current status entry for this user in 'livetable'.                	
@@ -406,7 +319,6 @@ var record = io.sockets.on('connection', function (socket) {
 		                        throw err;
 							} else
 					    	    debuglog(fn , socket.id + ' - ' + socket.roomid + ' status updated to \'Dead\'. (disconnect)');
-						    	//if (err) console.log(err);
 					    });
 					}
 				});
