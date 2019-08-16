@@ -228,7 +228,7 @@ var record = io.sockets.on('connection', function (socket) {
 */                	    		
 	                            var updatelivetablesql = "UPDATE " + dbprefix + "quizaccess_hbmon_livetable SET status = " 	+ socket.currentstatus 
 //																+ ", deadtime = "  	+ deadtime 
-//																+ ", timetoconsider = " + socket.timestampC
+																+ ", timetoconsider = " + socket.timestampC
 																+ ", timeserver = " + currenttimeserverid
 																+ " WHERE roomid = " + socket.roomid;
 								con.query(updatelivetablesql, function(err, result) {
