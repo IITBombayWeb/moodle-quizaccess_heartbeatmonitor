@@ -58,9 +58,9 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
         $phplogs = $CFG->dirroot . "/mod/quiz/accessrule/heartbeatmonitor/phplogs.text";
 
     	if(file_exists($phplogs_temp)) {
-            	file_put_contents($phplogs, file_get_contents($phplogs_temp), FILE_APPEND | LOCK_EX);
+        	file_put_contents($phplogs, file_get_contents($phplogs_temp), FILE_APPEND | LOCK_EX);
     	}
-        $this->debuglog($fn);
+    	$this->debuglog($fn);
         file_put_contents($phplogs_temp, '');
 
         return get_string('quiztimelimit', 'quizaccess_timelimit', format_time($this->quiz->timelimit));
@@ -159,7 +159,7 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
 //                         $node_up = $this->check_node_server_status($unfinishedattempt);
 //                         if($node_up) {
                             $this->debuglog($fn, 'include client.js');
-                            $PAGE->requires->js_init_call('client', array($roomid, json_encode($HBCFG)));
+                            $PAGE->requires->js_init_call('client', array($roomid, json_encode($HBCFG), json_encode($CFG)));
                             $this->debuglog($fn, "end ---");
                             return false;
 //                         } else {

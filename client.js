@@ -23,7 +23,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-function client(Y, roomid, hbcfg)
+function client(Y, roomid, hbcfg, cfg)
 {
 	var nodecfg = JSON.parse(hbcfg);
 	var socket = io(nodecfg.wwwroot + ':' + nodecfg.port);	
@@ -31,7 +31,7 @@ function client(Y, roomid, hbcfg)
 	socket.on('connect', function() {
 		console.log('-- In client \'connect\' event --');
 		console.log('-- After socket connected - ' + socket.id  + '. Curr. TS - ' + Math.floor(new Date().getTime()/1000));
-		socket.emit('attempt', {roomid:roomid});
+		socket.emit('attempt', {roomid:roomid, cfg:cfg});
 		
 	});	
 	

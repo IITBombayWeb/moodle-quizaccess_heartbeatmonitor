@@ -29,11 +29,30 @@ var io			= require('socket.io').listen(http);
 var bodyParser 	= require('body-parser');
 var mysql 		= require('mysql');
 var obj;
+var cfgarr = new Array();
 
+//var port = 3000;
+//http.listen(port);
+///*
 // EXEC SYNC - WORKS
-var child = require('child_process').execSync('php -r \'define("CLI_SCRIPT", true); include("/var/www/html/moodle/config.php"); print json_encode($CFG);\'');
-obj = JSON.parse(child);
+//var child = require('child_process').execSync('php -r \'define("CLI_SCRIPT", true); include("/var/www/html/moodle/config.php"); print json_encode($CFG);\'');
+//obj = JSON.parse(child);
 
+//print process.argv
+process.argv.forEach(function (val, index, array) {
+//  console.log(index + ': ' + val);
+  cfgarr[index] = val;
+});
+
+for (i in cfgarr) {
+	// Previous state details.
+//	console.log('cfgarr : ' + i + ' : ' + cfgarr[i]);
+}
+
+//var args = process.argv.slice(2);
+var args = process.argv.splice(process.execArgv.length + 2);
+//console.log(args);
+/*
 // DB CONN
 var con = mysql.createConnection({
 	host 	 : obj.dbhost,
@@ -42,7 +61,16 @@ var con = mysql.createConnection({
 	database : obj.dbname
 });
 var dbprefix = obj.prefix;
+*/
+var con = mysql.createConnection({
+	host 	 : cfgarr[2],
+	user 	 : cfgarr[3],
+	password : cfgarr[4],
+	database : cfgarr[5]
+});
+var dbprefix = cfgarr[6];
 
+//*/
 //app.use(bodyParser.urlencoded({ extended: true }));
 
 var totalconnectedsockets;
@@ -52,10 +80,9 @@ var allsocketscount;
 var allsocketids;
 var cfg;
 var timeserverid;
-var port;
+//var port;
 var currenttimeserverid;
-
-//Insert new record for node server.
+///*
 var nodesql = "Select * from " + dbprefix + "quizaccess_hbmon_node";
 con.query(nodesql, function(err, result) {
     if (err) throw err;                
@@ -89,7 +116,7 @@ var interval = setInterval(function() {
 		});
 	}
 }, 5000);
-
+//*/
 function debuglog (fn, msg) {
 	dtobj = new Date();
 	dtstr = dtobj.toString();
@@ -115,6 +142,48 @@ var record = io.sockets.on('connection', function (socket) {
 	socket.on('attempt', function(data) {
 		fn = 'connect:attempt';
 //		debuglog(fn , 'In attempt event.');		
+		
+		
+		//========================================================
+		/* If cfg was passed to server.js from client.js .. not tested
+		obj = data.cfg;
+		// EXEC SYNC - WORKS
+//		var child = require('child_process').execSync('php -r \'define("CLI_SCRIPT", true); include("/var/www/html/moodle/config.php"); print json_encode($CFG);\'');
+//		obj = JSON.parse(child);
+
+		// DB CONN
+		var con = mysql.createConnection({
+			host 	 : obj.dbhost,
+			user 	 : obj.dbuser,
+			password : obj.dbpass,
+			database : obj.dbname
+		});
+		var dbprefix = obj.prefix;
+
+		// Insert new record for node server.
+		var timeserversql = "INSERT INTO " + dbprefix + "quizaccess_hbmon_timeserver (timestarted, lastlivetime) VALUES" +
+									"(" + Math.floor((new Date().getTime())/1000) + "," 
+										+ Math.floor((new Date().getTime())/1000) + ")";
+		con.query(timeserversql, function(err, result) {
+			if (err) throw err;
+			currenttimeserverid = result.insertId;
+		});
+		    	
+		// Update record for node server.
+		var interval = setInterval(function() {
+			if (currenttimeserverid) {
+				var updatetstablesql = "UPDATE " + dbprefix + "quizaccess_hbmon_timeserver SET lastlivetime = "
+												+ Math.floor((new Date().getTime())/1000) 
+												+ " WHERE timeserverid = " + currenttimeserverid;
+				con.query(updatetstablesql, function(err, result) {
+					if (err) throw err;
+				});
+			}
+		}, 5000);
+		*/
+		//========================================================
+		
+		
 		// Append some extra data to the socket object.
         socket.roomid 			= "'" + data.roomid + "'";
         socket.socketid 		= "'" + socket.id + "'";
