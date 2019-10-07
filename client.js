@@ -26,7 +26,7 @@
 function client(Y, roomid, hbcfg)
 {
 	var nodecfg = JSON.parse(hbcfg);
-	var socket = io(nodecfg.wwwroot + ':' + nodecfg.port);	
+	var socket = io("http://10.102.1.115:3000");	
 	
 	socket.on('connect', function() {
 		console.log('-- In client \'connect\' event --');
