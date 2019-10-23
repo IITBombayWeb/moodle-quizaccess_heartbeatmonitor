@@ -19,7 +19,7 @@
  *
  * @package    quizaccess
  * @subpackage heartbeatmonitor
- * @author     Prof. P Sunthar, Amrata Ramchandani <ramchandani.amrata@gmail.com>, Kashmira Nagwekar
+ * @author     Prof. P Sunthar, Amrata Ramchandani, Kashmira Nagwekar
  * @copyright  2017 IIT Bombay, India
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -475,10 +475,19 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
 
     public static function add_settings_form_fields(
             mod_quiz_mod_form $quizform, MoodleQuickForm $mform) {
-        $mform->addElement('header', 'hbmonheader', 'Heartbeat monitor');
+//         $mform->addElement('header', 'hbmonheader', 'Heartbeat monitor');
+        $mform->addElement('static', 'description', 'Heartbeat Monitor',
+                'The following settings pertain to the \'Hearbeat Monitor\' plugin.');
+        $mform->addElement('html', '<hr>');
 
         $hbmonsettingsarray   = array();
+
         $mform->addElement('select', 'hbmonrequired',
+                get_string('hbmonrequired', 'quizaccess_heartbeatmonitor'), array(
+                        0 => get_string('notrequired', 'quizaccess_heartbeatmonitor'),
+                        1 => get_string('hbmonrequiredoption', 'quizaccess_heartbeatmonitor')
+                ));
+        $hbmonsettingsarray[] = $mform->createElement('select', 'hbmonrequired',
                 get_string('hbmonrequired', 'quizaccess_heartbeatmonitor'), array(
                         0 => get_string('notrequired', 'quizaccess_heartbeatmonitor'),
                         1 => get_string('hbmonrequiredoption', 'quizaccess_heartbeatmonitor')
@@ -486,22 +495,30 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
         $mform->addHelpButton('hbmonrequired', 'hbmonrequired', 'quizaccess_heartbeatmonitor');
 
         $radioarray = array();
-        $hbmonsettingsarray[]= $mform->createElement('radio', 'hbmonmode', '', get_string('automatic', 'quizaccess_heartbeatmonitor'), 1);
-        $hbmonsettingsarray[]= $mform->createElement('radio', 'hbmonmode', '', get_string('manual', 'quizaccess_heartbeatmonitor'), 0);
+        $radioarray[]= $mform->createElement('radio', 'hbmonmode', '', get_string('automatic', 'quizaccess_heartbeatmonitor'), 1);
+        $radioarray[]= $mform->createElement('radio', 'hbmonmode', '', get_string('manual', 'quizaccess_heartbeatmonitor'), 0);
         $mform->setDefault('hbmonmode', 1);
-        $mform->addGroup($hbmonsettingsarray, 'enablehbmon', 'Mode', array(' '), false);
+        $mform->addGroup($radioarray, 'enablehbmon', 'Mode', array(' '), false);
+        $group = $mform->createElement('group', 'enablehbmon', 'Mode', $radioarray, null, false);
         $mform->disabledIf('hbmonmode', 'hbmonrequired', 'neq', 1);
+        $hbmonsettingsarray[] = $group;
 
         $mform->addElement('text', 'nodehost', "Node host", 'maxlength="25" size="15" ');
+        $hbmonsettingsarray[] = $mform->createElement('text', 'nodehost', "Node host", 'maxlength="25" size="15" ');
         $mform->setType('nodehost', PARAM_HOST);
         $mform->setDefault('nodehost', 'localhost');
 //         $mform->setDefault('nodehost', '10.102.1.115');
         $mform->disabledIf('nodehost', 'hbmonrequired', 'neq', 1);
 
         $mform->addElement('text', 'nodeport', 'Node port', 'maxlength="4" size="4" ');
+        $hbmonsettingsarray[] = $mform->createElement('text', 'nodeport', 'Node port', 'maxlength="4" size="4" ');
         $mform->setType('nodeport', PARAM_NUMBER);
         $mform->setDefault('nodeport', '3000');
         $mform->disabledIf('nodeport', 'hbmonrequired', 'neq', 1);
+
+//         $mform->addGroup($hbmonsettingsarray, 'hbmonsettings', 'Heartbeat Monitor', ' ', false);
+        $mform->addElement('html', '<hr>');
+//         $mform->closeHeaderBefore('enableod');
     }
 
     public static function validate_settings_form_fields(array $errors,
@@ -567,7 +584,7 @@ class quizaccess_heartbeatmonitor extends quiz_access_rule_base {
         );
     }
 
-    public static function get_extra_settings($quizid) {
-        return array();
-    }
+//     public static function get_extra_settings($quizid) {
+//         return array();
+//     }
 }
